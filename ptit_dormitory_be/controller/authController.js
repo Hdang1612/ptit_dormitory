@@ -5,7 +5,7 @@ export const register = async (req, res) => {
     const response = await registerService(req.body);
     res.status(201).json(response);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error);
   }
 };
 

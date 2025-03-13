@@ -32,7 +32,7 @@ export const authorizeRoles = (requiredRoles = []) => {
       const hasPermission = userRoles.some((role) => requiredRoles.includes(role));
   
       if (!hasPermission) {
-        return res.status(403).json({ message: "no permission" });
+        return res.status(403).json({ message: "No permission" });
       }
   
       next();

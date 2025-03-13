@@ -5,23 +5,14 @@ import dotenv from "dotenv";
 import { connectDB, sequelize } from "./config/db.js";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
 dotenv.config();
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
-
-const PORT = process.env.PORT || 3000;
-
-// db.query("SELECT 1")
-//   .then(() => {
-//     console.log("Connected to DB");
-//     app.listen(PORT, () => {
-//       console.log(`Server is running on port ${PORT}`);
-//     });
-//   })
-//   .catch((err) => console.log("Database connection failed", err));
 
 const startServer = async () => {
   try {
@@ -36,3 +27,4 @@ const startServer = async () => {
 };
 startServer();
 app.use("/api/auth", authRoutes);
+app.use(errorHandler);
