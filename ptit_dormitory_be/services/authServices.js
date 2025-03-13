@@ -1,11 +1,11 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import User from "../models/Users.js";
-import ApiError from "../utils/apiError.js";
-import { v4 as uuidv4 } from "uuid";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import User from '../models/Users.js';
+import ApiError from '../utils/apiError.js';
+import { v4 as uuidv4 } from 'uuid';
 
-import { ROLES } from "../utils/admin_role.js";
+import { ROLES } from '../utils/admin_role.js';
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 dotenv.config();
@@ -22,11 +22,11 @@ export const registerService = async ({
 }) => {
   const existingUser = await User.findOne({ where: { email } });
   if (existingUser) {
-    throw new ApiError(400, "User already exists!");
+    throw new ApiError(400, 'User already exists!');
   }
 
   if (!Object.values(ROLES).includes(role)) {
-    throw new ApiError(400, "Invalid role!");
+    throw new ApiError(400, 'Invalid role!');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -44,7 +44,7 @@ export const registerService = async ({
   });
 
   return {
-    message: "Register successful",
+    message: 'Register successful',
     user: {
       id: newUser.id,
       email: newUser.email,
@@ -58,22 +58,22 @@ export const loginService = async ({ email, password }) => {
   });
 
   if (!user) {
-    throw new ApiError(404, "User does not exist");
+    throw new ApiError(404, 'User does not exist');
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new ApiError(401, "Invalid password");
+    throw new ApiError(401, 'Invalid password');
   }
 
   const userRole = user.role;
 
   const token = jwt.sign({ id: user.id, role: userRole }, JWT_SECRET_KEY, {
-    expiresIn: "1h",
+    expiresIn: '1h',
   });
 
   return {
-    message: "Login successful",
+    message: 'Login successful',
     token,
     user: {
       id: user.id,

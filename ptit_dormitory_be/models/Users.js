@@ -1,9 +1,9 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/db.js";
-import { ROLES } from "../utils/admin_role.js";
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/db.js';
+import { ROLES } from '../utils/admin_role.js';
 
 const User = sequelize.define(
-  "User",
+  'User',
   {
     id: {
       type: DataTypes.STRING(255),
@@ -52,17 +52,17 @@ const User = sequelize.define(
       allowNull: true,
     },
     role: {
-      type: DataTypes.ENUM("1", "2", "3", "4"),
+      type: DataTypes.ENUM('1', '2', '3', '4'),
       allowNull: false,
-      defaultValue: "4",
+      defaultValue: '4',
     },
   },
   {
-    tableName: "users",
+    tableName: 'users',
     timestamps: true,
-    createdAt: "create_at",
-    updatedAt: "update_at",
-  }
+    createdAt: 'create_at',
+    updatedAt: 'update_at',
+  },
 );
 
 export default User;

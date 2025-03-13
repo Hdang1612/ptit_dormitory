@@ -1,11 +1,11 @@
-import express from "express";
-import bodyParser from "body-parser";
-import dotenv from "dotenv";
+import express from 'express';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 // import db from "./config/db.js";
-import { connectDB, sequelize } from "./config/db.js";
-import cors from "cors";
-import authRoutes from "./routes/authRoutes.js";
-import errorHandler from "./middleware/errorHandler.js";
+import { connectDB, sequelize } from './config/db.js';
+import cors from 'cors';
+import authRoutes from './routes/authRoutes.js';
+import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 dotenv.config();
@@ -22,9 +22,9 @@ const startServer = async () => {
       console.log(`Server is running http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("Running failed:", error);
+    console.error('Running failed:', error);
   }
 };
 startServer();
-app.use("/api/auth", authRoutes);
+app.use('/api/auth', authRoutes);
 app.use(errorHandler);
