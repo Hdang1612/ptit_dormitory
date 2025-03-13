@@ -4,8 +4,11 @@ import dotenv from 'dotenv';
 // import db from "./config/db.js";
 import { connectDB, sequelize } from './config/db.js';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
+import { verifyToken,authorizeRoles } from './middleware/auth.js';
+
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 dotenv.config();
@@ -27,4 +30,5 @@ const startServer = async () => {
 };
 startServer();
 app.use('/api/auth', authRoutes);
+app.use('/api/user', verifyToken, authorizeRoles([1, 2]), userRoutes);
 app.use(errorHandler);

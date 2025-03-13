@@ -14,6 +14,7 @@ export const verifyToken = (req, res, next) => {
 
     jwt.verify(token, JWT_SECRET_KEY, (error, data) => {
       if (error) return res.status(403).json({ message: 'Wrong token' });
+      console.log('Decoded Token:', data);
       req.user = data;
       next();
     });
@@ -24,16 +25,13 @@ export const verifyToken = (req, res, next) => {
 
 export const authorizeRoles = (requiredRoles = []) => {
   return (req, res, next) => {
+    console.log('User roles from token:', req.user.role);
+    console.log('Required roles:', requiredRoles);
     if (!req.user) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const userRoles = req.user.roles || [];
-    const hasPermission = userRoles.some((role) =>
-      requiredRoles.includes(role),
-    );
-
-    if (!hasPermission) {
+    if (!requiredRoles.includes(req.user.role)) {
       return res.status(403).json({ message: 'No permission' });
     }
 
