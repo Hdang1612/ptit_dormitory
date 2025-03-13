@@ -1,9 +1,9 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/db.js";
-import Role from "./Roles.js";
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/db.js';
+import { ROLES } from '../utils/admin_role.js';
 
 const User = sequelize.define(
-  "User",
+  'User',
   {
     id: {
       type: DataTypes.STRING(255),
@@ -14,9 +14,6 @@ const User = sequelize.define(
       type: DataTypes.STRING(45),
       allowNull: false,
       unique: true,
-      validate: {
-        isEmail: true,
-      },
     },
     password: {
       type: DataTypes.STRING(255),
@@ -29,7 +26,6 @@ const User = sequelize.define(
     create_at: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     update_at: {
       type: DataTypes.DATE,
@@ -38,14 +34,10 @@ const User = sequelize.define(
     status: {
       type: DataTypes.TINYINT,
       allowNull: true,
-      defaultValue: 1,
     },
     phone_number: {
       type: DataTypes.STRING(45),
       allowNull: true,
-      validate: {
-        isNumeric: true,
-      },
     },
     dob: {
       type: DataTypes.DATE,
@@ -59,17 +51,18 @@ const User = sequelize.define(
       type: DataTypes.STRING(45),
       allowNull: true,
     },
+    role: {
+      type: DataTypes.ENUM('1', '2', '3', '4'),
+      allowNull: false,
+      defaultValue: '4',
+    },
   },
   {
-    tableName: "users",
+    tableName: 'users',
     timestamps: true,
-    createdAt: "create_at",
-    updatedAt: "update_at",
-  }
+    createdAt: 'create_at',
+    updatedAt: 'update_at',
+  },
 );
-
-// Một user có thể có nhiều vai trò
-User.hasMany(Role, { foreignKey: "user_id", as: "roles" });
-
 
 export default User;
