@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js';
-import { ROLES } from '../utils/admin_role.js';
+import Role from './Role.js';
+import { ROLES } from '../constants/admin_role.js';
 
 const User = sequelize.define(
   'User',
@@ -51,10 +52,9 @@ const User = sequelize.define(
       type: DataTypes.STRING(45),
       allowNull: true,
     },
-    role: {
-      type: DataTypes.ENUM('1', '2', '3', '4'),
+    role_id: {
+      type: DataTypes.STRING(255),
       allowNull: false,
-      defaultValue: '4',
     },
   },
   {
@@ -64,5 +64,6 @@ const User = sequelize.define(
     updatedAt: 'update_at',
   },
 );
-
+Role.hasMany(User, { foreignKey: 'role_id', as: 'users' });
+User.belongsTo(Role, { foreignKey: 'role_id', as: 'role' });
 export default User;

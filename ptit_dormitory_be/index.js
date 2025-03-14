@@ -30,5 +30,5 @@ const startServer = async () => {
 };
 startServer();
 app.use('/api/auth', authRoutes);
-app.use('/api/user', verifyToken, authorizeRoles([1, 2]), userRoutes);
+app.use('/api/user', verifyToken, authorizeRoles(['1', '2']), userRoutes);
 app.use(errorHandler);

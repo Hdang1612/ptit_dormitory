@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 import User from '../models/Users.js';
 import ApiError from '../utils/apiError.js';
 
@@ -16,6 +18,12 @@ export const updateUserService = async (userId, updateData) => {
         throw new ApiError(400, 'Email already exist');
       }
     }
+
+    if (updateData.password) {
+      const hashedPassword = await bcrypt.hash(updateData.password, 10);
+      updateData.password = hashedPassword;
+    }
+
     Object.keys(updateData).forEach((key) => {
       if (updateData[key] !== undefined) {
         user[key] = updateData[key];
