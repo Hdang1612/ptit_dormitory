@@ -23,15 +23,13 @@ export const verifyToken = (req, res, next) => {
   }
 };
 
-export const authorizeRoles = (requiredRoles = []) => {
+export const authorizeRoles = (requiredRoleIds = []) => {
   return (req, res, next) => {
-    console.log('User roles from token:', req.user.role);
-    console.log('Required roles:', requiredRoles);
+    console.log('User roles', req.user.role_id);
     if (!req.user) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-
-    if (!requiredRoles.includes(req.user.role)) {
+    if (!requiredRoleIds.includes(req.user.role_id)) {
       return res.status(403).json({ message: 'No permission' });
     }
 
