@@ -25,7 +25,7 @@ export const verifyToken = (req, res, next) => {
 
 export const authorizeRoles = (requiredRoleIds = []) => {
   return (req, res, next) => {
-    console.log('User roles from token:', req.user.role_id);
+    console.log('User roles', req.user.role_id);
     if (!req.user) {
       return res.status(401).json({ message: 'Unauthorized' });
     }

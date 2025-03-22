@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 import User from '../models/Users.js';
+
 import ApiError from '../utils/apiError.js';
 
 export const updateUserService = async (userId, updateData) => {
@@ -31,7 +32,7 @@ export const updateUserService = async (userId, updateData) => {
     });
 
     await user.save();
-    return { success: true, message: 'User updated successfully', user };
+    return { success: true, user  };
   } catch (error) {
     throw new Error(error.message);
   }

@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Role from '../models/Role.js';
 import User from '../models/Users.js';
 
-import { ROLES } from '../constants/admin_role.js';
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 dotenv.config();
@@ -48,7 +47,6 @@ export const registerService = async ({
   });
 
   return {
-    message: 'Register successful',
     user: {
       id: newUser.id,
       email: newUser.email,
@@ -77,7 +75,6 @@ export const loginService = async ({ email, password }) => {
   });
 
   return {
-    message: 'Login successful',
     token,
     user: {
       id: user.id,
