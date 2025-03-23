@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 import { connectDB, sequelize } from './config/db.js';
 import cors from 'cors';
 import errorHandler from './middleware/errorHandler.js';
-import { verifyToken, authorizeRoles } from './middleware/auth.js';
 
 import router from './routes/Routes.js';
 
