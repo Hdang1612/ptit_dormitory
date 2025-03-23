@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import ApiError from '../utils/apiError.js';
 import { v4 as uuidv4 } from 'uuid';
 
-
 import Role from '../models/Role.js';
 import User from '../models/Users.js';
 
@@ -69,7 +68,7 @@ export const loginService = async ({ email, password }) => {
     throw new ApiError(401, 'Invalid password');
   }
 
-  const userRole = user.role_id ;
+  const userRole = user.role_id;
   const token = jwt.sign({ id: user.id, role_id: userRole }, JWT_SECRET_KEY, {
     expiresIn: '1h',
   });
