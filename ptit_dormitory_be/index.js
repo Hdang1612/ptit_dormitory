@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 // import db from "./config/db.js";
 import { connectDB, sequelize } from './config/db.js';
+import './models/Assocication.js';
 import cors from 'cors';
 import errorHandler from './middleware/errorHandler.js';
 

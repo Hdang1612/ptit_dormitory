@@ -8,7 +8,9 @@ import areaRoutes from './areaRoute.js';
 const router = express.Router();
 
 router.use('/auth', authRoutes);
+router.use('/user', userRoutes);
 router.use('/user', verifyToken, authorizeRoles(['1', '2']), userRoutes);
 router.use('/place', areaRoutes);
+
 
 export default router;

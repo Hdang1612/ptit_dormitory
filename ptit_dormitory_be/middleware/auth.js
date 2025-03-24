@@ -1,6 +1,8 @@
 import jwt, { decode } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
+import { getPermissionService } from '../services/getPermissionService.js';
+
 dotenv.config();
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
@@ -23,16 +25,28 @@ export const verifyToken = (req, res, next) => {
   }
 };
 
-export const authorizeRoles = (requiredRoleIds = []) => {
-  return (req, res, next) => {
-    console.log('User roles', req.user.role_id);
-    if (!req.user) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    if (!requiredRoleIds.includes(req.user.role_id)) {
-      return res.status(403).json({ message: 'No permission' });
-    }
+export const authorizeRoles = (requiredPermissions = []) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
 
-    next();
+      const userPermissions = await getPermissionService(req.user.role_id);
+      console.log('>>>', userPermissions);
+
+      const hasPermission = requiredPermissions.some((perm) =>
+        userPermissions.includes(perm),
+      );
+
+      if (!hasPermission) {
+        return res.status(403).json({ message: 'No permission' });
+      }
+
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
   };
 };
