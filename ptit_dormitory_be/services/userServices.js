@@ -1,11 +1,14 @@
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import xlsx from 'xlsx';
+import fs from 'fs';
 
-import User from '../models/Users.js';
 import { Op } from 'sequelize';
+import User from '../models/Users.js';
 
 import ApiError from '../utils/apiError.js';
-
+import { columnMapping, genderMapping } from '../constants/mapping.js';
+import { parseDate } from '../utils/convertDate.js';
 // Get danh sách user
 export const getListUserService = async (search, page, limit) => {
   const offset = (page - 1) * limit;
@@ -46,8 +49,7 @@ export const getListUserService = async (search, page, limit) => {
   };
 };
 
-
-// get thôgn tin user theo id 
+// get thôgn tin user theo id
 export const getUserByIdService = async (id) => {
   const user = await User.findByPk(id, {
     attributes: { exclude: ['password'] },
@@ -60,8 +62,7 @@ export const getUserByIdService = async (id) => {
   return user;
 };
 
-
-// tạo tài khoản 
+// tạo tài khoản
 export const createUserService = async (userData) => {
   const {
     email,
@@ -100,8 +101,7 @@ export const createUserService = async (userData) => {
   };
 };
 
-
-// cập nhật thông tin tài khoản 
+// cập nhật thông tin tài khoản
 export const updateUserService = async (userId, updateData) => {
   const user = await User.findByPk(userId);
   if (!user) {
@@ -132,7 +132,6 @@ export const updateUserService = async (userId, updateData) => {
   return { success: true, user };
 };
 
-
 // Xóa tài khoản
 export const deleteUserService = async (id) => {
   const user = await User.findByPk(id);
@@ -142,4 +141,70 @@ export const deleteUserService = async (id) => {
 
   await user.destroy();
   return { message: 'deleted successfully' };
+};
+
+// import user từ file excel
+export const importUsersFromExcel = async (filePath) => {
+  try {
+    const fileBuffer = fs.readFileSync(filePath);
+    const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    const users = await Promise.all(
+      data.map(async (row) => {
+        const mappedUser = {
+          id: uuidv4(),
+          role_id: '4',
+        };
+
+        for (const key in columnMapping) {
+          let value = row[key];
+          const dbField = columnMapping[key];
+
+          if (dbField === 'name') {
+            const nameParts = value.trim().split(' ');
+            mappedUser['first_name'] = nameParts.slice(0, -1).join(' ');
+            mappedUser['last_name'] = nameParts.slice(-1).join(' ');
+            continue;
+          }
+
+          if (dbField === 'gender') {
+            value = genderMapping[value] || 'Other';
+          }
+
+          if (['dob', 'visa_start', 'visa_end'].includes(dbField)) {
+            value = parseDate(value);
+          }
+
+          mappedUser[dbField] = value;
+        }
+
+        //  check user exist
+        const existingUser = await User.findOne({
+          where: { student_code: mappedUser.student_code },
+        });
+
+        if (existingUser) {
+          await existingUser.update(mappedUser);
+          return { action: 'updated', student_code: mappedUser.student_code };
+        } else {
+          await User.create(mappedUser);
+          return { action: 'inserted', student_code: mappedUser.student_code };
+        }
+      }),
+    );
+
+    // Đếm số lượng insert và update
+    const insertedCount = users.filter((u) => u.action === 'inserted').length;
+    const updatedCount = users.filter((u) => u.action === 'updated').length;
+
+    return {
+      inserted: insertedCount,
+      updated: updatedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    throw new ApiError(400, 'Import failed');
+  }
 };

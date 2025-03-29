@@ -4,6 +4,7 @@ import {
   createUserService,
   deleteUserService,
   getUserByIdService,
+  importUsersFromExcel,
 } from '../services/userServices.js';
 
 export const getUsersList = async (req, res, next) => {
@@ -76,6 +77,26 @@ export const deleteUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: result.message,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//import sinh viên lào
+export const importUsers = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'upload Excel file !!!' });
+    }
+
+    const result = await importUsersFromExcel(req.file.path);
+
+    res.status(200).json({
+      success: true,
+      message: 'Import successful',
+      inserted: result.inserted,
+      updated: result.updated,
     });
   } catch (error) {
     next(error);
