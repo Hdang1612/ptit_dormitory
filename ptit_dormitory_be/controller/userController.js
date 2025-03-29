@@ -6,7 +6,7 @@ import {
   getUserByIdService,
   importUsersFromExcel,
 } from '../services/userServices.js';
-
+import { importStudentRoomsService } from '../services/StudentToRoomService.js';
 export const getUsersList = async (req, res, next) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -100,5 +100,26 @@ export const importUsers = async (req, res) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+//import file xếp sinh viên vào phòng
+
+export const importStudentRooms = async (req, res) => {
+  try {
+    // Kiểm tra có file hay không
+    if (!req.file) {
+      return res.status(400).json({ message: "Vui lòng upload file Excel" });
+    }
+
+    // Gọi service xử lý import
+    const results = await importStudentRoomsService(req.file.path);
+
+    return res.status(200).json({
+      message: "Import dữ liệu hoàn tất",
+      results,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };

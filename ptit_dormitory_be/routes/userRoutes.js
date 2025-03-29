@@ -9,6 +9,7 @@ import {
   deleteUser,
   getUserById,
   importUsers,
+  importStudentRooms,
 } from '../controller/userController.js';
 
 const userRoutes = express.Router();
@@ -44,5 +45,11 @@ userRoutes.delete(
   deleteUser,
 );
 userRoutes.post('/import', verifyToken, upload.single('file'), importUsers);
+userRoutes.post(
+  '/importroomstudent',
+  verifyToken,
+  upload.single('file'),
+  importStudentRooms,
+);
 
 export default userRoutes;
