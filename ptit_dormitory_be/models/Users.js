@@ -13,12 +13,12 @@ const User = sequelize.define(
     },
     email: {
       type: DataTypes.STRING(45),
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
     password: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     qr_code: {
       type: DataTypes.STRING(45),
@@ -55,6 +55,42 @@ const User = sequelize.define(
     role_id: {
       type: DataTypes.STRING(255),
       allowNull: false,
+    },
+    student_code: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    nationality: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    class_code: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    cooperation_area: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    gender: {
+      type: DataTypes.ENUM('Male', 'Female', 'Other'),
+      allowNull: true,
+    },
+    visa_number: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    passport_number: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    visa_start: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    visa_end: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {

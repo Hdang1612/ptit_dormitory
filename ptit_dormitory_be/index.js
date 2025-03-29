@@ -8,6 +8,12 @@ import cors from 'cors';
 import errorHandler from './middleware/errorHandler.js';
 
 import router from './routes/Routes.js';
+import fs from 'fs';
+
+// Tạo thư mục `uploads/` nếu chưa có
+if (!fs.existsSync('uploads')) {
+  fs.mkdirSync('uploads');
+}
 
 const app = express();
 dotenv.config();

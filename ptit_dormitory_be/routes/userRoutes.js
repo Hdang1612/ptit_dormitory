@@ -1,11 +1,14 @@
 import express from 'express';
 import { verifyToken, authorizeRoles } from '../middleware/auth.js';
+import upload from '../middleware/uploadUser.js';
+
 import {
   updateUser,
   createUser,
   getUsersList,
   deleteUser,
   getUserById,
+  importUsers,
 } from '../controller/userController.js';
 
 const userRoutes = express.Router();
@@ -40,5 +43,6 @@ userRoutes.delete(
   authorizeRoles(['user_delete']),
   deleteUser,
 );
+userRoutes.post('/import', verifyToken, upload.single('file'), importUsers);
 
 export default userRoutes;
