@@ -33,7 +33,7 @@ export const authorizeRoles = (requiredPermissions = []) => {
       }
 
       const userPermissions = await getPermissionService(req.user.role_id);
-      console.log('>>>', userPermissions);
+      console.log('Permission >>>', userPermissions);
 
       const hasPermission = requiredPermissions.some((perm) =>
         userPermissions.includes(perm),

@@ -6,6 +6,7 @@ import { Op } from 'sequelize';
 
 import ApiError from '../utils/apiError.js';
 
+// Get danh sách user
 export const getListUserService = async (search, page, limit) => {
   const offset = (page - 1) * limit;
   const whereClause = search
@@ -45,6 +46,8 @@ export const getListUserService = async (search, page, limit) => {
   };
 };
 
+
+// get thôgn tin user theo id 
 export const getUserByIdService = async (id) => {
   const user = await User.findByPk(id, {
     attributes: { exclude: ['password'] },
@@ -57,6 +60,8 @@ export const getUserByIdService = async (id) => {
   return user;
 };
 
+
+// tạo tài khoản 
 export const createUserService = async (userData) => {
   const {
     email,
@@ -95,6 +100,8 @@ export const createUserService = async (userData) => {
   };
 };
 
+
+// cập nhật thông tin tài khoản 
 export const updateUserService = async (userId, updateData) => {
   const user = await User.findByPk(userId);
   if (!user) {
@@ -125,6 +132,8 @@ export const updateUserService = async (userId, updateData) => {
   return { success: true, user };
 };
 
+
+// Xóa tài khoản
 export const deleteUserService = async (id) => {
   const user = await User.findByPk(id);
   if (!user) {
