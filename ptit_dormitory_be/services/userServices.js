@@ -7,7 +7,11 @@ import { Op } from 'sequelize';
 import User from '../models/Users.js';
 
 import ApiError from '../utils/apiError.js';
-import { columnMapping, genderMapping } from '../constants/mapping.js';
+import {
+  columnMappingForeignStudent,
+  columnMappingStudent,
+  genderMapping,
+} from '../constants/mapping.js';
 import { parseDate } from '../utils/convertDate.js';
 // Get danh sách user
 export const getListUserService = async (search, page, limit) => {
@@ -144,7 +148,7 @@ export const deleteUserService = async (id) => {
 };
 
 // import user từ file excel
-export const importUsersFromExcel = async (filePath) => {
+export const importForeignStudentFromExcelService = async (filePath) => {
   try {
     const fileBuffer = fs.readFileSync(filePath);
     const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
@@ -158,9 +162,9 @@ export const importUsersFromExcel = async (filePath) => {
           role_id: '4',
         };
 
-        for (const key in columnMapping) {
+        for (const key in columnMappingForeignStudent) {
           let value = row[key];
-          const dbField = columnMapping[key];
+          const dbField = columnMappingForeignStudent[key];
 
           if (dbField === 'name') {
             const nameParts = value.trim().split(' ');
@@ -209,4 +213,82 @@ export const importUsersFromExcel = async (filePath) => {
   }
 };
 
+export const importVnStudentFromExcelService = async (filePath) => {
+  try {
+    const fileBuffer = fs.readFileSync(filePath);
+    const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
+    const users = await Promise.all(
+      data.map(async (row) => {
+        // console.log('Dữ liệu đọc từ Excel:', row);
+        const mappedUser = {
+          id: uuidv4(),
+          role_id: '4',
+        };
+
+        for (const key in columnMappingStudent) {
+          let value = row[key];
+          const dbField = columnMappingStudent[key];
+
+          if (dbField === 'name') {
+            if (!value || typeof value !== 'string') {
+              mappedUser['first_name'] = '';
+              mappedUser['last_name'] = '';
+            } else {
+              const nameParts = value.trim().split(/\s+/);
+              mappedUser['first_name'] = nameParts.slice(0, -1).join(' ');
+              mappedUser['last_name'] = nameParts.slice(-1).join(' ');
+            }
+            continue;
+          }
+
+          // if (dbField === 'gender') {
+          //   value = genderMapping[value] || 'Other';
+          // }
+
+          // if (['dob', 'visa_start', 'visa_end'].includes(dbField)) {
+          //   value = parseDate(value);
+          // }
+
+          mappedUser[dbField] = value;
+        }
+        let studentCode = row['Mã sinh viên']
+          ? row['Mã sinh viên'].toString().trim()
+          : '';
+
+        if (studentCode.startsWith("'")) {
+          studentCode = studentCode.slice(1);
+        }
+
+        mappedUser.student_code = studentCode;
+
+        //  check user exist
+        const existingUser = await User.findOne({
+          where: { student_code: mappedUser.student_code },
+        });
+
+        if (existingUser) {
+          await existingUser.update(mappedUser);
+          return { action: 'updated', student_code: mappedUser.student_code };
+        } else {
+          await User.create(mappedUser);
+          return { action: 'inserted', student_code: mappedUser.student_code };
+        }
+      }),
+    );
+
+    // Đếm số lượng insert và update
+    const insertedCount = users.filter((u) => u.action === 'inserted').length;
+    const updatedCount = users.filter((u) => u.action === 'updated').length;
+
+    return {
+      inserted: insertedCount,
+      updated: updatedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    throw new ApiError(400, 'Import failed');
+  }
+};

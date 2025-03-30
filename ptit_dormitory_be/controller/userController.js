@@ -4,7 +4,8 @@ import {
   createUserService,
   deleteUserService,
   getUserByIdService,
-  importUsersFromExcel,
+  importForeignStudentFromExcelService,
+  importVnStudentFromExcelService,
 } from '../services/userServices.js';
 import { importStudentRoomsService } from '../services/StudentToRoomService.js';
 export const getUsersList = async (req, res, next) => {
@@ -84,13 +85,33 @@ export const deleteUser = async (req, res, next) => {
 };
 
 //import sinh viên lào
-export const importUsers = async (req, res) => {
+export const importForeignStudent = async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'upload Excel file !!!' });
     }
 
-    const result = await importUsersFromExcel(req.file.path);
+    const result = await importForeignStudentFromExcelService(req.file.path);
+
+    res.status(200).json({
+      success: true,
+      message: 'Import successful',
+      inserted: result.inserted,
+      updated: result.updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// import sinh vien viet nam
+export const importVnStudent = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'upload Excel file !!!' });
+    }
+
+    const result = await importVnStudentFromExcelService(req.file.path);
 
     res.status(200).json({
       success: true,
@@ -109,17 +130,19 @@ export const importStudentRooms = async (req, res) => {
   try {
     // Kiểm tra có file hay không
     if (!req.file) {
-      return res.status(400).json({ message: "Vui lòng upload file Excel" });
+      return res.status(400).json({ message: 'Vui lòng upload file Excel' });
     }
 
     // Gọi service xử lý import
     const results = await importStudentRoomsService(req.file.path);
 
     return res.status(200).json({
-      message: "Import dữ liệu hoàn tất",
+      message: 'Import dữ liệu hoàn tất',
       results,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Lỗi server", error: error.message });
+    return res
+      .status(500)
+      .json({ message: 'Lỗi server', error: error.message });
   }
 };

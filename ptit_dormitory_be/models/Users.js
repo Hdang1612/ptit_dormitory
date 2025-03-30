@@ -58,19 +58,19 @@ const User = sequelize.define(
     },
     student_code: {
       type: DataTypes.STRING(45),
-      allowNull: false,
+      allowNull: true,
     },
     nationality: {
       type: DataTypes.STRING(45),
-      allowNull: false,
+      allowNull: true,
     },
     class_code: {
       type: DataTypes.STRING(45),
-      allowNull: false,
+      allowNull: true,
     },
     cooperation_area: {
       type: DataTypes.STRING(45),
-      allowNull: false,
+      allowNull: true,
     },
     gender: {
       type: DataTypes.ENUM('Male', 'Female', 'Other'),
