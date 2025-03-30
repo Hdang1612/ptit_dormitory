@@ -27,16 +27,22 @@ export const importStudentRoomsService = async (filePath) => {
     data.forEach((row) => {
       if (row['Phòng ở']) {
         lastRoomNumber = row['Phòng ở'];
+      } else if (row['Phòng ở KTX']) {
+        lastRoomNumber = row['Phòng ở KTX'];
       } else {
         row['Phòng ở'] = lastRoomNumber;
+        row['Phòng ở KTX'] = lastRoomNumber;
       }
     });
 
     const results = await Promise.all(
       data.map(async (row) => {
-        const studentCode = row['Mã sinh viên (Student code)'];
-        const roomNumber = row['Phòng ở']; // Đã xử lý merge cell
-        const isLeader = row['Đại diện phòng'] === 'TP'; // Kiểm tra trưởng phòng
+        const studentCode =
+          row['Mã sinh viên (Student code)'] || row['Mã sinh viên'];
+        const roomNumber = row['Phòng ở'] || row['Phòng ở KTX']; // Đã xử lý merge cell
+        const isLeader =
+          (row['Đại diện phòng'] && row['Đại diện phòng'].trim() !== '') ||
+          (row['Ghi chú'] && row['Ghi chú'].trim() !== ''); // Kiểm tra trưởng phòng
 
         if (!studentCode || !roomNumber) {
           return {
@@ -60,11 +66,11 @@ export const importStudentRoomsService = async (filePath) => {
           };
         }
 
-        // Tìm phòng theo area_name và parent_id là B1
+        // Tìm phòng theo area_name và parent_id
         const room = await Place.findOne({
           where: {
             area_name: roomNumber,
-            parent_id: 'B1-F1',
+            parent_id: { [Op.in]: ['B1-F1', 'B1-F2', 'B1-F3', 'B1-F4'] },
           },
         });
         if (!room) {
@@ -76,7 +82,7 @@ export const importStudentRoomsService = async (filePath) => {
           };
         }
 
-        // Kiểm tra sinh viên đã có phòng chưa
+        // kiểm tra sinh viên đã có phòng chưa
         const existingStudentRoom = await StudentRoom.findOne({
           where: { student_id: student.id },
         });
@@ -100,7 +106,7 @@ export const importStudentRoomsService = async (filePath) => {
         // Nếu sinh viên là Trưởng phòng, cập nhật `leader` trong `room_detail`
         if (isLeader) {
           await RoomDetail.update(
-            { leader: studentCode },
+            { leader: student.id },
             { where: { room_number: roomNumber } },
           );
         }
@@ -125,7 +131,7 @@ export const importStudentRoomsService = async (filePath) => {
       details: results,
     };
   } catch (error) {
-    console.error('Lỗi import:', error);
-    throw new ApiError(400, 'Import thất bại');
+    console.error('lỗi import:', error);
+    throw new ApiError(400, 'Import failed');
   }
 };
