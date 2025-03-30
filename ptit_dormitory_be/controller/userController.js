@@ -13,7 +13,8 @@ export const getUsersList = async (req, res, next) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const search = req.query.search || '';
-    const data = await getListUserService(search, page, limit);
+    const role = req.query.role;
+    const data = await getListUserService(search, page, limit,role);
 
     res.status(200).json({
       success: true,

@@ -14,17 +14,18 @@ import {
 } from '../constants/mapping.js';
 import { parseDate } from '../utils/convertDate.js';
 // Get danh sách user
-export const getListUserService = async (search, page, limit) => {
+export const getListUserService = async (search, page, limit, role) => {
   const offset = (page - 1) * limit;
-  const whereClause = search
-    ? {
-        [Op.or]: [
-          { first_name: { [Op.like]: `%${search}%` } },
-          { last_name: { [Op.like]: `%${search}%` } },
-          { email: { [Op.like]: `%${search}%` } },
-        ],
-      }
-    : {};
+  const whereClause = {
+    ...(search && {
+      [Op.or]: [
+        { first_name: { [Op.like]: `%${search}%` } },
+        { last_name: { [Op.like]: `%${search}%` } },
+        { email: { [Op.like]: `%${search}%` } },
+      ],
+    }),
+    ...(role && { role_id: role }),
+  };
   const { count, rows } = await User.findAndCountAll({
     where: whereClause,
     limit: limit,
@@ -38,7 +39,7 @@ export const getListUserService = async (search, page, limit) => {
       'phone_number',
       'dob',
       'role_id',
-      'room_id',
+      // 'room_id',
       'create_at',
     ],
   });
