@@ -16,10 +16,8 @@ export const importStudentRoomsService = async (filePath) => {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
-    // Chuyển đổi dữ liệu từ sheet, bắt đầu từ hàng thứ 3 (index 2)
     const data = xlsx.utils.sheet_to_json(sheet, { range: 2 });
 
-    // Xóa file sau khi đọc xong
     fs.unlinkSync(filePath);
 
     // Xử lý dữ liệu phòng bị thiếu do merge cell

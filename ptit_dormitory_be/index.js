@@ -1,4 +1,5 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 // import db from "./config/db.js";
@@ -6,6 +7,7 @@ import { connectDB, sequelize } from './config/db.js';
 import './models/Assocication.js';
 import cors from 'cors';
 import errorHandler from './middleware/errorHandler.js';
+import swaggerDocs from './config/swagger.js';
 
 import router from './routes/Routes.js';
 import fs from 'fs';
@@ -21,6 +23,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 const startServer = async () => {
   try {
