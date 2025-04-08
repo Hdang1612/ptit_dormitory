@@ -72,6 +72,76 @@ function ContractRenewalApp() {
       studentCommitment: "",
     });
   };
+  const numberToVietnamese = (number) => {
+    const ChuSo = [
+      "không",
+      "một",
+      "hai",
+      "ba",
+      "bốn",
+      "năm",
+      "sáu",
+      "bảy",
+      "tám",
+      "chín",
+    ];
+    const DonVi = ["", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ"];
+
+    if (number === 0) return "Không đồng";
+
+    const blocks = [];
+    while (number > 0) {
+      blocks.push(number % 1000);
+      number = Math.floor(number / 1000);
+    }
+
+    const result = [];
+    for (let i = blocks.length - 1; i >= 0; i--) {
+      const block = blocks[i];
+      const isFirstBlock = i === blocks.length - 1; // khối bên trái nhất
+
+      if (block === 0) continue;
+
+      let str = "";
+      const hundreds = Math.floor(block / 100);
+      const tens = Math.floor((block % 100) / 10);
+      const units = block % 10;
+
+      if (hundreds > 0) {
+        str += ChuSo[hundreds] + " trăm ";
+      } else if (!isFirstBlock && (tens > 0 || units > 0)) {
+        str += "không trăm ";
+      }
+
+      if (tens > 1) {
+        str += ChuSo[tens] + " mươi ";
+        if (units === 1) str += "mốt ";
+        else if (units === 5) str += "lăm ";
+        else if (units > 0) str += ChuSo[units] + " ";
+      } else if (tens === 1) {
+        str += "mười ";
+        if (units === 5) str += "lăm ";
+        else if (units > 0) str += ChuSo[units] + " ";
+      } else if (units > 0) {
+        if (tens === 0 && hundreds !== 0) str += "lẻ ";
+        str += ChuSo[units] + " ";
+      }
+
+      str += DonVi[i] + " ";
+      result.push(str.trim());
+    }
+
+    const finalStr = result.join(" ").replace(/\s+/g, " ").trim() + " đồng";
+    return finalStr.charAt(0).toUpperCase() + finalStr.slice(1);
+  };
+
+  const reason = Number(formData.renewalReason);
+  const duration = Number(formData.renewalDuration);
+  const total = reason * duration;
+  const formatVND = (value) => {
+    if (!value) return "0";
+    return Number(value).toLocaleString("vi-VN");
+  };
 
   const handlePrint = () => {
     window.print();
@@ -213,14 +283,11 @@ function ContractRenewalApp() {
               </p>
               <p className="payment">
                 <strong>
-                  {formData.renewalReason} đồng/tháng x{" "}
-                  {formData.renewalDuration}
-                  tháng = {formData.renewalDuration *
-                    formData.renewalReason}{" "}
-                  VNĐ
+                  {formatVND(reason)} đồng/tháng x {duration} tháng ={" "}
+                  {formatVND(total)} VNĐ
                 </strong>
                 <br />
-                <em>(Bằng chữ: ./. )</em>
+                <em>(Bằng chữ: {numberToVietnamese(total)})</em>
               </p>
 
               <p style={{ marginLeft: "70px", color: "red" }}>
@@ -305,7 +372,7 @@ function ContractRenewalApp() {
 
             <div className="print-controls no-print">
               <button className="print-btn" onClick={handlePrint}>
-                In đơn gia hạn
+                In đơn
               </button>
               <button className="back-btn" onClick={handleBack}>
                 Quay lại chỉnh sửa
@@ -409,13 +476,12 @@ function ContractRenewalApp() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Số CMND/CCCD</label>
+                  <label>Quê quán</label>
                   <input
                     type="text"
-                    name="idNumber"
-                    value={formData.idNumber}
+                    name="nationality"
+                    value={formData.nationality}
                     onChange={handleChange}
-                    required
                   />
                 </div>
               </div>
@@ -449,18 +515,6 @@ function ContractRenewalApp() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Quê quán</label>
-                  <input
-                    type="text"
-                    name="nationality"
-                    value={formData.nationality}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
                   <label>Hệ đào tạo</label>
                   <input
                     type="text"
@@ -468,19 +522,6 @@ function ContractRenewalApp() {
                     value={formData.residentialAddress}
                     onChange={handleChange}
                   />
-                </div>
-                <div className="form-group">
-                  <label>Tỉnh/Thành phố</label>
-                  <select
-                    name="cityProvince"
-                    value={formData.cityProvince}
-                    onChange={handleChange}
-                  >
-                    <option value="">Chọn tỉnh/thành phố</option>
-                    <option value="Hà Nội">Hà Nội</option>
-                    <option value="TP HCM">TP HCM</option>
-                    <option value="Đà Nẵng">Đà Nẵng</option>
-                  </select>
                 </div>
               </div>
 
@@ -495,15 +536,6 @@ function ContractRenewalApp() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Quận/Huyện</label>
-                  <select name="district" onChange={handleChange}>
-                    <option value="">Chọn quận/huyện</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
                   <label>Email</label>
                   <input
                     type="email"
@@ -512,12 +544,6 @@ function ContractRenewalApp() {
                     onChange={handleChange}
                     required
                   />
-                </div>
-                <div className="form-group">
-                  <label>Phường/Xã</label>
-                  <select name="ward" onChange={handleChange}>
-                    <option value="">Phường/Xã</option>
-                  </select>
                 </div>
               </div>
             </div>
@@ -655,7 +681,7 @@ function ContractRenewalApp() {
                 Lưu
               </button>
               <button type="submit" className="print-preview-btn">
-                In đơn gia hạn
+                In đơn
               </button>
             </div>
           </form>
