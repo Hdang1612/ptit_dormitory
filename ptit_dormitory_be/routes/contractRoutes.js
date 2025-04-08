@@ -5,12 +5,13 @@ import {
   // fillContract,
   getContractlist,
   // getContracts,
-  // getContractById,
+  getContractById,
   createContract,
   updateContract,
   // deleteContract,
   // generateContractDoc,
-  printRegistrationForm
+  printRegistrationForm,
+  printCancelForm,
 } from '../controller/contractController.js';
 
 const contractRoutes = express.Router();
@@ -38,8 +39,9 @@ contractRoutes.get(
 
 // Tạo file Word từ hợp đồng
 contractRoutes.post('/create', createContract);
-contractRoutes.post('/generate-doc', printRegistrationForm);
-
+contractRoutes.get('/fetch/:id', verifyToken, getContractById);
+contractRoutes.post('/generate-register-doc', printRegistrationForm);
+contractRoutes.post('/generate-cancel-doc', printCancelForm);
 
 // contractRoutes.get(
 //   '/',

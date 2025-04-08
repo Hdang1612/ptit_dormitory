@@ -24,11 +24,8 @@ export const getContractsService = async (query) => {
     where: whereClause,
     limit,
     offset,
+    attributes: ['id', 'student_id', 'type', 'status', 'apply_date'],
     include: [
-      {
-        model: ContractType,
-        as: 'ContractType',
-      },
       {
         model: User,
         as: 'student',
@@ -49,35 +46,34 @@ export const getContractsService = async (query) => {
 };
 
 // Lấy chi tiết hợp đồng
-export const getContractByIdService = async (contractId) => {
-  const contract = await Contract.findByPk(contractId, {
-    include: [
-      {
-        model: ContractType,
-        as: 'ContractType',
-      },
-      {
-        model: User,
-        as: 'student',
-        attributes: ['id', 'first_name', 'last_name', 'student_code'],
-      },
-    ],
-  });
+export const getContractDetailService = async (contractId) => {
+  const contract = await Contract.findByPk(contractId);
 
   if (!contract) {
-    throw new ApiError(404, 'Hợp đồng không tồn tại');
+    throw new ApiError(404, 'Không tìm thấy hợp đồng');
   }
 
-  return contract;
+  const { id, type, student_id, apply_date, status, file_path, form_data } =
+    contract;
+
+  return {
+    id,
+    type,
+    student_id,
+    apply_date,
+    status,
+    file_path,
+    student: { ...form_data },
+  };
 };
 
 // Tạo hợp đồng mới
-export const createContractService = async (contractData) => {
+export const createContractService = async (type, contractData) => {
   // 1. Kiểm tra loại hợp đồng tồn tại
-  // const contractType = await ContractType.findByPk(type);
-  // if (!contractType) {
-  //   throw new ApiError(404, 'Loại hợp đồng không tồn tại');
-  // }
+  const contractType = await ContractType.findByPk(type);
+  if (!contractType) {
+    throw new ApiError(404, 'Loại hợp đồng không tồn tại');
+  }
 
   // 2. Tạo file Word từ dữ liệu form
   const buffer = await generateRegistrationFormFileService(contractData);
@@ -91,7 +87,7 @@ export const createContractService = async (contractData) => {
 
   const fileName = `${contractId}.docx`;
   const filePath = path.join(outputDir, fileName);
-  const relativePath = `/contracts/${fileName}`; // lưu path tương đối vào DB
+  const relativePath = `/contracts/${fileName}`;
 
   // 4. Ghi file vào hệ thống
   fs.writeFileSync(filePath, buffer);
@@ -110,7 +106,7 @@ export const createContractService = async (contractData) => {
   return newContract;
 };
 
-// // Cập nhật hợp đồng
+// Cập nhật hợp đồng
 export const updateContractService = async (id, updateData) => {
   console.log('>>>>', id);
   const contract = await Contract.findByPk(id);
@@ -118,8 +114,8 @@ export const updateContractService = async (id, updateData) => {
 
   const prevStatus = contract.status;
   const newStatus = updateData.status;
-
-  // Nếu chuyển trạng thái từ "đã gửi" → "xác nhận"
+  let updatePayload = { ...updateData };
+  // Nếu chuyển trạng thái từ "đã gửi" -> "xác nhận"
   if (prevStatus === 'đã gửi' && newStatus === 'xác nhận') {
     const studentData = contract.form_data;
 
@@ -144,26 +140,14 @@ export const updateContractService = async (id, updateData) => {
         ...studentData,
       });
 
-      contract.student_id = newUserId;
+      updatePayload.student_id = newUserId;
     }
   }
 
-  await contract.update(updateData);
+  await contract.update(updatePayload);
   return contract;
 };
 
-// // Xóa hợp đồng
-// export const deleteContractService = async (contractId) => {
-//   const contract = await Contract.findByPk(contractId);
-//   if (!contract) {
-//     throw new ApiError(404, 'Hợp đồng không tồn tại');
-//   }
-
-//   await contract.destroy();
-//   return { message: 'Xóa hợp đồng thành công' };
-// };
-
-// Service điền thông tin hợp đồng
 export const fillContractService = async (studentId) => {
   const student = await User.findByPk(studentId, {
     where: { role_id: 4 }, // Chỉ lấy sinh viên
@@ -275,6 +259,36 @@ export const generateRegistrationFormFileService = async (formData) => {
   } catch (error) {
     console.error('Error generating registration form file:', error);
     throw new ApiError(500, 'Lỗi khi tạo file đơn đăng ký');
+  }
+};
+
+export const generateCancelFormFileService = async (formData) => {
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const templatePath = path.join(
+      __dirname,
+      '../templates/cancel_contract_template.docx',
+    );
+
+    const templateBuffer = fs.readFileSync(templatePath);
+
+    // Tạo file từ template
+    const buffer = await createReport({
+      template: templateBuffer, //
+      data: {
+        ...formData,
+        helpers,
+      },
+      cmdDelimiter: ['{{', '}}'],
+      processLineBreaks: true,
+      noSandbox: true,
+    });
+
+    return buffer;
+  } catch (error) {
+    console.error('Error generating cancel form file:', error);
+    throw new ApiError(500, 'Lỗi khi tạo file đơn hủy');
   }
 };
 

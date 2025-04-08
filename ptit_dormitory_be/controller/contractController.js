@@ -1,12 +1,13 @@
 import {
   getContractsService,
-  // getContractByIdService,
+  getContractDetailService,
   createContractService,
   updateContractService,
   // deleteContractService,
   fillContractService,
   // generateContractFile,
   generateRegistrationFormFileService,
+  generateCancelFormFileService
 } from '../services/contractService.js';
 
 // Lấy danh sách hợp đồng
@@ -26,23 +27,23 @@ export const getContractlist = async (req, res) => {
   }
 };
 
-// // Lấy chi tiết hợp đồng
-// export const getContractById = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const contract = await getContractByIdService(id);
-//     res.status(200).json({
-//       success: true,
-//       data: contract,
-//     });
-//   } catch (error) {
-//     console.error('getContractById error:', error);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message || 'Lỗi khi lấy chi tiết hợp đồng',
-//     });
-//   }
-// };
+// Lấy chi tiết hợp đồng
+export const getContractById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const contract = await getContractDetailService(id);
+    res.status(200).json({
+      success: true,
+      data: contract,
+    });
+  } catch (error) {
+    console.error('getContractById error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi lấy chi tiết hợp đồng',
+    });
+  }
+};
 
 // Tạo hợp đồng mới
 export const createContract = async (req, res) => {
@@ -160,6 +161,24 @@ export const printRegistrationForm = async (req, res) => {
     res.setHeader(
       'Content-Disposition',
       'attachment; filename=don_dang_ky_ktx.docx',
+    );
+    res.end(buffer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const printCancelForm = async (req, res) => {
+  try {
+    const buffer = await generateCancelFormFileService(req.body);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=don_huy_ktx.docx',
     );
     res.end(buffer);
   } catch (error) {
