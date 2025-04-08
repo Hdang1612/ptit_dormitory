@@ -71,53 +71,86 @@ export const getContractByIdService = async (contractId) => {
   return contract;
 };
 
-// // Tạo hợp đồng mới
-// export const createContractService = async (contractData) => {
-//   const { student_id, contract_type_id, apply_date, status } = contractData;
+// Tạo hợp đồng mới
+export const createContractService = async (contractData) => {
+  // 1. Kiểm tra loại hợp đồng tồn tại
+  // const contractType = await ContractType.findByPk(type);
+  // if (!contractType) {
+  //   throw new ApiError(404, 'Loại hợp đồng không tồn tại');
+  // }
 
-//   // Kiểm tra sinh viên tồn tại
-//   const student = await User.findByPk(student_id);
-//   if (!student) {
-//     throw new ApiError(404, 'Sinh viên không tồn tại');
-//   }
+  // 2. Tạo file Word từ dữ liệu form
+  const buffer = await generateRegistrationFormFileService(contractData);
 
-//   // Kiểm tra loại hợp đồng tồn tại
-//   const contractType = await ContractType.findByPk(contract_type_id);
-//   if (!contractType) {
-//     throw new ApiError(404, 'Loại hợp đồng không tồn tại');
-//   }
+  // 3. Tạo đường dẫn lưu file
+  const contractId = uuidv4();
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const outputDir = path.join(__dirname, '../upload/contract'); // lưu trong thư mục public
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-//   const newContract = await Contract.create({
-//     id: uuidv4(),
-//     student_id,
-//     contract_type_id,
-//     apply_date: apply_date || new Date(),
-//     status: status || 'pending',
-//   });
+  const fileName = `${contractId}.docx`;
+  const filePath = path.join(outputDir, fileName);
+  const relativePath = `/contracts/${fileName}`; // lưu path tương đối vào DB
 
-//   return newContract;
-// };
+  // 4. Ghi file vào hệ thống
+  fs.writeFileSync(filePath, buffer);
+
+  // 5. Tạo hợp đồng mới trong DB
+  const newContract = await Contract.create({
+    id: contractId,
+    student_id: null,
+    type: 1,
+    apply_date: contractData.apply_date,
+    status: 'đã gửi',
+    file_path: relativePath,
+    form_data: contractData,
+  });
+
+  return newContract;
+};
 
 // // Cập nhật hợp đồng
-// export const updateContractService = async (contractId, updateData) => {
-//   const contract = await Contract.findByPk(contractId);
-//   if (!contract) {
-//     throw new ApiError(404, 'Hợp đồng không tồn tại');
-//   }
+export const updateContractService = async (id, updateData) => {
+  console.log('>>>>', id);
+  const contract = await Contract.findByPk(id);
+  if (!contract) throw new ApiError(404, 'Không tìm thấy hợp đồng');
 
-//   // Kiểm tra loại hợp đồng nếu cập nhật
-//   if (updateData.contract_type_id) {
-//     const contractType = await ContractType.findByPk(
-//       updateData.contract_type_id,
-//     );
-//     if (!contractType) {
-//       throw new ApiError(404, 'Loại hợp đồng không tồn tại');
-//     }
-//   }
+  const prevStatus = contract.status;
+  const newStatus = updateData.status;
 
-//   await contract.update(updateData);
-//   return contract;
-// };
+  // Nếu chuyển trạng thái từ "đã gửi" → "xác nhận"
+  if (prevStatus === 'đã gửi' && newStatus === 'xác nhận') {
+    const studentData = contract.form_data;
+
+    const existed = await User.findByPk(contract.student_id);
+    if (!existed) {
+      const newUserId = uuidv4();
+      if (studentData.gender === 'Nam') {
+        studentData.gender = 'Male';
+      } else if (studentData.gender === 'Nữ') {
+        studentData.gender = 'Female';
+      } else {
+        studentData.gender = 'Other';
+      }
+      const fullName = studentData.full_name?.trim() || '';
+      const nameParts = fullName.split(' ');
+
+      studentData.first_name = nameParts.pop();
+      studentData.last_name = nameParts.join(' ');
+      await User.create({
+        id: newUserId,
+        role_id: 4,
+        ...studentData,
+      });
+
+      contract.student_id = newUserId;
+    }
+  }
+
+  await contract.update(updateData);
+  return contract;
+};
 
 // // Xóa hợp đồng
 // export const deleteContractService = async (contractId) => {
@@ -223,12 +256,12 @@ export const generateRegistrationFormFileService = async (formData) => {
       __dirname,
       '../templates/contract_template.docx',
     );
-   
+
     const templateBuffer = fs.readFileSync(templatePath);
 
     // Tạo file từ template
     const buffer = await createReport({
-      template: templateBuffer, // 
+      template: templateBuffer, //
       data: {
         ...formData,
         helpers,
@@ -245,148 +278,117 @@ export const generateRegistrationFormFileService = async (formData) => {
   }
 };
 
-export const generateContractFile = async (contractId) => {
-  try {
-    // Lấy thông tin hợp đồng
-    const contract = await Contract.findByPk(contractId, {
-      include: [
-        {
-          model: User,
-          as: 'student',
-          attributes: [
-            'first_name',
-            'last_name',
-            'student_code',
-            'dob',
-            'gender',
-            'email',
-            'phone_number',
-            'class_code',
-          ],
-        },
-        {
-          model: ContractType,
-          as: 'ContractType',
-        },
-        {
-          model: StudentRoom,
-          as: 'StudentRoom',
-          include: [
-            {
-              model: Place,
-              as: 'Place',
-              include: [
-                {
-                  model: Place,
-                  as: 'ParentPlace',
-                  attributes: ['area_name', 'level'],
-                  include: [
-                    {
-                      model: Place,
-                      as: 'ParentPlace',
-                      attributes: ['area_name', 'level'],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
+// export const generateContractFile = async (contractId) => {
+//   try {
+//     // Lấy thông tin hợp đồng
+//     const contract = await Contract.findByPk(contractId, {
+//       include: [
+//         {
+//           model: User,
+//           as: 'student',
+//           attributes: [
+//             'first_name',
+//             'last_name',
+//             'student_code',
+//             'dob',
+//             'gender',
+//             'email',
+//             'phone_number',
+//             'class_code',
+//           ],
+//         },
+//         {
+//           model: ContractType,
+//           as: 'ContractType',
+//         },
+//         {
+//           model: StudentRoom,
+//           as: 'StudentRoom',
+//           include: [
+//             {
+//               model: Place,
+//               as: 'Place',
+//               include: [
+//                 {
+//                   model: Place,
+//                   as: 'ParentPlace',
+//                   attributes: ['area_name', 'level'],
+//                   include: [
+//                     {
+//                       model: Place,
+//                       as: 'ParentPlace',
+//                       attributes: ['area_name', 'level'],
+//                     },
+//                   ],
+//                 },
+//               ],
+//             },
+//           ],
+//         },
+//       ],
+//     });
 
-    if (!contract) {
-      throw new ApiError(404, 'Hợp đồng không tồn tại');
-    }
+//     if (!contract) {
+//       throw new ApiError(404, 'Hợp đồng không tồn tại');
+//     }
 
-    // Đường dẫn đến file template
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const templatePath = path.join(
-      __dirname,
-      '../templates/contract_template.docx',
-    );
+//     // Đường dẫn đến file template
+//     const __filename = fileURLToPath(import.meta.url);
+//     const __dirname = path.dirname(__filename);
+//     const templatePath = path.join(
+//       __dirname,
+//       '../templates/contract_template.docx',
+//     );
 
-    // Dữ liệu điền vào hợp đồng
-    const data = {
-      student_name: `${contract.student.last_name} ${contract.student.first_name}`,
-      student_code: contract.student.student_code,
-      dob: contract.student.dob,
-      gender: contract.student.gender,
-      email: contract.student.email,
-      phone_number: contract.student.phone_number,
-      class_code: contract.student.class_code,
-      room: contract.StudentRoom?.Place?.area_name || '',
-      floor: contract.StudentRoom?.Place?.ParentPlace?.area_name || '',
-      area:
-        contract.StudentRoom?.Place?.ParentPlace?.ParentPlace?.area_name || '',
-      contract_type: contract.ContractType?.name || '',
-      apply_date: contract.apply_date,
-      status: contract.status,
-    };
+//     // Dữ liệu điền vào hợp đồng
+//     const data = {
+//       student_name: `${contract.student.last_name} ${contract.student.first_name}`,
+//       student_code: contract.student.student_code,
+//       dob: contract.student.dob,
+//       gender: contract.student.gender,
+//       email: contract.student.email,
+//       phone_number: contract.student.phone_number,
+//       class_code: contract.student.class_code,
+//       room: contract.StudentRoom?.Place?.area_name || '',
+//       floor: contract.StudentRoom?.Place?.ParentPlace?.area_name || '',
+//       area:
+//         contract.StudentRoom?.Place?.ParentPlace?.ParentPlace?.area_name || '',
+//       contract_type: contract.ContractType?.name || '',
+//       apply_date: contract.apply_date,
+//       status: contract.status,
+//     };
 
-    // Tạo file docx từ template
-    const buffer = await createReport({
-      template: templatePath,
-      data: { ...data, helpers },
-      cmdDelimiter: ['{{', '}}'],
-      processLineBreaks: true,
-      noSandbox: true,
-    });
+//     // Tạo file docx từ template
+//     const buffer = await createReport({
+//       template: templatePath,
+//       data: { ...data, helpers },
+//       cmdDelimiter: ['{{', '}}'],
+//       processLineBreaks: true,
+//       noSandbox: true,
+//     });
 
-    // Tạo thư mục lưu nếu chưa có
-    const outputDir = path.join(__dirname, '../public/contracts');
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
+//     // Tạo thư mục lưu nếu chưa có
+//     const outputDir = path.join(__dirname, '../public/contracts');
+//     if (!fs.existsSync(outputDir)) {
+//       fs.mkdirSync(outputDir, { recursive: true });
+//     }
 
-    // Tạo tên và lưu file
-    const fileName = `contract_${contractId}.docx`;
-    const filePath = path.join(outputDir, fileName);
-    fs.writeFileSync(filePath, buffer);
+//     // Tạo tên và lưu file
+//     const fileName = `contract_${contractId}.docx`;
+//     const filePath = path.join(outputDir, fileName);
+//     fs.writeFileSync(filePath, buffer);
 
-    // Cập nhật đường dẫn vào DB
-    await contract.update({ file_path: `/contracts/${fileName}` });
+//     // Cập nhật đường dẫn vào DB
+//     await contract.update({ file_path: `/contracts/${fileName}` });
 
-    // Trả về để FE tải trực tiếp nếu muốn
-    return {
-      buffer,
-      fileName,
-      filePath,
-    };
-  } catch (error) {
-    console.error('Error generating contract file:', error);
-    throw new ApiError(500, 'Lỗi khi tạo file hợp đồng');
-  }
-};
-
-// Tải file hợp đồng
-export const downloadContractFile = async (contractId) => {
-  try {
-    const contract = await Contract.findByPk(contractId);
-
-    if (!contract) {
-      throw new ApiError(404, 'Hợp đồng không tồn tại');
-    }
-
-    if (!contract.file_path) {
-      throw new ApiError(404, 'File hợp đồng không tồn tại');
-    }
-
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const filePath = path.join(__dirname, '../public', contract.file_path);
-
-    if (!fs.existsSync(filePath)) {
-      throw new ApiError(404, 'File hợp đồng không tồn tại');
-    }
-
-    return {
-      filePath,
-      fileName: path.basename(contract.file_path),
-    };
-  } catch (error) {
-    console.error('Error downloading contract file:', error);
-    throw new ApiError(500, 'Lỗi khi tải file hợp đồng');
-  }
-};
+//     // Trả về để FE tải trực tiếp nếu muốn
+//     return {
+//       buffer,
+//       fileName,
+//       filePath,
+//     };
+//   } catch (error) {
+//     console.error('Error generating contract file:', error);
+//     throw new ApiError(500, 'Lỗi khi tạo file hợp đồng');
+//   }
+// };

@@ -2,24 +2,31 @@ import express from 'express';
 import { verifyToken, authorizeRoles } from '../middleware/auth.js';
 
 import {
-  fillContract,
+  // fillContract,
   getContractlist,
   // getContracts,
   // getContractById,
-  // createContract,
-  // updateContract,
+  createContract,
+  updateContract,
   // deleteContract,
-  generateContractDoc,
+  // generateContractDoc,
   printRegistrationForm
 } from '../controller/contractController.js';
 
 const contractRoutes = express.Router();
 
 contractRoutes.get(
-  '/fill/:studentId',
+  '/fill/:id',
   verifyToken,
   //   authorizeRoles(['user_read']),
-  fillContract,
+  updateContract,
+);
+
+contractRoutes.put(
+  '/update/:studentId',
+  verifyToken,
+  //   authorizeRoles(['user_read']),
+  updateContract,
 );
 
 contractRoutes.get(
@@ -30,7 +37,7 @@ contractRoutes.get(
 );
 
 // Tạo file Word từ hợp đồng
-contractRoutes.post('/:contractId/generate-doc', generateContractDoc);
+contractRoutes.post('/create', createContract);
 contractRoutes.post('/generate-doc', printRegistrationForm);
 
 

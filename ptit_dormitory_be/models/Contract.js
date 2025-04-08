@@ -12,19 +12,19 @@ const Contract = sequelize.define(
     },
     student_id: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: null,
     },
     apply_date: {
       type: DataTypes.DATE,
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM('pending', 'rejected', 'accepted'),
+      type: DataTypes.ENUM('đã gửi', 'xác nhận', 'từ chối'),
       allowNull: true,
     },
     type: {
       type: DataTypes.STRING(255),
-      allowNull: true,
+      allowNull: false,
     },
     confirm_by: {
       type: DataTypes.STRING(255),
@@ -32,6 +32,10 @@ const Contract = sequelize.define(
     },
     file_path: {
       type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    form_data: {
+      type: DataTypes.JSON,
       allowNull: true,
     },
   },
