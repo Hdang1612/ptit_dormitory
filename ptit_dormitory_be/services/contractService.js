@@ -9,6 +9,7 @@ import { createReport } from 'docx-templates';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import moment from 'moment';
 
 // Lấy danh sách hợp đồng
 export const getContractsService = async (query) => {
@@ -165,56 +166,85 @@ export const fillContractService = async (studentId) => {
     throw new ApiError(404, 'Sinh viên không tồn tại');
   }
 
-  // Lấy hợp đồng gần nhất
-  // const latestContract = await Contract.findOne({
-  //   where: { student_id: studentId },
-  //   include: [
-  //     {
-  //       model: ContractType,
-  //       as: 'ContractType',
-  //     },
-  //     {
-  //       model: User,
-  //       as: 'confirmBy',
-  //       attributes: ['id', 'first_name', 'last_name'],
-  //     },
-  //   ],
-  //   order: [['apply_date', 'DESC']],
-  // });
+  // Tạo số hợp đồng theo định dạng: HĐNT-YYYY-XXXXX
+  const contract_number = `HĐNT-${new Date().getFullYear()}-${String(
+    Math.floor(Math.random() * 100000),
+  ).padStart(5, '0')}`;
 
   return {
-    full_name: ` ${student.first_name} ${student.last_name}`,
+    contract_number,
+    full_name: `${student.first_name} ${student.last_name}`,
     student_code: student.student_code,
     dob: student.dob,
     gender: student.gender,
     email: student.email,
     phone_number: student.phone_number,
     class_code: student.class_code,
-    cooperation_area: student.cooperation_area,
-    nationality: student.nationality,
-    religion: student.religion,
-    identification_code: student.identification_code,
-    stu_province: student.stu_province,
-    stu_distict: student.stu_distict,
-    stu_commune: student.stu_commune,
+    ethnicity: student.ethnicity || '',
+    religion: student.religion || '',
+    birth_place: student.birth_place || '',
+    school_year: student.school_year || '',
+    major: student.major || '',
+    education_type: student.education_type || '',
+    father_name: student.father_name || '',
+    father_phone: student.father_phone || '',
+    mother_name: student.mother_name || '',
+    mother_phone: student.mother_phone || '',
+    contact_address: student.contact_address || '',
     room: student.StudentRoom?.Place?.area_name || '',
     floor: student.StudentRoom?.Place?.ParentPlace?.area_name || '',
     area: student.StudentRoom?.Place?.ParentPlace?.ParentPlace?.area_name || '',
-    // latest_contract: latestContract
-    //   ? {
-    //       id: latestContract.id,
-    //       type: latestContract.ContractType?.name,
-    //       apply_date: latestContract.apply_date,
-    //       status: latestContract.status,
-    //       confirm_by: latestContract.confirmBy
-    //         ? `${latestContract.confirmBy.last_name} ${latestContract.confirmBy.first_name}`
-    //         : null,
-    //     }
-    //   : null,
   };
 };
 
-// Tạo file Word từ template
+const helpers = {
+  formatDate: (date, format) => {
+    if (!date) return '';
+    return moment(date).format(format);
+  },
+  formatCurrency: (amount) => {
+    if (!amount) return '0';
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(amount);
+  },
+  capitalize: (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  },
+};
+
+export const generateRegistrationFormFileService = async (formData) => {
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const templatePath = path.join(
+      __dirname,
+      '../templates/contract_template.docx',
+    );
+   
+    const templateBuffer = fs.readFileSync(templatePath);
+
+    // Tạo file từ template
+    const buffer = await createReport({
+      template: templateBuffer, // 
+      data: {
+        ...formData,
+        helpers,
+      },
+      cmdDelimiter: ['{{', '}}'],
+      processLineBreaks: true,
+      noSandbox: true,
+    });
+
+    return buffer;
+  } catch (error) {
+    console.error('Error generating registration form file:', error);
+    throw new ApiError(500, 'Lỗi khi tạo file đơn đăng ký');
+  }
+};
+
 export const generateContractFile = async (contractId) => {
   try {
     // Lấy thông tin hợp đồng
@@ -238,6 +268,30 @@ export const generateContractFile = async (contractId) => {
           model: ContractType,
           as: 'ContractType',
         },
+        {
+          model: StudentRoom,
+          as: 'StudentRoom',
+          include: [
+            {
+              model: Place,
+              as: 'Place',
+              include: [
+                {
+                  model: Place,
+                  as: 'ParentPlace',
+                  attributes: ['area_name', 'level'],
+                  include: [
+                    {
+                      model: Place,
+                      as: 'ParentPlace',
+                      attributes: ['area_name', 'level'],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ],
     });
 
@@ -245,7 +299,7 @@ export const generateContractFile = async (contractId) => {
       throw new ApiError(404, 'Hợp đồng không tồn tại');
     }
 
-    // Đường dẫn đến template
+    // Đường dẫn đến file template
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     const templatePath = path.join(
@@ -253,7 +307,7 @@ export const generateContractFile = async (contractId) => {
       '../templates/contract_template.docx',
     );
 
-    // Dữ liệu để điền vào template
+    // Dữ liệu điền vào hợp đồng
     const data = {
       student_name: `${contract.student.last_name} ${contract.student.first_name}`,
       student_code: contract.student.student_code,
@@ -262,36 +316,43 @@ export const generateContractFile = async (contractId) => {
       email: contract.student.email,
       phone_number: contract.student.phone_number,
       class_code: contract.student.class_code,
-      contract_type: contract.ContractType.name,
+      room: contract.StudentRoom?.Place?.area_name || '',
+      floor: contract.StudentRoom?.Place?.ParentPlace?.area_name || '',
+      area:
+        contract.StudentRoom?.Place?.ParentPlace?.ParentPlace?.area_name || '',
+      contract_type: contract.ContractType?.name || '',
       apply_date: contract.apply_date,
       status: contract.status,
     };
 
-    // Tạo file từ template
+    // Tạo file docx từ template
     const buffer = await createReport({
       template: templatePath,
-      data,
+      data: { ...data, helpers },
+      cmdDelimiter: ['{{', '}}'],
+      processLineBreaks: true,
+      noSandbox: true,
     });
 
-    // Tạo thư mục nếu chưa tồn tại
+    // Tạo thư mục lưu nếu chưa có
     const outputDir = path.join(__dirname, '../public/contracts');
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // Tạo tên file
+    // Tạo tên và lưu file
     const fileName = `contract_${contractId}.docx`;
     const filePath = path.join(outputDir, fileName);
-
-    // Lưu file
     fs.writeFileSync(filePath, buffer);
 
-    // Cập nhật đường dẫn file trong database
+    // Cập nhật đường dẫn vào DB
     await contract.update({ file_path: `/contracts/${fileName}` });
 
+    // Trả về để FE tải trực tiếp nếu muốn
     return {
-      filePath,
+      buffer,
       fileName,
+      filePath,
     };
   } catch (error) {
     console.error('Error generating contract file:', error);

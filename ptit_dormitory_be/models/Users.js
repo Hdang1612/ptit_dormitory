@@ -96,24 +96,44 @@ const User = sequelize.define(
       type: DataTypes.STRING(45),
       allowNull: true,
     },
-    dad_name: {
+    father_name: {
       type: DataTypes.STRING(45),
       allowNull: true,
     },
-    mom_name: {
+    father_phone: {
       type: DataTypes.STRING(45),
       allowNull: true,
     },
-    stu_province: {
+    mother_name: {
       type: DataTypes.STRING(45),
       allowNull: true,
     },
-    stu_distict: {
+    mother_phone: {
       type: DataTypes.STRING(45),
       allowNull: true,
     },
-    stu_commune: {
+    ethnicity: {
       type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    religion: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    birth_place: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    school_year: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    major: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    address: {
+      type: DataTypes.STRING(255),
       allowNull: true,
     },
     personal_img: {

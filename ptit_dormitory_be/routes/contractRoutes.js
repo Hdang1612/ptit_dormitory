@@ -10,7 +10,7 @@ import {
   // updateContract,
   // deleteContract,
   generateContractDoc,
-  downloadContractDoc,
+  printRegistrationForm
 } from '../controller/contractController.js';
 
 const contractRoutes = express.Router();
@@ -31,9 +31,8 @@ contractRoutes.get(
 
 // Tạo file Word từ hợp đồng
 contractRoutes.post('/:contractId/generate-doc', generateContractDoc);
+contractRoutes.post('/generate-doc', printRegistrationForm);
 
-// Tải file hợp đồng
-contractRoutes.get('/:contractId/download', downloadContractDoc);
 
 // contractRoutes.get(
 //   '/',

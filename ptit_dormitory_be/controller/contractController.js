@@ -1,12 +1,12 @@
 import {
   getContractsService,
-  getContractByIdService,
-  createContractService,
-  updateContractService,
-  deleteContractService,
+  // getContractByIdService,
+  // createContractService,
+  // updateContractService,
+  // deleteContractService,
   fillContractService,
   generateContractFile,
-  downloadContractFile,
+  generateRegistrationFormFileService,
 } from '../services/contractService.js';
 
 // Lấy danh sách hợp đồng
@@ -26,80 +26,80 @@ export const getContractlist = async (req, res) => {
   }
 };
 
-// Lấy chi tiết hợp đồng
-export const getContractById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const contract = await getContractByIdService(id);
-    res.status(200).json({
-      success: true,
-      data: contract,
-    });
-  } catch (error) {
-    console.error('getContractById error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Lỗi khi lấy chi tiết hợp đồng',
-    });
-  }
-};
+// // Lấy chi tiết hợp đồng
+// export const getContractById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const contract = await getContractByIdService(id);
+//     res.status(200).json({
+//       success: true,
+//       data: contract,
+//     });
+//   } catch (error) {
+//     console.error('getContractById error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message || 'Lỗi khi lấy chi tiết hợp đồng',
+//     });
+//   }
+// };
 
-// Tạo hợp đồng mới
-export const createContract = async (req, res) => {
-  try {
-    const contractData = req.body;
-    const newContract = await createContractService(contractData);
-    res.status(201).json({
-      success: true,
-      message: 'Tạo hợp đồng thành công',
-      data: newContract,
-    });
-  } catch (error) {
-    console.error('createContract error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Lỗi khi tạo hợp đồng',
-    });
-  }
-};
+// // Tạo hợp đồng mới
+// export const createContract = async (req, res) => {
+//   try {
+//     const contractData = req.body;
+//     const newContract = await createContractService(contractData);
+//     res.status(201).json({
+//       success: true,
+//       message: 'Tạo hợp đồng thành công',
+//       data: newContract,
+//     });
+//   } catch (error) {
+//     console.error('createContract error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message || 'Lỗi khi tạo hợp đồng',
+//     });
+//   }
+// };
 
-// Cập nhật hợp đồng
-export const updateContract = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updateData = req.body;
-    const updatedContract = await updateContractService(id, updateData);
-    res.status(200).json({
-      success: true,
-      message: 'Cập nhật hợp đồng thành công',
-      data: updatedContract,
-    });
-  } catch (error) {
-    console.error('updateContract error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Lỗi khi cập nhật hợp đồng',
-    });
-  }
-};
+// // Cập nhật hợp đồng
+// export const updateContract = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const updateData = req.body;
+//     const updatedContract = await updateContractService(id, updateData);
+//     res.status(200).json({
+//       success: true,
+//       message: 'Cập nhật hợp đồng thành công',
+//       data: updatedContract,
+//     });
+//   } catch (error) {
+//     console.error('updateContract error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message || 'Lỗi khi cập nhật hợp đồng',
+//     });
+//   }
+// };
 
-// Xóa hợp đồng
-export const deleteContract = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await deleteContractService(id);
-    res.status(200).json({
-      success: true,
-      message: 'Xóa hợp đồng thành công',
-    });
-  } catch (error) {
-    console.error('deleteContract error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Lỗi khi xóa hợp đồng',
-    });
-  }
-};
+// // Xóa hợp đồng
+// export const deleteContract = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     await deleteContractService(id);
+//     res.status(200).json({
+//       success: true,
+//       message: 'Xóa hợp đồng thành công',
+//     });
+//   } catch (error) {
+//     console.error('deleteContract error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message || 'Lỗi khi xóa hợp đồng',
+//     });
+//   }
+// };
 
 // Lấy thông tin điền hợp đồng
 export const fillContract = async (req, res) => {
@@ -142,26 +142,22 @@ export const generateContractDoc = async (req, res) => {
   }
 };
 
-// Tải file hợp đồng
-export const downloadContractDoc = async (req, res) => {
+// Tạo file docx đăng ký
+export const printRegistrationForm = async (req, res) => {
   try {
-    const { contractId } = req.params;
-    const result = await downloadContractFile(contractId);
+    const buffer = await generateRegistrationFormFileService(req.body);
 
-    res.download(result.filePath, result.fileName, (err) => {
-      if (err) {
-        console.error('Download error:', err);
-        res.status(500).json({
-          success: false,
-          message: 'Lỗi khi tải file hợp đồng',
-        });
-      }
-    });
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=don_dang_ky_ktx.docx',
+    );
+    res.end(buffer);
   } catch (error) {
-    console.error('downloadContractDoc error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Lỗi khi tải file hợp đồng',
-    });
+    res.status(500).json({ message: error.message });
   }
 };
+
