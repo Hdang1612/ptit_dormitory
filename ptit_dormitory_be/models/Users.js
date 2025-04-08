@@ -92,6 +92,34 @@ const User = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    identification_code: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    dad_name: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    mom_name: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    stu_province: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    stu_distict: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    stu_commune: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    personal_img: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   },
   {
     tableName: 'users',
