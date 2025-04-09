@@ -7,13 +7,14 @@ import {
   fillContractService,
   // generateContractFile,
   generateRegistrationFormFileService,
-  generateCancelFormFileService
+  generateCancelFormFileService,
 } from '../services/contractService.js';
 
 // Lấy danh sách hợp đồng
 export const getContractlist = async (req, res) => {
   try {
     const contracts = await getContractsService(req.query);
+    console.log('>>>param', req.query);
     res.status(200).json({
       success: true,
       data: contracts,
@@ -31,7 +32,7 @@ export const getContractlist = async (req, res) => {
 export const getContractById = async (req, res) => {
   try {
     const { id } = req.params;
-    const contract = await getContractDetailService(id);
+    const contract = await getContractDetailService(id, req.user);
     res.status(200).json({
       success: true,
       data: contract,
@@ -90,24 +91,6 @@ export const updateContract = async (req, res) => {
   }
 };
 
-// // Xóa hợp đồng
-// export const deleteContract = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     await deleteContractService(id);
-//     res.status(200).json({
-//       success: true,
-//       message: 'Xóa hợp đồng thành công',
-//     });
-//   } catch (error) {
-//     console.error('deleteContract error:', error);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message || 'Lỗi khi xóa hợp đồng',
-//     });
-//   }
-// };
-
 // Lấy thông tin điền hợp đồng
 export const fillContract = async (req, res) => {
   try {
@@ -125,29 +108,6 @@ export const fillContract = async (req, res) => {
     });
   }
 };
-
-// // Tạo file Word từ hợp đồng
-// export const generateContractDoc = async (req, res) => {
-//   try {
-//     const { contractId } = req.params;
-//     const result = await generateContractFile(contractId);
-
-//     res.status(200).json({
-//       success: true,
-//       message: 'Tạo file hợp đồng thành công',
-//       data: {
-//         filePath: result.filePath,
-//         fileName: result.fileName,
-//       },
-//     });
-//   } catch (error) {
-//     console.error('generateContractDoc error:', error);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message || 'Lỗi khi tạo file hợp đồng',
-//     });
-//   }
-// };
 
 // Tạo file docx đăng ký
 export const printRegistrationForm = async (req, res) => {

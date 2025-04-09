@@ -13,11 +13,12 @@ import moment from 'moment';
 
 // Lấy danh sách hợp đồng
 export const getContractsService = async (query) => {
-  const { page = 1, limit = 10, status, student_id } = query;
+  const { page = 1, limit = 10, status, type, student_id } = query;
   const offset = (page - 1) * limit;
 
   const whereClause = {};
   if (status) whereClause.status = status;
+  if (type) whereClause.type = type;
   if (student_id) whereClause.student_id = student_id;
 
   const { count, rows } = await Contract.findAndCountAll({
@@ -46,15 +47,23 @@ export const getContractsService = async (query) => {
 };
 
 // Lấy chi tiết hợp đồng
-export const getContractDetailService = async (contractId) => {
-  const contract = await Contract.findByPk(contractId);
+export const getContractDetailService = async (contractId, user) => {
+  let contract;
+
+  if (user.role_id === '1') {
+    contract = await Contract.findByPk(contractId);
+  } else if (user.role_id === '4') {
+    contract = await Contract.findOne({
+      where: { student_id: user.id },
+      order: [['apply_date', 'DESC']],
+    });
+  }
 
   if (!contract) {
     throw new ApiError(404, 'Không tìm thấy hợp đồng');
   }
 
-  const { id, type, student_id, apply_date, status, file_path, form_data } =
-    contract;
+  const { id, type, student_id, apply_date, status, file_path, form_data } = contract;
 
   return {
     id,
@@ -66,6 +75,7 @@ export const getContractDetailService = async (contractId) => {
     student: { ...form_data },
   };
 };
+
 
 // Tạo hợp đồng mới
 export const createContractService = async (type, contractData) => {
@@ -82,7 +92,7 @@ export const createContractService = async (type, contractData) => {
   const contractId = uuidv4();
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
-  const outputDir = path.join(__dirname, '../upload/contract'); // lưu trong thư mục public
+  const outputDir = path.join(__dirname, '../upload/contract'); // lưu
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
   const fileName = `${contractId}.docx`;

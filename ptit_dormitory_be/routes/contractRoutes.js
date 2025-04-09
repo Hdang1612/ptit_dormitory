@@ -39,7 +39,8 @@ contractRoutes.get(
 
 // Tạo file Word từ hợp đồng
 contractRoutes.post('/create', createContract);
-contractRoutes.get('/fetch/:id', verifyToken, getContractById);
+contractRoutes.get('/fetch/:id', verifyToken, getContractById); // lấy hợp đồng khi login là admin
+contractRoutes.get('/fetch/me', verifyToken, getContractById); // lấy hợp đồng khi login là student
 contractRoutes.post('/generate-register-doc', printRegistrationForm);
 contractRoutes.post('/generate-cancel-doc', printCancelForm);
 
