@@ -11,6 +11,8 @@ import swaggerDocs from './config/swagger.js';
 
 import router from './routes/Routes.js';
 import fs from 'fs';
+// import fs from 'fs';
+import JSZip from 'jszip';
 
 // Tạo thư mục `uploads/` nếu chưa có
 if (!fs.existsSync('uploads')) {
@@ -20,6 +22,12 @@ if (!fs.existsSync('uploads')) {
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 3000;
+
+
+const file = fs.readFileSync('./templates/contract_template.docx');
+JSZip.loadAsync(file)
+  .then(() => console.log('Valid zip/docx file'))
+  .catch(err => console.error('Invalid zip/docx:', err));
 
 app.use(cors());
 app.use(bodyParser.json());

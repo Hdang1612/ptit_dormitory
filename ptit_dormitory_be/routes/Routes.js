@@ -5,6 +5,7 @@ import authRoutes from './authRoutes.js';
 import userRoutes from './userRoutes.js';
 import areaRoutes from './areaRoute.js';
 import roleRoutes from './roleRoutes.js';
+import contractRoutes from './contractRoutes.js';
 
 const router = express.Router();
 
@@ -12,6 +13,7 @@ router.use('/auth', authRoutes);
 router.use('/user', userRoutes);
 router.use('/place', areaRoutes);
 router.use('/role', roleRoutes);
+router.use('/contract', contractRoutes);
 
 
 export default router;
