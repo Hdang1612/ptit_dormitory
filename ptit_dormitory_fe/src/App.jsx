@@ -1,12 +1,52 @@
-import "./App.css";
-
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Login from "./view/Login";
+import ForgotPassword from "./view/ForgotPassword";
+import UserIdentificationCard from "./view/UserIdentificationCard";
+import UserEditPage from "./view/UserEditPage";
+import RegistrationListPage from "./view/RegistrationListPage";
+import ContractList from "./view/ContractList";
+import AddContract from "./view/AddContract";
+import InforContract from "./view/InforContract";
+import ContractRenewalApp from "./view/ContractRenewalApp";
+import CancelContract from "./view/CancelContract";
+import RoomList from "./view/RoomList";
+import ShiftManagement from "./view/ShiftManagement";
+import ShiftSchedule from "./view/ShiftSchedule";
+import StaffDuty from "./view/StaffDuty";
+import StudentCheckin from "./view/StudentCheckin";
+import StudentInfo from "./view/StudentInfo";
+import StudentList from "./view/StudentList";
 function App() {
   return (
-    <>
-      <div className="w-[1000px] bg-[#000] h-screen text-8xl  text-amber-300">
-        <p>hello</p>
-      </div>
-    </>
+    <Router>
+      <Routes>
+        {/* Dũng */}
+        <Route path="/dangnhap" element={<Login />}></Route>
+        <Route path="/quenmatkhau" element={<ForgotPassword />}></Route>
+        <Route path="/thedinhdanh" element={<UserIdentificationCard />}></Route>
+        <Route path="/suathongtin" element={<UserEditPage />}></Route>
+        <Route
+          path="/danhsachdondky"
+          element={<RegistrationListPage />}
+        ></Route>
+        <Route path="/danhsachhopdong" element={<ContractList />}></Route>
+        <Route path="/themdangky" element={<AddContract />}></Route>
+        <Route path="/thongtinhopdong" element={<InforContract />}></Route>
+        <Route path="/giahanhopdong" element={<ContractRenewalApp />}></Route>
+        <Route path="/huyhopdong" element={<CancelContract />}></Route>
+
+        {/* Quốc Anh */}
+        <Route path="/dsphong" element={<RoomList />}></Route>
+        <Route path="/shiftmanage" element={<ShiftManagement />}></Route>
+        <Route path="/shiftschedule" element={<ShiftSchedule />}></Route>
+        <Route path="/staffduty" element={<StaffDuty />}></Route>
+        <Route path="/studentcheckin" element={<StudentCheckin />}></Route>
+        <Route path="/student-infor" element={<StudentInfo />}></Route>
+        <Route path="/student-list" element={<StudentList />}></Route>
+
+        {/* Hoàng Anh */}
+      </Routes>
+    </Router>
   );
 }
 
