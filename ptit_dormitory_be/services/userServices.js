@@ -148,6 +148,7 @@ export const deleteUserService = async (id) => {
   return { message: 'deleted successfully' };
 };
 
+const DEFAULT_PWD = process.env.DEFAULT_PASSWORD_STUDENT;
 // import user từ file excel
 export const importForeignStudentFromExcelService = async (filePath) => {
   try {
@@ -183,6 +184,9 @@ export const importForeignStudentFromExcelService = async (filePath) => {
           }
 
           mappedUser[dbField] = value;
+          // Thêm password mặc định
+          const hashedPassword = await bcrypt.hash(DEFAULT_PWD, 10);
+          mappedUser.password = hashedPassword;
         }
 
         //  check user exist
@@ -264,6 +268,9 @@ export const importVnStudentFromExcelService = async (filePath) => {
         }
 
         mappedUser.student_code = studentCode;
+        // Thêm password mặc định
+        const hashedPassword = await bcrypt.hash(DEFAULT_PWD, 10);
+        mappedUser.password = hashedPassword;
 
         //  check user exist
         const existingUser = await User.findOne({
