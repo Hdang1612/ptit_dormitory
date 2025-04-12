@@ -1,0 +1,1 @@
+export { PowerMonitoring } from "../../view/PowerMonitoring";
