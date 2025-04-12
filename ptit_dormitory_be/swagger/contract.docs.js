@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /api/v1/contracts:
+ * /api/contract/fetchlist:
  *   get:
  *     summary: Lấy danh sách hợp đồng
  *     tags: [Contracts]
@@ -69,7 +69,7 @@
 
 /**
  * @swagger
- * /api/v1/contracts/{contractId}:
+ * /api/contract/fetch/{contractId}:
  *   get:
  *     summary: Lấy chi tiết hợp đồng
  *     tags: [Contracts]
@@ -93,7 +93,7 @@
 
 /**
  * @swagger
- * /api/v1/contracts:
+ * /api/contract/create:
  *   post:
  *     summary: Tạo hợp đồng mới
  *     tags: [Contracts]
@@ -137,7 +137,7 @@
 
 /**
  * @swagger
- * /api/v1/contracts/{contractId}:
+ * /api/contracts/update/{contractId}:
  *   put:
  *     summary: Cập nhật hợp đồng
  *     tags: [Contracts]
