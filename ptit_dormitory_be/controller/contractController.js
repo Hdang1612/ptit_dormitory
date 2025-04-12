@@ -3,11 +3,6 @@ import {
   getContractDetailService,
   createContractService,
   updateContractService,
-  // deleteContractService,
-  fillContractService,
-  // generateContractFile,
-  generateRegistrationFormFileService,
-  generateCancelFormFileService,
 } from '../services/contractService.js';
 
 // Lấy danh sách hợp đồng
@@ -88,60 +83,5 @@ export const updateContract = async (req, res) => {
       success: false,
       message: err.message || 'Lỗi khi cập nhật hợp đồng',
     });
-  }
-};
-
-// Lấy thông tin điền hợp đồng
-export const fillContract = async (req, res) => {
-  try {
-    const { studentId } = req.params;
-    const data = await fillContractService(studentId);
-    res.json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    console.error('fillContract error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Lỗi khi lấy thông tin điền hợp đồng',
-    });
-  }
-};
-
-// Tạo file docx đăng ký
-export const printRegistrationForm = async (req, res) => {
-  try {
-    const buffer = await generateRegistrationFormFileService(req.body);
-
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    );
-    res.setHeader(
-      'Content-Disposition',
-      'attachment; filename=don_dang_ky_ktx.docx',
-    );
-    res.end(buffer);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const printCancelForm = async (req, res) => {
-  try {
-    const buffer = await generateCancelFormFileService(req.body);
-
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    );
-    res.setHeader(
-      'Content-Disposition',
-      'attachment; filename=don_huy_ktx.docx',
-    );
-    res.end(buffer);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 };
