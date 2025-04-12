@@ -23,5 +23,35 @@ export const columnMappingStudent = {
 export const genderMapping = {
   'Nam (Boy)': 'Male',
   'Nữ (Girl)': 'Female',
-  Khác: 'Other',
+  "Khác": 'Other',
 };
+
+//test create contract
+// {
+//   "type":1,
+// "full_name": "test create contract",
+// "gender":"Nam",
+// "dob": "2003-05-20",
+// "student_code": "B22DCCN000",
+// "class_code": "D22CQCN01-B",
+// "school_year": "2022",
+// "major": "DPT",
+// "nationality": "Việt Nam",
+// "ethnicity": "Kinh",
+// "religion": "Không",
+// "education_type":"Chính quy",
+// "identification_code": "001203005678",
+// "birth_place": "Hà Nội",
+// "phone_number": "0987654321",
+// "email": "vana111@gmail.com",
+// "father_name": "Nguyễn Văn B",
+// "father_phone": "0912345678",
+// "mother_name": "Trần Thị C",
+// "mother_phone": "0934567890",
+// "address": "Số 234, Hoàng Mai, Hà Nội",
+// "area": "B5",
+// "floor": "3",
+// "room": "303",
+// "apply_date": "2025-04-01",
+// "expired_date": "2026-03-31"
+// }
