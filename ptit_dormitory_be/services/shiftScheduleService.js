@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import ShiftSchedule from '../models/ShiftSchedule.js';
+import { ShiftSchedule, User, Place } from '../models/association.js';
 
 export const createShiftScheduleService = async (data) => {
   const { user_id, shift_date, place_id, shift_start, shift_end, status } =
@@ -33,4 +33,42 @@ export const updateShiftScheduleService = async (id, data) => {
     status: status !== undefined ? status : record.status,
   });
   return updated;
+};
+export const getListShiftScheduleService = async (filters, pagination) => {
+  const { shift_date, place_id } = filters;
+  const { page = 1, limit = 10 } = pagination;
+  const whereCondition = {};
+  if (shift_date) whereCondition.shift_date = shift_date;
+  if (place_id) whereCondition.place_id = place_id;
+  const offset = (page - 1) * limit;
+  const { rows: data, count: total } = await ShiftSchedule.findAndCountAll({
+    where: whereCondition,
+    include: [
+      {
+        model: Place,
+        as: 'place',
+        attributes: ['id', 'area_name'],
+      },
+      {
+        model: User,
+        as: 'user',
+        attributes: ['id', 'first_name', 'last_name'],
+      },
+    ],
+    order: [
+      ['shift_date', 'ASC'],
+      ['shift_start', 'ASC'],
+    ],
+    offset,
+    limit,
+  });
+  return {
+    pagination: {
+      total: total,
+      page: page,
+      limit: limit,
+      totalPages: Math.ceil(total / limit),
+    },
+    data: data,
+  };
 };

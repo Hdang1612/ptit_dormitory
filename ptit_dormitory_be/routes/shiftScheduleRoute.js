@@ -4,7 +4,7 @@ const shiftScheduleRoute = express.Router();
 
 shiftScheduleRoute.post('/create', shiftScheduleController.createShiftSchedule);
 shiftScheduleRoute.get(
-  '/getList',
+  '/getListOfAllUser',
   shiftScheduleController.getListShiftSchedule,
 );
 shiftScheduleRoute.put(
