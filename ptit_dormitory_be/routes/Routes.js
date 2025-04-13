@@ -6,6 +6,7 @@ import userRoutes from './userRoutes.js';
 import areaRoutes from './areaRoute.js';
 import roleRoutes from './roleRoutes.js';
 import contractRoutes from './contractRoutes.js';
+import shiftScheduleRoute from './shiftScheduleRoute.js';
 
 const router = express.Router();
 
@@ -14,6 +15,6 @@ router.use('/user', userRoutes);
 router.use('/place', areaRoutes);
 router.use('/role', roleRoutes);
 router.use('/contract', contractRoutes);
-
+router.use('/shiftSchedule', shiftScheduleRoute);
 
 export default router;
