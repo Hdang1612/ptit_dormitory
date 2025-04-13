@@ -26,12 +26,12 @@
  *           default: 10
  *       - name: status
  *         in: query
- *         description: Trạng thái hợp đồng (ví dụ: "đã gửi", "xác nhận", "hủy")
+ *         description: 'Trạng thái hợp đồng (ví dụ: "đã gửi", "xác nhận", "hủy")'
  *         schema:
  *           type: string
  *       - name: type
  *         in: query
- *         description: Loại hợp đồng (ví dụ: "1" cho hợp đồng mới, "2" cho hợp đồng gia hạn)
+ *         description: 'Loại hợp đồng (ví dụ: "1" cho hợp đồng mới, "2" cho hợp đồng gia hạn)'
  *         schema:
  *           type: integer
  *       - name: student_id
