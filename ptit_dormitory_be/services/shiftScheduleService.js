@@ -72,3 +72,43 @@ export const getListShiftScheduleService = async (filters, pagination) => {
     data: data,
   };
 };
+export const getListOfUserService = async (user_id, filters, pagination) => {
+  if (!user_id || typeof user_id !== 'string') {
+    throw new Error('user_id khong hop le');
+  }
+  const { shift_date } = filters;
+  const { page = 1, limit = 10 } = pagination;
+
+  const offset = (page - 1) * limit;
+  const whereCondition = {
+    user_id,
+  };
+  if (shift_date) {
+    whereCondition.shift_date = shift_date;
+  }
+  const { rows: data, count: total } = await ShiftSchedule.findAndCountAll({
+    where: whereCondition,
+    include: [
+      {
+        model: Place,
+        as: 'place',
+        attributes: ['id', 'area_name'],
+      },
+    ],
+    order: [
+      ['shift_date', 'ASC'],
+      ['shift_start', 'ASC'],
+    ],
+    offset,
+    limit,
+  });
+  return {
+    pagination: {
+      total: total,
+      page: page,
+      limit: limit,
+      totalPages: Math.ceil(total / limit),
+    },
+    data: data,
+  };
+};

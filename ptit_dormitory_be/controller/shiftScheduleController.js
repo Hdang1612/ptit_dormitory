@@ -1,5 +1,6 @@
 import {
   createShiftScheduleService,
+  getListOfUserService,
   getListShiftScheduleService,
   updateShiftScheduleService,
 } from '../services/shiftScheduleService.js';
@@ -29,7 +30,7 @@ const getListShiftSchedule = async (req, res) => {
     };
     const pagination = {
       page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 1,
+      limit: parseInt(req.query.limit) || 10,
     };
     const result = await getListShiftScheduleService(filters, pagination);
     return res.status(200).json({
@@ -61,10 +62,30 @@ const updateShiftSchedule = async (req, res) => {
     });
   }
 };
-
+const getListOfUser = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const filters = {
+      shift_date: req.query.shift_date,
+    };
+    console.log(typeof user_id);
+    const pagination = {
+      page: parseInt(req.query.page) || 1,
+      limit: parseInt(req.query.limit) || 10,
+    };
+    const result = await getListOfUserService(user_id, filters, pagination);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log('Lỗi lấy lịch trực cá nhân: ', error);
+    res.status(500).json({
+      message: 'Lỗi máy chủ',
+    });
+  }
+};
 const shiftScheduleController = {
   createShiftSchedule,
   getListShiftSchedule,
   updateShiftSchedule,
+  getListOfUser,
 };
 export default shiftScheduleController;

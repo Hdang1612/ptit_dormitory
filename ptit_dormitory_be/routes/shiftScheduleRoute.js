@@ -7,6 +7,10 @@ shiftScheduleRoute.get(
   '/getListOfAllUser',
   shiftScheduleController.getListShiftSchedule,
 );
+shiftScheduleRoute.get(
+  '/getListOfUser/:user_id',
+  shiftScheduleController.getListOfUser,
+);
 shiftScheduleRoute.put(
   '/edit/:id',
   shiftScheduleController.updateShiftSchedule,
