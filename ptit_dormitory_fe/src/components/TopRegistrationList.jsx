@@ -1,12 +1,14 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 
-const TopTable = () => {
+const TopRegistrationList = () => {
   const [entries, setEntries] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const handleEntriesChange = (e) => setEntries(e.target.value);
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-  const handleAddNew = () => alert("");
+  const handleAddNew = () => navigate("/themdangky");
 
   const styles = {
     container: {
@@ -83,4 +85,4 @@ const TopTable = () => {
   );
 };
 
-export default TopTable;
+export default TopRegistrationList;

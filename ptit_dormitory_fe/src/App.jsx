@@ -16,6 +16,7 @@ import StaffDuty from "./view/StaffDuty";
 import StudentCheckin from "./view/StudentCheckin";
 import StudentInfo from "./view/StudentInfo";
 import StudentList from "./view/StudentList";
+import FormAddContract from "./view/FormAddContract";
 function App() {
   return (
     <Router>
@@ -31,6 +32,7 @@ function App() {
         ></Route>
         <Route path="/danhsachhopdong" element={<ContractList />}></Route>
         <Route path="/themdangky" element={<AddContract />}></Route>
+        <Route path="/thongtindangky" element={<FormAddContract />}></Route>
         <Route path="/thongtinhopdong" element={<InforContract />}></Route>
         <Route path="/giahanhopdong" element={<ContractRenewalApp />}></Route>
         <Route path="/huyhopdong" element={<CancelContract />}></Route>

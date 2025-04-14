@@ -1,6 +1,7 @@
 import React from "react";
 import Sidebar from "../components/Sidebar";
-import DataTable from "../components/TopTable";
+import TopRegistrationList from "../components/TopRegistrationList";
+import { useNavigate } from "react-router-dom";
 
 const RegistrationList = () => {
   const data = [
@@ -32,6 +33,7 @@ const RegistrationList = () => {
       status: "Đã duyệt",
     },
   ];
+  const navigate = useNavigate();
 
   return (
     <div style={styles.container}>
@@ -41,7 +43,7 @@ const RegistrationList = () => {
         <h2 style={styles.title}>Danh sách đơn đăng ký lưu trú</h2>
 
         <div style={styles.tableContainer}>
-          <DataTable />
+          <TopRegistrationList />
           <table style={styles.table}>
             <thead>
               <tr>
@@ -79,7 +81,12 @@ const RegistrationList = () => {
                     </span>
                   </td>
                   <td style={styles.td}>
-                    <button style={styles.viewBtn}>Sửa</button>
+                    <button
+                      style={styles.viewBtn}
+                      onClick={() => navigate("/thongtindangky")}
+                    >
+                      Xem
+                    </button>
                     <button style={styles.deleteBtn}>Xóa</button>
                   </td>
                 </tr>

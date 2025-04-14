@@ -8,7 +8,7 @@ export default function Sidebar() {
     <div className="sidebar-container">
       <div className="user-info">
         <div className="avatar"></div>
-        <div className="user-details" onClick={() => navigate("/user-edit")}>
+        <div className="user-details" onClick={() => navigate("/suathongtin")}>
           <div className="username">Hoàng Dũng</div>
           <div className="role-badge">Admin</div>
         </div>

@@ -13,7 +13,7 @@ export default function Login() {
           <input type="password" placeholder="Nhập mật khẩu" />
           <button
             className="login-button"
-            onClick={() => navigate("/user-card")}
+            onClick={() => navigate("/danhsachdondky")}
           >
             ĐĂNG NHẬP
           </button>

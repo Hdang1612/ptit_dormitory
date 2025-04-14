@@ -1,8 +1,8 @@
 import React from "react";
 import Sidebar from "../components/Sidebar";
-import DataTable from "../components/TopTable";
+import TopConTractList from "../components/TopContractList";
 
-const RegistrationList = () => {
+const ContractList = () => {
   const data = [
     {
       id: "#20462",
@@ -35,7 +35,7 @@ const RegistrationList = () => {
         <h2 style={styles.title}>Danh sách hợp đồng</h2>
 
         <div style={styles.tableContainer}>
-          <DataTable />
+          <TopConTractList />
           <table style={styles.table}>
             <thead>
               <tr>
@@ -70,7 +70,7 @@ const RegistrationList = () => {
                     </span>
                   </td>
                   <td style={styles.td}>
-                    <button style={styles.viewBtn}>Sửa</button>
+                    <button style={styles.viewBtn}>Xem</button>
                     <button style={styles.deleteBtn}>Xóa</button>
                   </td>
                 </tr>
@@ -194,4 +194,4 @@ const styles = {
   },
 };
 
-export default RegistrationList;
+export default ContractList;

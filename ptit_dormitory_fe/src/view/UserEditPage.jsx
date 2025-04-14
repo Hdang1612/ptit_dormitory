@@ -67,7 +67,7 @@ const UserEditPage = () => {
               />
             </div>
 
-            <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+            {/* <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>Tỉnh/Thành phố</label>
                 <select style={inputStyle}>
@@ -86,7 +86,7 @@ const UserEditPage = () => {
                   <option>Chọn phường/xã</option>
                 </select>
               </div>
-            </div>
+            </div> */}
 
             <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
               <div style={{ flex: 1 }}>
