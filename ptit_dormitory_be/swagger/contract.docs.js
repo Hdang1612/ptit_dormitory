@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /api/v1/contracts:
+ * /api/contract/fetchlist:
  *   get:
  *     summary: Lấy danh sách hợp đồng
  *     tags: [Contracts]
@@ -26,12 +26,12 @@
  *           default: 10
  *       - name: status
  *         in: query
- *         description: Trạng thái hợp đồng (ví dụ: "đã gửi", "xác nhận", "hủy")
+ *         description: 'Trạng thái hợp đồng (ví dụ: "đã gửi", "xác nhận", "hủy")'
  *         schema:
  *           type: string
  *       - name: type
  *         in: query
- *         description: Loại hợp đồng (ví dụ: "1" cho hợp đồng mới, "2" cho hợp đồng gia hạn)
+ *         description: 'Loại hợp đồng (ví dụ: "1" cho hợp đồng mới, "2" cho hợp đồng gia hạn)'
  *         schema:
  *           type: integer
  *       - name: student_id
@@ -69,7 +69,7 @@
 
 /**
  * @swagger
- * /api/v1/contracts/{contractId}:
+ * /api/contract/fetch/{contractId}:
  *   get:
  *     summary: Lấy chi tiết hợp đồng
  *     tags: [Contracts]
@@ -93,7 +93,7 @@
 
 /**
  * @swagger
- * /api/v1/contracts:
+ * /api/contract/create:
  *   post:
  *     summary: Tạo hợp đồng mới
  *     tags: [Contracts]
@@ -137,7 +137,7 @@
 
 /**
  * @swagger
- * /api/v1/contracts/{contractId}:
+ * /api/contracts/update/{contractId}:
  *   put:
  *     summary: Cập nhật hợp đồng
  *     tags: [Contracts]
