@@ -1,5 +1,6 @@
 import {
   createShiftScheduleService,
+  getAttendanceOfShiftService,
   getListOfUserService,
   getListShiftScheduleService,
   updateShiftScheduleService,
@@ -82,10 +83,29 @@ const getListOfUser = async (req, res) => {
     });
   }
 };
+const getAttendanceOfShift = async (req, res) => {
+  try {
+    const { shift_id, place_id } = req.params;
+    const pagination = {
+      page: req.query.page || 1,
+      limit: req.query.limit || 10,
+    };
+    const result = getAttendanceOfShiftService(shift_id, place_id, pagination);
+  } catch (error) {
+    console.log(
+      'Lỗi lấy danh sách sinh viên và trạng thái điểm danh của ca trực',
+      error,
+    );
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
 const shiftScheduleController = {
   createShiftSchedule,
   getListShiftSchedule,
   updateShiftSchedule,
   getListOfUser,
+  getAttendanceOfShift,
 };
 export default shiftScheduleController;

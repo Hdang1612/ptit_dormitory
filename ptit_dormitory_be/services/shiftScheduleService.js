@@ -1,5 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ShiftSchedule, User, Place } from '../models/association.js';
+import { Op } from 'sequelize';
+import {
+  ShiftSchedule,
+  User,
+  Place,
+  Attendance,
+  StudentRoom,
+} from '../models/association.js';
 
 export const createShiftScheduleService = async (data) => {
   const { user_id, shift_date, place_id, shift_start, shift_end, status } =
@@ -110,5 +117,110 @@ export const getListOfUserService = async (user_id, filters, pagination) => {
       totalPages: Math.ceil(total / limit),
     },
     data: data,
+  };
+};
+export const getAttendanceOfShiftService = async (
+  shift_id,
+  place_id,
+  pagination,
+) => {
+  // Lấy record của place để xác định level
+  const placeRecord = await Place.findOne({ where: { id: place_id } });
+  if (!placeRecord) {
+    throw new Error('Place not found');
+  }
+  let roomIds = [];
+  if (placeRecord.level === 'area') {
+    // lấy tất cả tầng floor thuộc khu vực area
+    const floors = await Place.findAll({
+      where: { level: 'floor', parent_id: place_id },
+      attributes: ['id'],
+    });
+    const floorIds = floors.map((floor) => floor.id);
+    if (floorIds.length === 0)
+      return {
+        pagination: {
+          total: 0,
+          page: pagination.page,
+          limit: pagination.limit,
+          totalPages: 0,
+        },
+        data: [],
+      };
+    // lấy tất cả phòng thuộc tầng
+    const rooms = await Place.findAll({
+      where: { level: 'room', parent_id: { [Op.in]: floorIds } },
+      attributes: ['id'],
+    });
+    roomIds = rooms.map((room) => room.id);
+  } else if (placeRecord.level === 'floor') {
+    // lấy tất cả phòng thuộc tầng
+    const rooms = await Place.findAll({
+      where: { level: 'room', parent_id: place_id },
+      attributes: ['id'],
+    });
+    roomIds = rooms.map((room) => room.id);
+  } else if (placeRecord.level === 'room') {
+    roomIds = [place_id];
+  } else {
+    throw new Error('Invali level of place');
+  }
+  if (roomIds.length === 0) {
+    return {
+      pagination: {
+        total: 0,
+        page: pagination.page,
+        limit: pagination.limit,
+        totalPages: 0,
+      },
+      data: [],
+    };
+  }
+  // Phân trang
+  const page = parseInt(pagination.page, 10) || 1;
+  const limit = parseInt(pagination.limit, 10) || 10;
+  const offset = (page - 1) * limit;
+  // Truy vấn danh sách sinh viên thuộc các phòng có id thuộc roomIds, kết hợp LEFT JOIN với attendance.
+  // Nếu sinh viên chưa có dữ liệu điểm danh cho ca trực này, trường attendance_status sẽ trả về NULL.
+  const dataQuery = `
+    SELECT 
+      u.id AS student_id,
+      u.first_name,
+      u.last_name,
+      u.student_code,
+      sr.room_id,
+      a.status AS attendance_status
+    FROM student_room sr
+    JOIN users u ON sr.student_id = u.id
+    LEFT JOIN attendance a
+      ON a.student_id = u.id AND a.shift_id = :shift_id
+    WHERE sr.room_id IN (:roomIds)
+    ORDER BY u.student_code ASC
+    LIMIT :limit OFFSET :offset
+  `;
+  const countQuery = `
+    SELECT COUNT(*) AS total
+    FROM student_room sr
+    WHERE sr.room_id IN (:roomIds)
+  `;
+  const data = await sequelize.query(dataQuery, {
+    replacements: { shift_id, roomIds, limit, offset },
+    type: sequelize.QueryTypes.SELECT,
+  });
+
+  const countResult = await sequelize.query(countQuery, {
+    replacements: { roomIds },
+    type: sequelize.QueryTypes.SELECT,
+  });
+  const total = countResult[0].total;
+  const totalPages = Math.ceil(total / limit);
+  return {
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages,
+    },
+    data,
   };
 };

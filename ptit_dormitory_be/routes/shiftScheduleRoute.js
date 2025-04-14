@@ -19,4 +19,9 @@ shiftScheduleRoute.put(
   '/edit/:id',
   shiftScheduleController.updateShiftSchedule,
 );
+// Báo cáo của ca trực (danh sách sinh viên thuộc khu vực của ca trực đó kèm trạng thái điểm danh)
+shiftScheduleRoute.get(
+  '/attedanceOfShift/:shift_id/:place_id',
+  shiftScheduleController.getAttendanceOfShift,
+);
 export default shiftScheduleRoute;
