@@ -25,10 +25,9 @@ const Report = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    attendance_id: {
+    shift_schedule_id: {
       type: DataTypes.STRING(255),
       allowNull: true,
-      unique: true,
     },
   },
   {

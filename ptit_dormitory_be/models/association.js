@@ -55,9 +55,15 @@ ShiftSchedule.hasMany(Attendance, {
   as: 'attendances',
 });
 
-// Attendance có thể có 1 report
-Attendance.hasOne(Report, { foreignKey: 'attendance_id', as: 'report' });
-Report.belongsTo(Attendance, { foreignKey: 'attendance_id', as: 'attendance' });
+// ShiftSchedule có thể có nhiều báo cáo
+ShiftSchedule.hasMany(Report, {
+  foreignKey: 'shift_schedule_id',
+  as: 'reports',
+});
+Report.belongsTo(ShiftSchedule, {
+  foreignKey: 'shift_schedule_id',
+  as: 'shifts',
+});
 
 // Report được tạo bởi 1 user
 Report.belongsTo(User, { foreignKey: 'create_by', as: 'creator' });
