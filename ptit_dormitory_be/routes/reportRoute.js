@@ -10,7 +10,7 @@ reportRoute.post(
   reportController.createReport,
 );
 reportRoute.put(
-  '/updateReport',
+  '/updateReport/:id',
   uploadReport.single('checkin_photo'),
   reportController.updateReport,
 );

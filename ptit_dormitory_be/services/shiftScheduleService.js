@@ -7,6 +7,7 @@ import {
   Place,
   Attendance,
   StudentRoom,
+  Report,
 } from '../models/association.js';
 
 export const createShiftScheduleService = async (data) => {
@@ -208,6 +209,16 @@ export const getAttendanceOfShiftService = async (
     type: sequelize.QueryTypes.SELECT,
   });
   const attendanceStatus = attendanceAggregate[0];
+  const reports = await Report.findAll({
+    where: {
+      shift_schedule_id: shift_id,
+    },
+    attributes: ['id', 'content', 'date', 'create_by', 'checkin_photo'],
+  });
+  const parsedReports = reports.map((report) => ({
+    ...report.toJSON(),
+    content: report.content ? JSON.parse(report.content) : null,
+  }));
   return {
     pagination: {
       total,
@@ -216,6 +227,7 @@ export const getAttendanceOfShiftService = async (
       totalPages,
     },
     attendanceStatus,
+    reports: parsedReports,
     data,
   };
 };

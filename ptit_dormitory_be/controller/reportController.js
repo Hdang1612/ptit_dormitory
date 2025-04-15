@@ -18,8 +18,30 @@ const createReport = async (req, res) => {
     });
   }
 };
-const getReport = async (req, res) => {};
-const updateReport = async (req, res) => {};
+const getReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await getReportService(id);
+    res.status(200).json(result);
+  } catch (error) {
+    console.log('Lỗi lấy báo cáo', error);
+    res.status(500).json({
+      error: 'Lỗi lấy báo cáo',
+    });
+  }
+};
+const updateReport = async (req, res) => {
+  try {
+    const updatedReport = await updateReportService(req);
+    console.log(updatedReport);
+    res.status(200).json(updatedReport);
+  } catch (error) {
+    console.log('Lỗi sửa báo cáo', error);
+    res.status(500).json({
+      error: 'Lỗi sửa báo cáo',
+    });
+  }
+};
 
 const reportController = {
   createReport,
