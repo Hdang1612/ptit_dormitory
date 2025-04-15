@@ -8,6 +8,7 @@ import roleRoutes from './roleRoutes.js';
 import contractRoutes from './contractRoutes.js';
 import shiftScheduleRoute from './shiftScheduleRoute.js';
 import attendanceRoute from './attendanceRoute.js';
+import reportRoute from './reportRoute.js';
 
 const router = express.Router();
 
@@ -18,5 +19,5 @@ router.use('/role', roleRoutes);
 router.use('/contract', contractRoutes);
 router.use('/shiftSchedule', shiftScheduleRoute);
 router.use('/attendance', attendanceRoute);
-
+router.use('/report', reportRoute);
 export default router;
