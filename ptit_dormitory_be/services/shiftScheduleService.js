@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Op } from 'sequelize';
+import { sequelize } from '../config/db.js';
 import {
   ShiftSchedule,
   User,
@@ -124,80 +125,52 @@ export const getAttendanceOfShiftService = async (
   place_id,
   pagination,
 ) => {
-  // Lấy record của place để xác định level
-  const placeRecord = await Place.findOne({ where: { id: place_id } });
+  const placeRecord = await Place.findOne({
+    where: { id: place_id },
+  });
   if (!placeRecord) {
-    throw new Error('Place not found');
+    throw new Error('Place not found !');
   }
-  let roomIds = [];
-  if (placeRecord.level === 'area') {
-    // lấy tất cả tầng floor thuộc khu vực area
-    const floors = await Place.findAll({
-      where: { level: 'floor', parent_id: place_id },
-      attributes: ['id'],
-    });
-    const floorIds = floors.map((floor) => floor.id);
-    if (floorIds.length === 0)
-      return {
-        pagination: {
-          total: 0,
-          page: pagination.page,
-          limit: pagination.limit,
-          totalPages: 0,
-        },
-        data: [],
-      };
-    // lấy tất cả phòng thuộc tầng
-    const rooms = await Place.findAll({
-      where: { level: 'room', parent_id: { [Op.in]: floorIds } },
-      attributes: ['id'],
-    });
-    roomIds = rooms.map((room) => room.id);
-  } else if (placeRecord.level === 'floor') {
-    // lấy tất cả phòng thuộc tầng
-    const rooms = await Place.findAll({
-      where: { level: 'room', parent_id: place_id },
-      attributes: ['id'],
-    });
-    roomIds = rooms.map((room) => room.id);
-  } else if (placeRecord.level === 'room') {
-    roomIds = [place_id];
-  } else {
-    throw new Error('Invali level of place');
+  if (placeRecord.level !== 'floor') {
+    throw new Error('Place has not level is floor');
   }
+  const rooms = await Place.findAll({
+    where: { level: 'room', parent_id: place_id },
+    attributes: ['id'],
+  });
+  const roomIds = rooms.map((room) => room.id);
   if (roomIds.length === 0) {
     return {
       pagination: {
         total: 0,
-        page: pagination.page,
-        limit: pagination.limit,
+        page: parseInt(pagination.page, 10) || 1,
+        limit: parseInt(pagination.limit, 10) || 10,
         totalPages: 0,
       },
       data: [],
     };
   }
-  // Phân trang
+  console.log(roomIds);
   const page = parseInt(pagination.page, 10) || 1;
   const limit = parseInt(pagination.limit, 10) || 10;
   const offset = (page - 1) * limit;
-  // Truy vấn danh sách sinh viên thuộc các phòng có id thuộc roomIds, kết hợp LEFT JOIN với attendance.
-  // Nếu sinh viên chưa có dữ liệu điểm danh cho ca trực này, trường attendance_status sẽ trả về NULL.
+  // Query sinh vien thuoc phong voi left join den attendance
   const dataQuery = `
-    SELECT 
-      u.id AS student_id,
-      u.first_name,
-      u.last_name,
-      u.student_code,
-      sr.room_id,
-      a.status AS attendance_status
-    FROM student_room sr
-    JOIN users u ON sr.student_id = u.id
-    LEFT JOIN attendance a
-      ON a.student_id = u.id AND a.shift_id = :shift_id
-    WHERE sr.room_id IN (:roomIds)
-    ORDER BY u.student_code ASC
-    LIMIT :limit OFFSET :offset
-  `;
+  SELECT 
+    u.id AS student_id,
+    u.first_name,
+    u.last_name,
+    u.student_code,
+    sr.room_id,
+    a.status AS attendance_status
+  FROM student_room sr
+  JOIN users u ON sr.student_id = u.id
+  LEFT JOIN attendance a ON a.student_id = u.id AND a.shift_id = :shift_id
+  WHERE sr.room_id IN (:roomIds)
+  ORDER BY u.student_code ASC
+  LIMIT :limit OFFSET :offset
+`;
+  // Querry dem tong so ban ghi de phan trang
   const countQuery = `
     SELECT COUNT(*) AS total
     FROM student_room sr
@@ -207,13 +180,34 @@ export const getAttendanceOfShiftService = async (
     replacements: { shift_id, roomIds, limit, offset },
     type: sequelize.QueryTypes.SELECT,
   });
-
+  console.log('data: ', data);
   const countResult = await sequelize.query(countQuery, {
     replacements: { roomIds },
     type: sequelize.QueryTypes.SELECT,
   });
+  console.log('countResult: ', countResult);
+
   const total = countResult[0].total;
   const totalPages = Math.ceil(total / limit);
+  // Query thong ke diem danh
+  const attendanceAggregateQuery = `
+    SELECT
+      COUNT(*) AS total,
+      SUM(CASE WHEN a.status = 1 THEN 1 ELSE 0 END) AS trueAttendance,
+      SUM(CASE WHEN a.status = 0 THEN 1 ELSE 0 END) AS falseAttendance,
+      SUM(CASE WHEN a.status IS NULL THEN 1 ELSE 0 END) AS nullAttendance
+    FROM student_room sr
+    JOIN users u ON sr.student_id = u.id
+    LEFT JOIN attendance a 
+      ON a.student_id = u.id 
+      AND a.shift_id = :shift_id
+    WHERE sr.room_id IN (:roomIds)
+  `;
+  const attendanceAggregate = await sequelize.query(attendanceAggregateQuery, {
+    replacements: { shift_id, roomIds },
+    type: sequelize.QueryTypes.SELECT,
+  });
+  const attendanceStatus = attendanceAggregate[0];
   return {
     pagination: {
       total,
@@ -221,6 +215,7 @@ export const getAttendanceOfShiftService = async (
       limit,
       totalPages,
     },
+    attendanceStatus,
     data,
   };
 };

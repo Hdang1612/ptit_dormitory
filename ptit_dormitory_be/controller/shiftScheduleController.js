@@ -90,7 +90,12 @@ const getAttendanceOfShift = async (req, res) => {
       page: req.query.page || 1,
       limit: req.query.limit || 10,
     };
-    const result = getAttendanceOfShiftService(shift_id, place_id, pagination);
+    const result = await getAttendanceOfShiftService(
+      shift_id,
+      place_id,
+      pagination,
+    );
+    res.status(200).json(result);
   } catch (error) {
     console.log(
       'Lỗi lấy danh sách sinh viên và trạng thái điểm danh của ca trực',
