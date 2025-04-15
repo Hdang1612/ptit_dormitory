@@ -5,6 +5,8 @@ import fs from 'fs';
 
 import { Op } from 'sequelize';
 import User from '../models/Users.js';
+import StudentRoom from '../models/StudentRoom.js';
+import Place from '../models/Place.js';
 
 import ApiError from '../utils/apiError.js';
 import {
@@ -13,9 +15,69 @@ import {
   genderMapping,
 } from '../constants/mapping.js';
 import { parseDate } from '../utils/convertDate.js';
+
+const getAreaNameFromRoomId = async (roomId) => {
+  let currentPlace = await Place.findByPk(roomId);
+  while (currentPlace && currentPlace.parent_id) {
+    const parent = await Place.findByPk(currentPlace.parent_id);
+    if (parent?.level === 'area') return parent.area_name;
+    currentPlace = parent;
+  }
+  return null;
+};
 // Get danh sách user
-export const getListUserService = async (search, page, limit, role) => {
+export const getListUserService = async (
+  search,
+  page,
+  limit,
+  role,
+  placeId,
+) => {
   const offset = (page - 1) * limit;
+  let studentIdsInPlace = null;
+  if (placeId) {
+    // Đệ quy để lấy tất cả room_id từ placeId bất kỳ (area, floor, hoặc room)
+    const getAllRoomIds = async (startId) => {
+      const stack = [startId];
+      const roomIds = [];
+
+      while (stack.length) {
+        const currentId = stack.pop();
+        const children = await Place.findAll({
+          where: { parent_id: currentId },
+        });
+
+        for (const child of children) {
+          if (child.level === 'room') {
+            roomIds.push(child.id);
+          } else {
+            stack.push(child.id);
+          }
+        }
+
+        const currentPlace = await Place.findByPk(currentId);
+        if (currentPlace && currentPlace.level === 'room') {
+          roomIds.push(currentId);
+        }
+      }
+
+      return roomIds;
+    };
+
+    const roomIds = await getAllRoomIds(placeId);
+
+    if (roomIds.length > 0) {
+      const studentRoomRecords = await StudentRoom.findAll({
+        where: { room_id: { [Op.in]: roomIds } },
+        attributes: ['student_id'],
+      });
+
+      studentIdsInPlace = studentRoomRecords.map((record) => record.student_id);
+    } else {
+      studentIdsInPlace = []; // Không có room nào thì không có user nào
+    }
+  }
+
   const whereClause = {
     ...(search && {
       [Op.or]: [
@@ -25,6 +87,11 @@ export const getListUserService = async (search, page, limit, role) => {
       ],
     }),
     ...(role && { role_id: role }),
+    ...(studentIdsInPlace && {
+      id: {
+        [Op.in]: studentIdsInPlace,
+      },
+    }),
   };
   const { count, rows } = await User.findAndCountAll({
     where: whereClause,
@@ -42,10 +109,31 @@ export const getListUserService = async (search, page, limit, role) => {
       // 'room_id',
       'create_at',
     ],
+    include: [
+      {
+        model: StudentRoom,
+        attributes: ['room_id'],
+        required: false,
+        include: [
+          {
+            model: Place,
+            attributes: ['area_name'],
+            required: false,
+          },
+        ],
+      },
+    ],
+  });
+  const users = rows.map((user) => {
+    const { StudentRoom, ...rest } = user.toJSON();
+    return {
+      ...rest,
+      room: StudentRoom?.Place?.area_name || null,
+    };
   });
 
   return {
-    users: rows,
+    users: users,
     pagination: {
       total: count,
       currentPage: page,
