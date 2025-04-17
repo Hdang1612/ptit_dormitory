@@ -25,7 +25,7 @@ export default function Login() {
           </label>
           <span
             className="forgot-password"
-            onClick={() => navigate("/forgot-password")}
+            onClick={() => navigate("/quenmatkhau")}
           >
             Quên mật khẩu?
           </span>

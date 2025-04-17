@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import React, { useState } from "react";
 import "../style/AddContract.css";
 import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 function FormAddContract() {
   const [formData, setFormData] = useState({
@@ -179,6 +180,10 @@ function FormAddContract() {
     }
   }, [formData.startDate, formData.endDate]);
 
+  const navigate = useNavigate();
+  const handleAccept = () => {
+    navigate("/danhsachdondky");
+  };
   if (showPrintView) {
     return (
       <div>
@@ -859,10 +864,18 @@ function FormAddContract() {
             </div>
 
             <div className="form-actions">
-              <button type="button" className="reset-btn">
+              <button
+                type="button"
+                className="reset-btn"
+                onClick={handleAccept}
+              >
                 Hủy
               </button>
-              <button type="button" className="submit-btn">
+              <button
+                type="button"
+                className="submit-btn"
+                onClick={handleAccept}
+              >
                 Duyệt
               </button>
               <button type="submit" className="print-preview-btn">

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import React, { useState } from "react";
 import "../style/ContractRenewalApp.css";
 import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 function ContractRenewalApp() {
   const [formData, setFormData] = useState({
@@ -172,6 +173,11 @@ function ContractRenewalApp() {
       }
     }
   }, [formData.startDate, formData.endDate]);
+
+  const navigate = useNavigate();
+  const handleAccept = () => {
+    navigate("/danhsachhopdong");
+  };
 
   if (showPrintView) {
     return (
@@ -625,16 +631,6 @@ function ContractRenewalApp() {
 
               <div className="form-row">
                 <div className="form-group">
-                  {/* <label>Thời gian gia hạn</label>
-                  <select
-                    name="renewalDuration"
-                    value={formData.renewalDuration}
-                    onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="6">6 tháng</option>
-                    <option value="12">12 tháng</option>
-                  </select> */}
                   <label>Thời gian gia hạn</label>
                   <input
                     type="text"
@@ -677,7 +673,11 @@ function ContractRenewalApp() {
               <button type="button" className="reset-btn">
                 Hủy
               </button>
-              <button type="button" className="submit-btn">
+              <button
+                type="button"
+                className="submit-btn"
+                onClick={handleAccept}
+              >
                 Lưu
               </button>
               <button type="submit" className="print-preview-btn">

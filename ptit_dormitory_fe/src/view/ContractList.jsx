@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import TopConTractList from "../components/TopContractList";
 
@@ -26,6 +27,11 @@ const ContractList = () => {
       status: "Còn hạn",
     },
   ];
+
+  const navigate = useNavigate();
+  const handleView = () => {
+    navigate("/thongtinhopdong");
+  };
 
   return (
     <div style={styles.container}>
@@ -70,7 +76,9 @@ const ContractList = () => {
                     </span>
                   </td>
                   <td style={styles.td}>
-                    <button style={styles.viewBtn}>Xem</button>
+                    <button style={styles.viewBtn} onClick={handleView}>
+                      Xem
+                    </button>
                     <button style={styles.deleteBtn}>Xóa</button>
                   </td>
                 </tr>

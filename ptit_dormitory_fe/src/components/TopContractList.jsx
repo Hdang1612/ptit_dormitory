@@ -37,17 +37,6 @@ const TopConTractList = () => {
       marginLeft: "10px",
       width: "250px",
     },
-    addButton: {
-      backgroundColor: "#BC2626",
-      color: "white",
-      border: "none",
-      padding: "8px 15px",
-      borderRadius: "5px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      marginLeft: "700px",
-    },
   };
 
   return (
@@ -75,11 +64,6 @@ const TopConTractList = () => {
         onChange={handleSearchChange}
         style={styles.searchInput}
       />
-
-      {/* Nút thêm mới */}
-      <button onClick={handleAddNew} style={styles.addButton}>
-        + Thêm mới
-      </button>
     </div>
   );
 };

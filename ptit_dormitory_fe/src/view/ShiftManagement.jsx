@@ -1,18 +1,65 @@
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import TopShiftSchedule from "../components/TopShiftSchedule";
+import { useNavigate } from "react-router-dom";
 
 const ShiftManagement = () => {
+  const navigate = useNavigate();
+  const handleArrange = () => {
+    navigate("/shiftschedule");
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const shiftsPerPage = 5;
 
   const [shifts, setShifts] = useState([
-    { id: "1", name: "Nguyễn Văn A", date: "2025-04-08", shiftTime: "11:00 - 16:00", attendance: "Chưa điểm danh", report: "Không có" },
-    { id: "2", name: "Nguyễn Văn B", date: "2025-04-08", shiftTime: "11:00 - 16:00", attendance: "Đã điểm danh", report: "Xem" },
-    { id: "3", name: "Nguyễn Văn C", date: "2025-04-09", shiftTime: "11:00 - 16:00", attendance: "Chưa điểm danh", report: "Chưa tạo" },
-    { id: "4", name: "Nguyễn Văn D", date: "2025-04-09", shiftTime: "11:00 - 16:00", attendance: "Ngoài giờ", report: "Chưa tạo" },
-    { id: "5", name: "Nguyễn Văn A", date: "2025-04-10", shiftTime: "11:00 - 16:00", attendance: "Ngoài giờ", report: "Chưa tạo" },
-    { id: "6", name: "Nguyễn Văn B", date: "2025-04-10", shiftTime: "11:00 - 16:00", attendance: "Ngoài giờ", report: "Chưa tạo" },
+    {
+      id: "1",
+      name: "Nguyễn Văn A",
+      date: "2025-04-08",
+      shiftTime: "11:00 - 16:00",
+      attendance: "Chưa điểm danh",
+      report: "Không có",
+    },
+    {
+      id: "2",
+      name: "Nguyễn Văn B",
+      date: "2025-04-08",
+      shiftTime: "11:00 - 16:00",
+      attendance: "Đã điểm danh",
+      report: "Xem",
+    },
+    {
+      id: "3",
+      name: "Nguyễn Văn C",
+      date: "2025-04-09",
+      shiftTime: "11:00 - 16:00",
+      attendance: "Chưa điểm danh",
+      report: "Chưa tạo",
+    },
+    {
+      id: "4",
+      name: "Nguyễn Văn D",
+      date: "2025-04-09",
+      shiftTime: "11:00 - 16:00",
+      attendance: "Ngoài giờ",
+      report: "Chưa tạo",
+    },
+    {
+      id: "5",
+      name: "Nguyễn Văn A",
+      date: "2025-04-10",
+      shiftTime: "11:00 - 16:00",
+      attendance: "Ngoài giờ",
+      report: "Chưa tạo",
+    },
+    {
+      id: "6",
+      name: "Nguyễn Văn B",
+      date: "2025-04-10",
+      shiftTime: "11:00 - 16:00",
+      attendance: "Ngoài giờ",
+      report: "Chưa tạo",
+    },
   ]);
 
   const indexOfLast = currentPage * shiftsPerPage;
@@ -104,22 +151,26 @@ const ShiftManagement = () => {
             >
               Trước
             </button>
-            {[...Array(Math.ceil(shifts.length / shiftsPerPage)).keys()].map((number) => (
-              <button
-                key={number + 1}
-                style={{
-                  ...styles.pageBtn,
-                  ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
-                }}
-                onClick={() => paginate(number + 1)}
-              >
-                {number + 1}
-              </button>
-            ))}
+            {[...Array(Math.ceil(shifts.length / shiftsPerPage)).keys()].map(
+              (number) => (
+                <button
+                  key={number + 1}
+                  style={{
+                    ...styles.pageBtn,
+                    ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+                  }}
+                  onClick={() => paginate(number + 1)}
+                >
+                  {number + 1}
+                </button>
+              )
+            )}
             <button
               style={styles.pageBtn}
               onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === Math.ceil(shifts.length / shiftsPerPage)}
+              disabled={
+                currentPage === Math.ceil(shifts.length / shiftsPerPage)
+              }
             >
               Sau
             </button>
@@ -127,11 +178,10 @@ const ShiftManagement = () => {
         </div>
 
         <div style={styles.buttonContainer}>
-            <button style={styles.scheduleButton}>
-              Sắp xếp lịch trực
-            </button>
+          <button style={styles.scheduleButton} onClick={handleArrange}>
+            Sắp xếp lịch trực
+          </button>
         </div>
-
       </div>
     </div>
   );

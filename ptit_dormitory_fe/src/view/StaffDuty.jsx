@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import TopStaffDuty from "../components/TopStaffDuty";
+import { useNavigate } from "react-router-dom";
 
 const StaffDuty = () => {
+  const navigate = useNavigate();
+  const handleAttendance = () => {
+    navigate("/studentcheckin");
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const shiftsPerPage = 6;
 
@@ -115,7 +120,9 @@ const StaffDuty = () => {
 
                 <p style={styles.p}>
                   {shift.studentCheckin === "Trong giờ" ? (
-                    <button style={styles.button}>ĐD sinh viên</button>
+                    <button style={styles.button} onClick={handleAttendance}>
+                      ĐD sinh viên
+                    </button>
                   ) : (
                     <span
                       style={{

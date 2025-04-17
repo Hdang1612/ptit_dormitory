@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../style/CancelContract.css";
 import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 function CancelContract() {
   const [formData, setFormData] = useState({
@@ -85,6 +86,11 @@ function CancelContract() {
 
   const handleBack = () => {
     setShowPrintView(false);
+  };
+
+  const navigate = useNavigate();
+  const handleCancel = () => {
+    navigate("/thongtinhopdong");
   };
 
   if (showPrintView) {
@@ -428,7 +434,11 @@ function CancelContract() {
             </div>
 
             <div className="form-actions">
-              <button type="button" className="reset-btn">
+              <button
+                type="button"
+                className="reset-btn"
+                onClick={handleCancel}
+              >
                 Hủy
               </button>
               <button type="button" className="submit-btn">

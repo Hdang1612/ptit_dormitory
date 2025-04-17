@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import React, { useState } from "react";
 import "../style/AddContract.css";
 import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 function InforContract() {
   const [formData, setFormData] = useState({
@@ -178,6 +179,14 @@ function InforContract() {
       }
     }
   }, [formData.startDate, formData.endDate]);
+
+  const navigate = useNavigate();
+  const handleRenewal = () => {
+    navigate("/giahanhopdong");
+  };
+  const handleCancel = () => {
+    navigate("/huyhopdong");
+  };
 
   if (showPrintView) {
     return (
@@ -859,12 +868,21 @@ function InforContract() {
             </div>
 
             <div className="form-actions">
-              <button type="button" className="reset-btn">
-                Hủy
+              <button
+                type="button"
+                className="submit-btn"
+                onClick={handleRenewal}
+              >
+                Gia hạn
               </button>
-              <button type="button" className="submit-btn">
-                Lưu
+              <button
+                type="button"
+                className="submit-btn"
+                onClick={handleCancel}
+              >
+                Hủy hợp đồng
               </button>
+
               <button type="submit" className="print-preview-btn">
                 In đơn
               </button>
