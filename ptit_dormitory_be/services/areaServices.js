@@ -368,3 +368,22 @@ export const updatePlaceService = async (id, data) => {
     throw { status: 400, message: 'Invalid level' };
   }
 };
+
+// Cập nhật trạng thái phòng
+export const updateRoomStatusAuto = async (roomId) => {
+  const room = await RoomDetail.findByPk(roomId);
+  if (!room) throw new ApiError(404, 'Không tìm thấy phòng');
+
+  const currentCount = await StudentRoom.count({ where: { room_id: roomId } });
+
+  if (room.capacity) {
+    let newStatus = 'notfull';
+    if (currentCount >= room.capacity) {
+      newStatus = 'full';
+    }
+
+    if (room.status !== newStatus) {
+      await room.update({ status: newStatus });
+    }
+  }
+};
