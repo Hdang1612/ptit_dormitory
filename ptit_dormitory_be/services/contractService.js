@@ -3,6 +3,7 @@ import User from '../models/Users.js';
 import StudentRoom from '../models/StudentRoom.js';
 import Place from '../models/Place.js';
 import ContractType from '../models/contractType.js';
+import RoomDetail from '../models/RoomDetail.js';
 import ApiError from '../utils/apiError.js';
 import { v4 as uuidv4 } from 'uuid';
 import { createReport } from 'docx-templates';
@@ -10,6 +11,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import moment from 'moment';
+
+import { updateRoomStatusAuto } from './areaServices.js';
 
 // Lấy danh sách hợp đồng
 export const getContractsService = async (query) => {
@@ -135,44 +138,73 @@ export const createContractService = async (contractData) => {
 
 // Cập nhật hợp đồng
 export const updateContractService = async (id, updateData) => {
-  console.log('>>>>', id);
   const contract = await Contract.findByPk(id);
   if (!contract) throw new ApiError(404, 'Không tìm thấy hợp đồng');
 
   const prevStatus = contract.status;
   const newStatus = updateData.status;
   let updatePayload = { ...updateData };
+  console.log('prevStatus:', prevStatus);
+  console.log('newStatus:', newStatus);
+
   // Nếu chuyển trạng thái từ "đã gửi" -> "xác nhận"
   if (prevStatus === 'đã gửi' && newStatus === 'xác nhận') {
     const studentData = contract.form_data;
 
-    const existed = await User.findByPk(contract.student_id);
-    if (!existed) {
-      const newUserId = uuidv4();
-      if (studentData.gender === 'Nam') {
-        studentData.gender = 'Male';
-      } else if (studentData.gender === 'Nữ') {
-        studentData.gender = 'Female';
-      } else {
-        studentData.gender = 'Other';
-      }
-      const fullName = studentData.full_name?.trim() || '';
-      const nameParts = fullName.split(' ');
+    // Kiểm tra xem user đã tồn tại chưa
+    // const existingUser = await User.findOne({
+    //   where: { student_code: studentData.student_code },
+    // });
 
-      studentData.first_name = nameParts.pop();
-      studentData.last_name = nameParts.join(' ');
-      await User.create({
-        id: newUserId,
-        role_id: 4,
-        ...studentData,
-      });
+    // if (existingUser) {
+    //   throw new ApiError(400, 'Sinh viên đã tồn tại trong hệ thống');
+    // }
 
-      updatePayload.student_id = newUserId;
+    // Kiểm tra phòng còn chỗ không
+    const roomId = studentData.room;
+    const room = await RoomDetail.findByPk(roomId);
+    if (!room) throw new ApiError(404, 'Không tìm thấy phòng trong hợp đồng');
+    console.log('room', room);
+    if (room.status === 'full') {
+      throw new ApiError(400, 'Phòng đã đầy, không thể xác nhận hợp đồng');
     }
+    const newUserId = uuidv4();
+
+    studentData.gender =
+      studentData.gender === 'Nam'
+        ? 'Male'
+        : studentData.gender === 'Nữ'
+        ? 'Female'
+        : 'Other';
+
+    const fullName = studentData.full_name?.trim() || '';
+    const nameParts = fullName.split(' ');
+    studentData.first_name = nameParts.pop();
+    studentData.last_name = nameParts.join(' ');
+
+    let user = await User.create({
+      id: newUserId,
+      role_id: 4,
+      ...studentData,
+    });
+    console.log('new user ', user);
+
+    updatePayload.student_id = newUserId;
+
+    // Tạo bản ghi student_room
+    await StudentRoom.create({
+      student_id: updatePayload.student_id,
+      room_id: roomId,
+      apply_date: studentData.apply_date,
+      contrac_id: id,
+      expired_date: studentData.expired_date,
+    });
+
+    await updateRoomStatusAuto(roomId);
   }
 
   await contract.update(updatePayload);
-  return contract;
+  return { contract };
 };
 
 const helpers = {

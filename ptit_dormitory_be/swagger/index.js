@@ -36,7 +36,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: [path.join(__dirname, './**/*.js')], // Đảm bảo rằng các file controller có @swagger comment
+  apis: [path.join(__dirname, './**/*.js')], 
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
