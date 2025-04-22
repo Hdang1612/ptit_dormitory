@@ -78,7 +78,7 @@ const StaffDuty = () => {
 
   return (
     <div style={styles.container}>
-      <Sidebar />
+      <Sidebar role="nguoitruc" username="Nguyễn Thị B" />
       <div style={styles.content}>
         <h2 style={styles.title}>Lịch trực</h2>
 

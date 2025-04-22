@@ -12,14 +12,12 @@ function AddContract() {
     studentId: "",
     gender: "",
     class: "",
-    faculty: "",
+    ethnicity: "",
     khoa: "",
-    idNumber: "",
     nganh: "",
     nationality: "",
-    hometown: "",
-    cityProvince: "",
-    residentialAddress: "",
+    studyProgram: "",
+    phoneNumber: "",
     email: "",
     contractId: "",
     dormitoryArea: "",
@@ -28,10 +26,14 @@ function AddContract() {
     startDate: "",
     endDate: "",
     renewalDuration: "",
-    renewalReason: "",
-    studentCommitment: "",
+    price: "",
+    studentNote: "",
     relativesName: "",
     relativesAddress: "",
+    fatherName: "",
+    fatherNumber: "",
+    motherName: "",
+    motherNumber: "",
   });
 
   const [showPrintView, setShowPrintView] = useState(false);
@@ -49,36 +51,6 @@ function AddContract() {
     setShowPrintView(true);
   };
 
-  const handleReset = () => {
-    setFormData({
-      studentName: "",
-      birthDate: "",
-      studentId: "",
-      gender: "",
-      class: "",
-      faculty: "",
-      khoa: "",
-      idNumber: "",
-      nganh: "",
-      nationality: "",
-      hometown: "",
-      cityProvince: "",
-      residentialAddress: "",
-      email: "",
-      contractId: "",
-      dormitoryArea: "",
-      room: "",
-      startDate: "",
-      endDate: "",
-      renewalDuration: "",
-      renewalReason: "",
-      studentCommitment: "",
-      fatherName: "",
-      fatherNumber: "",
-      motherName: "",
-      motherNumber: "",
-    });
-  };
   const numberToVietnamese = (number) => {
     const ChuSo = [
       "không",
@@ -535,7 +507,7 @@ function AddContract() {
 
   return (
     <div className="app-container">
-      <Sidebar />
+      <Sidebar role="admin" username="Hoàng Dũng" />
       <div className="main-content">
         <div className="form-container">
           <h2>Thêm mới đăng ký</h2>
@@ -607,8 +579,8 @@ function AddContract() {
                   <label>Dân tộc</label>
                   <input
                     type="text"
-                    name="faculty"
-                    value={formData.faculty}
+                    name="ethnicity"
+                    value={formData.ethnicity}
                     onChange={handleChange}
                   />
                 </div>
@@ -667,8 +639,8 @@ function AddContract() {
                   <label>Hệ đào tạo</label>
                   <input
                     type="text"
-                    name="residentialAddress"
-                    value={formData.residentialAddress}
+                    name="studyProgram"
+                    value={formData.studyProgram}
                     onChange={handleChange}
                   />
                 </div>
@@ -679,8 +651,8 @@ function AddContract() {
                   <label>Số điện thoại</label>
                   <input
                     type="tel"
-                    name="hometown"
-                    value={formData.hometown}
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
                     onChange={handleChange}
                   />
                 </div>
@@ -842,8 +814,8 @@ function AddContract() {
                 <div className="form-group">
                   <label>Mức thu/tháng</label>
                   <select
-                    name="renewalReason"
-                    value={formData.renewalReason}
+                    name="price"
+                    value={formData.price}
                     onChange={handleChange}
                   >
                     <option value=""></option>
@@ -856,8 +828,8 @@ function AddContract() {
                 <div className="form-group full-width">
                   <label>Ghi chú</label>
                   <textarea
-                    name="studentCommitment"
-                    value={formData.studentCommitment}
+                    name="studentNote"
+                    value={formData.studentNote}
                     onChange={handleChange}
                     rows="4"
                   ></textarea>

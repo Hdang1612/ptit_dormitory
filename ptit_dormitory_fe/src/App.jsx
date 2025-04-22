@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import Login from "./view/Login";
 import ForgotPassword from "./view/ForgotPassword";
 import UserIdentificationCard from "./view/UserIdentificationCard";
@@ -16,9 +21,7 @@ import StaffDuty from "./view/StaffDuty";
 import StudentCheckin from "./view/StudentCheckin";
 import StudentInfo from "./view/StudentInfo";
 import StudentList from "./view/StudentList";
-
 import FormAddContract from "./view/FormAddContract";
-
 import { Frame } from "./view/Frame/index.jsx";
 import { PowerMonitoring } from "./view/PowerMonitoring/index.jsx";
 import { Reports } from "./view/Reports/index.jsx";
@@ -27,6 +30,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<Navigate to="/dangnhap" replace />} />
         {/* Dũng */}
         <Route path="/dangnhap" element={<Login />}></Route>
         <Route path="/quenmatkhau" element={<ForgotPassword />}></Route>
@@ -40,6 +44,7 @@ function App() {
         <Route path="/themdangky" element={<AddContract />}></Route>
         <Route path="/thongtindangky" element={<FormAddContract />}></Route>
         <Route path="/thongtinhopdong" element={<InforContract />}></Route>
+
         <Route path="/giahanhopdong" element={<ContractRenewalApp />}></Route>
         <Route path="/huyhopdong" element={<CancelContract />}></Route>
 
@@ -53,7 +58,7 @@ function App() {
         <Route path="/student-list" element={<StudentList />}></Route>
 
         {/* Hoàng Anh */}
-        <Route path="/" element={<Frame />} />
+        <Route path="/invoice" element={<Frame />} />
         <Route path="/power-monitoring" element={<PowerMonitoring />} />
         <Route path="/reports" element={<Reports />} />
       </Routes>

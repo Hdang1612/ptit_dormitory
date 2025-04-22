@@ -75,7 +75,7 @@ const RoomList = () => {
 
   return (
     <div style={styles.container}>
-      <Sidebar />
+      <Sidebar role="admin" username="Hoàng Dũng" />
       <div style={styles.content}>
         <h2 style={styles.title}>Danh sách phòng</h2>
         <DataRoom />

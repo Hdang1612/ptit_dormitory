@@ -32,10 +32,13 @@ const ContractList = () => {
   const handleView = () => {
     navigate("/thongtinhopdong");
   };
+  const handleRenewal = () => {
+    navigate("/giahanhopdong");
+  };
 
   return (
     <div style={styles.container}>
-      <Sidebar />
+      <Sidebar role="admin" username="Hoàng Dũng" />
 
       <div style={styles.content}>
         <h2 style={styles.title}>Danh sách hợp đồng</h2>
@@ -78,6 +81,9 @@ const ContractList = () => {
                   <td style={styles.td}>
                     <button style={styles.viewBtn} onClick={handleView}>
                       Xem
+                    </button>
+                    <button style={styles.renewalBtn} onClick={handleRenewal}>
+                      Gia hạn
                     </button>
                     <button style={styles.deleteBtn}>Xóa</button>
                   </td>
@@ -150,6 +156,15 @@ const styles = {
     fontWeight: "bold",
   },
   viewBtn: {
+    background: "#007bff",
+    color: "white",
+    border: "none",
+    padding: "5px 10px",
+    marginRight: "5px",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
+  renewalBtn: {
     background: "#007bff",
     color: "white",
     border: "none",

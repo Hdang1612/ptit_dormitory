@@ -1,16 +1,19 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Sidebar.css";
+import { menuConfig } from "../config/menuConfig";
 
-export default function Sidebar() {
+export default function Sidebar({ role = "admin", username = "User" }) {
   const navigate = useNavigate();
+  const menuItems = menuConfig[role] || [];
+
   return (
     <div className="sidebar-container">
       <div className="user-info">
         <div className="avatar"></div>
         <div className="user-details" onClick={() => navigate("/suathongtin")}>
-          <div className="username">Hoàng Dũng</div>
-          <div className="role-badge">Admin</div>
+          <div className="username">{username}</div>
+          <div className="role-badge">{role.toUpperCase()}</div>
         </div>
       </div>
 
@@ -18,9 +21,15 @@ export default function Sidebar() {
       <hr className="divider" />
 
       <div className="menu">
-        <div className="menu-item active"></div>
-        <div className="menu-item"></div>
-        <div className="menu-item"></div>
+        {menuItems.map((item, index) => (
+          <div
+            className="menu-item"
+            key={index}
+            onClick={() => navigate(item.path)}
+          >
+            {item.label}
+          </div>
+        ))}
       </div>
     </div>
   );
