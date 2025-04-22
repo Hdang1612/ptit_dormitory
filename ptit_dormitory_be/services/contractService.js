@@ -13,7 +13,9 @@ import moment from 'moment';
 
 // Lấy danh sách hợp đồng
 export const getContractsService = async (query) => {
-  const { page = 1, limit = 10, status, type, student_id } = query;
+  const page = parseInt(query.page) || 1;
+  const limit = parseInt(query.limit) || 10;
+  const { status, type, student_id } = query;
   const offset = (page - 1) * limit;
 
   const whereClause = {};
