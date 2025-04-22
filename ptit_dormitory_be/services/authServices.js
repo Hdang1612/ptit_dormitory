@@ -82,3 +82,25 @@ export const loginService = async ({ email, password }) => {
     },
   };
 };
+
+export const changePasswordService = async ({ userId, currentPassword, newPassword }) => {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    throw new ApiError(401, 'Current password is incorrect');
+  }
+
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedNewPassword;
+  await user.save();
+
+  return {
+    message: 'Password has been changed successfully',
+  };
+};
+
