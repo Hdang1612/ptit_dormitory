@@ -1,4 +1,4 @@
-import { registerService, loginService } from '../services/authServices.js';
+import { registerService, loginService,changePasswordService } from '../services/authServices.js';
 
 export const register = async (req, res, next) => {
   try {
@@ -20,6 +20,22 @@ export const login = async (req, res, next) => {
       success: true,
       message: 'Login successfully',
       data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePassword = async (req, res, next) => {
+  try {
+    const userId = req.user.id; // Lấy từ middleware authenticate
+    const { currentPassword, newPassword } = req.body;
+
+    const result = await changePasswordService({ userId, currentPassword, newPassword });
+
+    res.status(200).json({
+      success: true,
+      message: result.message,
     });
   } catch (error) {
     next(error);
