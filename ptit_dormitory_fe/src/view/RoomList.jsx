@@ -1,123 +1,121 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import DataRoom from "../components/TopRoomList";
-import deleteIcon from "../assets/delete_button.png";
 import editIcon from "../assets/edit_button.png";
+import { getRooms } from "../service/placeService.js";
 
 const RoomList = () => {
+  
   const [currentPage, setCurrentPage] = useState(1);
-  const RoomsPerPage = 8;
+  const [parentId, setParentId] = useState("B1");
+  const [data, setData] = useState([]);
+  const [area, setArea] = useState("");
+  const [floor, setFloor] = useState("");
+  const [gender, setGender] = useState("");
+  const [status, setStatus] = useState("");
+  const [search, setSearch] = useState("");
+  const [limit, setLimit] = useState(8);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    limit: 10,
+    totalPages: 0,
+    totalRecords: 0,
+  });
 
-  const rooms = [
-    {
-      roomNum: "Phòng 101",
-      type: "4 người/phòng",
-      memNum: "2/4",
-      gender: "Nam",
-      state: "Còn chỗ",
-    },
-    {
-      roomNum: "Phòng 102",
-      type: "4 người/phòng",
-      memNum: "4/4",
-      gender: "Nam",
-      state: "Hết chỗ",
-    },
-    {
-      roomNum: "Phòng 103",
-      type: "4 người/phòng",
-      memNum: "0/4",
-      gender: "Nam",
-      state: "Tạm khóa",
-    },
-    {
-      roomNum: "Phòng 104",
-      type: "4 người/phòng",
-      memNum: "0/4",
-      gender: "Nam",
-      state: "Đang bảo trì",
-    },
-    {
-      roomNum: "Phòng 105",
-      type: "6 người/phòng",
-      memNum: "4/6",
-      gender: "Nam",
-      state: "Còn chỗ",
-    },
-    {
-      roomNum: "Phòng 106",
-      type: "6 người/phòng",
-      memNum: "6/6",
-      gender: "Nam",
-      state: "Hết chỗ",
-    },
-    {
-      roomNum: "Phòng 201",
-      type: "4 người/phòng",
-      memNum: "0/4",
-      gender: "Nam",
-      state: "Tạm khóa",
-    },
-    {
-      roomNum: "Phòng 202",
-      type: "4 người/phòng",
-      memNum: "0/4",
-      gender: "Nam",
-      state: "Đang bảo trì",
-    },
-  ];
+  // Hàm lấy dữ liệu từ API
+  const fetchData = async (parentId, gender, status, search, page, limit) => {
+    try {
+      const rooms = await getRooms(parentId, gender, status, search, page, limit);
+      if (!rooms || !Array.isArray(rooms.data)) {
+        setData([]);
+        return;
+      }
+      setData(rooms.data);
+      setPagination({
+        currentPage: rooms.pagination.currentPage,
+        limit: rooms.pagination.limit,
+        totalPages: rooms.pagination.totalPages,
+        totalRecords: rooms.pagination.totalRecords,
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
-  const indexOfLastRoom = currentPage * RoomsPerPage;
-  const indexOfFirstRoom = indexOfLastRoom - RoomsPerPage;
-  const currentRooms = rooms.slice(indexOfFirstRoom, indexOfLastRoom);
+  console.log("data room", data);
+  console.log("pagination", pagination)
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  useEffect(() => {
+    fetchData(parentId, gender, status, search, pagination.currentPage, pagination.limit);
+  }, [currentPage, limit, parentId, gender, status, search]);
+
+  const paginate = (pageNumber) => {
+    if (pageNumber < 1 || pageNumber > pagination.totalPages) return;
+    setCurrentPage(pageNumber);
+  };
+
+  const indexOfLastRoom = currentPage * limit;
+  const indexOfFirstRoom = indexOfLastRoom - limit;
+  const currentRooms = Array.isArray(data)
+    ? data.slice(indexOfFirstRoom, indexOfLastRoom)
+    : [];   
 
   return (
     <div style={styles.container}>
       <Sidebar />
       <div style={styles.content}>
         <h2 style={styles.title}>Danh sách phòng</h2>
-        <DataRoom />
+        <DataRoom
+          area={area}
+          floor={floor}
+          gender={gender}
+          status={status}
+          search={search}
+          limit={limit}
+          fetchData={fetchData}
+        />
+
         <div style={styles.gridContainer}>
-          {currentRooms.map((room, index) => (
+          {data.map((room, index) => (
             <div key={index} style={styles.roomCard}>
               <div style={styles.iconContainer}>
-                <img src={deleteIcon} alt="Delete" style={styles.icon} />
                 <img src={editIcon} alt="Edit" style={styles.icon} />
               </div>
-              <h3 style={styles.roomNum}>{room.roomNum}</h3>
+              <h3 style={styles.roomNum}>{room.area_name}</h3>
               <div style={styles.gridContent}>
-                <p>Loại: {room.type}</p>
-                <p>
+                <p style={styles.p}>Loại: {room.room_detail?.capacity || "Không rõ"}</p>
+                <p style={styles.p}>
                   <span
                     style={{
                       ...styles.status,
                       backgroundColor:
-                        room.state === "Còn chỗ"
+                        room.room_detail?.status === "Còn chỗ"
                           ? "#EBF9F1"
-                          : room.state === "Hết chỗ"
+                          : room.room_detail?.status === "Hết chỗ"
                           ? "#FEFFE2"
                           : "#F9D2D3",
                       color:
-                        room.state === "Còn chỗ"
+                        room.room_detail?.status === "Còn chỗ"
                           ? "#1F9254"
-                          : room.state === "Hết chỗ"
+                          : room.room_detail?.status === "Hết chỗ"
                           ? "#8D9720"
                           : "#A30D11",
                     }}
                   >
-                    {room.state}
+                    {room.room_detail?.status || "Không rõ"}
                   </span>
                 </p>
-                <p>Số người hiện tại: {room.memNum}</p>
+
+                <p style={styles.p}>Số người hiện tại: {room.memNum}</p>
                 <button style={styles.viewBtn}>Xem</button>
-                <p>Giới tính: {room.gender}</p>
+                <p style={styles.p}>Giới tính: {room.room_detail?.gender || "Không rõ"}</p>
+                <button style={styles.viewBtn}>Thêm SV</button>
               </div>
             </div>
           ))}
         </div>
-        {/* Phân trang */}
+
+        {/* Pagination */}
         <div style={styles.pagination}>
           <button
             style={styles.pageBtn}
@@ -126,24 +124,22 @@ const RoomList = () => {
           >
             Trước
           </button>
-          {[...Array(Math.ceil(rooms.length / RoomsPerPage)).keys()].map(
-            (number) => (
-              <button
-                key={number + 1}
-                style={{
-                  ...styles.pageBtn,
-                  ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
-                }}
-                onClick={() => paginate(number + 1)}
-              >
-                {number + 1}
-              </button>
-            )
-          )}
+          {[...Array(pagination.totalPages).keys()].map((number) => (
+            <button
+              key={number + 1}
+              style={{
+                ...styles.pageBtn,
+                ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+              }}
+              onClick={() => paginate(number + 1)}
+            >
+              {number + 1}
+            </button>
+          ))}
           <button
             style={styles.pageBtn}
             onClick={() => paginate(currentPage + 1)}
-            disabled={currentPage === Math.ceil(rooms.length / RoomsPerPage)}
+            disabled={currentPage === pagination.totalPages}
           >
             Sau
           </button>
@@ -215,6 +211,10 @@ const styles = {
     gap: "0px",
     marginTop: "10px",
     alignItems: "center",
+  },
+  p: {
+    paddingTop: "10px",
+    paddingBottom: "15px",
   },
   viewBtn: {
     backgroundColor: "white",
