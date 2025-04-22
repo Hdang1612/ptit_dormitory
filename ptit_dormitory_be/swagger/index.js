@@ -2,10 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import swaggerJsDoc from 'swagger-jsdoc';
+
 const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const swaggerOptions = {
   swaggerDefinition: {
     openapi: '3.0.0',
@@ -19,8 +21,22 @@ const swaggerOptions = {
         url: `http://localhost:${PORT}`,
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: [path.join(__dirname, './**/*.js')],
+  apis: [path.join(__dirname, './**/*.js')], 
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
