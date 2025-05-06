@@ -5,33 +5,35 @@ import { useNavigate, useParams } from "react-router-dom";
 
 function FormAddContract() {
   const [formData, setFormData] = useState({
-    studentName: "",
-    birthDate: "",
-    studentId: "",
+    full_name: "",
+    dob: "",
+    student_code: "",
     gender: "",
-    class: "",
+    class_code: "",
     ethnicity: "",
-    khoa: "",
-    nganh: "",
+    school_year: "",
+    major: "",
     nationality: "",
-    studyProgram: "",
-    phoneNumber: "",
+    education_type: "",
+    identification_code: "",
+    birth_place: "",
+    phone_number: "",
     email: "",
-    contractId: "",
-    dormitoryArea: "",
+    religion: "",
+    area: "",
     room: "",
     floor: "",
-    startDate: "",
-    endDate: "",
+    apply_date: "",
+    expired_date: "",
     renewalDuration: "",
     price: "",
     studentNote: "",
     relativesName: "",
-    relativesAddress: "",
-    fatherName: "",
-    fatherNumber: "",
-    motherName: "",
-    motherNumber: "",
+    address: "",
+    father_name: "",
+    father_phone: "",
+    mother_name: "",
+    mother_phone: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -60,33 +62,32 @@ function FormAddContract() {
         const data = await response.json();
 
         setFormData({
-          studentName: data.studentName || "",
-          birthDate: data.birthDate || "",
-          studentId: data.studentId || "",
+          full_name: data.full_name || "",
+          dob: data.dob || "",
+          student_code: data.student_code || "",
           gender: data.gender || "",
-          class: data.class || "",
+          class_code: data.class_code || "",
           ethnicity: data.ethnicity || "",
-          khoa: data.khoa || "",
-          nganh: data.nganh || "",
+          school_year: data.school_year || "",
+          major: data.major || "",
           nationality: data.nationality || "",
-          studyProgram: data.studyProgram || "",
-          phoneNumber: data.phoneNumber || "",
+          education_type: data.education_type || "",
+          phone_number: data.phone_number || "",
           email: data.email || "",
-          contractId: data.contractId || "",
-          dormitoryArea: data.dormitoryArea || "",
+          area: data.area || "",
           room: data.room || "",
           floor: data.floor || "",
-          startDate: data.startDate || "",
-          endDate: data.endDate || "",
+          apply_date: data.apply_date || "",
+          expired_date: data.expired_date || "",
           renewalDuration: data.renewalDuration || "",
           price: data.price || "",
           studentNote: data.studentNote || "",
           relativesName: data.relativesName || "",
           relativesAddress: data.relativesAddress || "",
-          fatherName: data.fatherName || "",
-          fatherNumber: data.fatherNumber || "",
-          motherName: data.motherName || "",
-          motherNumber: data.motherNumber || "",
+          father_name: data.father_name || "",
+          father_phone: data.father_phone || "",
+          mother_name: data.mother_name || "",
+          mother_phone: data.mother_phone || "",
         });
 
         setLoading(false);
@@ -115,9 +116,9 @@ function FormAddContract() {
 
   // Tính thời hạn hợp đồng dựa vào ngày bắt đầu và kết thúc
   useEffect(() => {
-    if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate);
-      const end = new Date(formData.endDate);
+    if (formData.apply_date && formData.expired_date) {
+      const start = new Date(formData.apply_date);
+      const end = new Date(formData.expired_date);
 
       if (start < end) {
         const months =
@@ -135,7 +136,7 @@ function FormAddContract() {
         }));
       }
     }
-  }, [formData.startDate, formData.endDate]);
+  }, [formData.apply_date, formData.expired_date]);
 
   const handleRenewal = () => {
     navigate("/danhsachhopdong");
@@ -190,8 +191,8 @@ function FormAddContract() {
                   <label>Họ tên sinh viên</label>
                   <input
                     type="text"
-                    name="studentName"
-                    value={formData.studentName}
+                    name="full_name"
+                    value={formData.full_name}
                     onChange={handleChange}
                     readOnly
                   />
@@ -200,8 +201,8 @@ function FormAddContract() {
                   <label>Ngày sinh</label>
                   <input
                     type="date"
-                    name="birthDate"
-                    value={formData.birthDate}
+                    name="dob"
+                    value={formData.dob}
                     onChange={handleChange}
                     readOnly
                   />
@@ -213,8 +214,8 @@ function FormAddContract() {
                   <label>Mã sinh viên</label>
                   <input
                     type="text"
-                    name="studentId"
-                    value={formData.studentId}
+                    name="student_code"
+                    value={formData.student_code}
                     onChange={handleChange}
                     readOnly
                   />
@@ -233,11 +234,32 @@ function FormAddContract() {
 
               <div className="form-row">
                 <div className="form-group">
+                  <label>CMND/CCCD</label>
+                  <input
+                    type="text"
+                    name="identification_code"
+                    value={formData.identification_code}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Tôn giáo</label>
+                  <input
+                    type="text"
+                    name="religion"
+                    value={formData.religion}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
                   <label>Lớp</label>
                   <input
                     type="text"
-                    name="class"
-                    value={formData.class}
+                    name="class_code"
+                    value={formData.class_code}
                     onChange={handleChange}
                     readOnly
                   />
@@ -259,8 +281,8 @@ function FormAddContract() {
                   <label>Khóa</label>
                   <input
                     type="text"
-                    name="khoa"
-                    value={formData.khoa}
+                    name="school_year"
+                    value={formData.school_year}
                     onChange={handleChange}
                     readOnly
                   />
@@ -282,8 +304,8 @@ function FormAddContract() {
                   <label>Ngành</label>
                   <input
                     type="text"
-                    name="nganh"
-                    value={formData.nganh}
+                    name="major"
+                    value={formData.major}
                     onChange={handleChange}
                     readOnly
                   />
@@ -292,8 +314,8 @@ function FormAddContract() {
                   <label>Hệ đào tạo</label>
                   <input
                     type="text"
-                    name="studyProgram"
-                    value={formData.studyProgram}
+                    name="education_type"
+                    value={formData.education_type}
                     onChange={handleChange}
                     readOnly
                   />
@@ -305,8 +327,8 @@ function FormAddContract() {
                   <label>Số điện thoại</label>
                   <input
                     type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
+                    name="phone_number"
+                    value={formData.phone_number}
                     onChange={handleChange}
                     readOnly
                   />
@@ -328,8 +350,8 @@ function FormAddContract() {
                   <label>Họ tên bố</label>
                   <input
                     type="text"
-                    name="fatherName"
-                    value={formData.fatherName}
+                    name="father_name"
+                    value={formData.father_name}
                     onChange={handleChange}
                     readOnly
                   />
@@ -338,8 +360,8 @@ function FormAddContract() {
                   <label>Số điện thoại bố</label>
                   <input
                     type="text"
-                    name="fatherNumber"
-                    value={formData.fatherNumber}
+                    name="father_phone"
+                    value={formData.father_phone}
                     onChange={handleChange}
                     readOnly
                   />
@@ -351,8 +373,8 @@ function FormAddContract() {
                   <label>Họ tên mẹ</label>
                   <input
                     type="text"
-                    name="motherName"
-                    value={formData.motherName}
+                    name="mother_name"
+                    value={formData.mother_name}
                     onChange={handleChange}
                     readOnly
                   />
@@ -361,8 +383,8 @@ function FormAddContract() {
                   <label>Số điện thoại mẹ</label>
                   <input
                     type="text"
-                    name="motherNumber"
-                    value={formData.motherNumber}
+                    name="mother_phone"
+                    value={formData.mother_phone}
                     onChange={handleChange}
                     readOnly
                   />
@@ -383,8 +405,8 @@ function FormAddContract() {
                   <label>Địa chỉ người thân</label>
                   <input
                     type="text"
-                    name="relativesAddress"
-                    value={formData.relativesAddress}
+                    name="address"
+                    value={formData.address}
                     onChange={handleChange}
                     readOnly
                   />
@@ -400,8 +422,8 @@ function FormAddContract() {
                   <label>Khu ký túc xá</label>
                   <input
                     type="text"
-                    name="dormitoryArea"
-                    value={formData.dormitoryArea}
+                    name="area"
+                    value={formData.area}
                     onChange={handleChange}
                     readOnly
                   />
@@ -433,8 +455,8 @@ function FormAddContract() {
                   <label>Ngày bắt đầu</label>
                   <input
                     type="date"
-                    name="startDate"
-                    value={formData.startDate}
+                    name="apply_date"
+                    value={formData.apply_date}
                     onChange={handleChange}
                     readOnly
                   />
@@ -443,8 +465,8 @@ function FormAddContract() {
                   <label>Ngày kết thúc</label>
                   <input
                     type="date"
-                    name="endDate"
-                    value={formData.endDate}
+                    name="expired_date"
+                    value={formData.expired_date}
                     onChange={handleChange}
                     readOnly
                   />

@@ -44,7 +44,6 @@ function App() {
         <Route path="/themdangky" element={<AddContract />}></Route>
         <Route path="/thongtindangky" element={<FormAddContract />}></Route>
         <Route path="/thongtinhopdong" element={<InforContract />}></Route>
-
         <Route path="/giahanhopdong" element={<ContractRenewalApp />}></Route>
         <Route path="/huyhopdong" element={<CancelContract />}></Route>
 

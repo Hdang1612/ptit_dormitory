@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import authService from "../service/authService"; // ✅ import service
 import "../style/Login.css";
 
 export default function Login() {
@@ -7,37 +8,35 @@ export default function Login() {
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
 
-  const handleLogin = () => {
-    let role = "";
+  const handleLogin = async () => {
+    try {
+      const res = await authService.login(usernameInput, passwordInput);
 
-    if (usernameInput === "admin" && passwordInput === "admin123") {
-      role = "admin";
-    } else if (usernameInput === "sinhvien" && passwordInput === "sv123") {
-      role = "sinhvien";
-    } else if (usernameInput === "nguoitruc" && passwordInput === "nt123") {
-      role = "nguoitruc";
-    } else {
-      alert("Sai tài khoản hoặc mật khẩu!");
-      return;
-    }
+      if (res.success) {
+        const role = res.data.user.role_id;
 
-    // Lưu vào localStorage
-    localStorage.setItem("role", role);
-    localStorage.setItem("username", usernameInput);
-
-    // Chuyển trang theo role
-    switch (role) {
-      case "admin":
-        navigate("/danhsachdondky");
-        break;
-      case "sinhvien":
-        navigate("/thedinhdanh");
-        break;
-      case "nguoitruc":
-        navigate("/shiftmanage");
-        break;
-      default:
-        navigate("/dangnhap");
+        // Điều hướng theo role
+        switch (role) {
+          case "1":
+            navigate("/danhsachdondky");
+            break;
+          case "4":
+            navigate("/thedinhdanh");
+            break;
+          case "3":
+            navigate("/shiftmanage");
+            break;
+          default:
+            alert("Không xác định được vai trò người dùng.");
+            navigate("/dangnhap");
+        }
+      } else {
+        alert("Đăng nhập thất bại: " + res.message);
+      }
+    } catch (err) {
+      alert(
+        "Lỗi khi đăng nhập: " + (err.response?.data?.message || err.message)
+      );
     }
   };
 
@@ -49,7 +48,7 @@ export default function Login() {
         <div className="login-inputs">
           <input
             type="text"
-            placeholder="Nhập tài khoản"
+            placeholder="Nhập email"
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)}
           />
