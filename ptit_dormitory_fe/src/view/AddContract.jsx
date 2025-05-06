@@ -157,22 +157,24 @@ function AddContract() {
 
   const navigate = useNavigate();
 
+  const dateToDatetime = (dateStr) => {
+    return dateStr ? `${dateStr} 00:00:00` : null;
+  };
+
   const handleAccept = async () => {
     try {
       const payload = {
         type: 1,
-        apply_date: formData.apply_date,
+        apply_date: dateToDatetime(formData.apply_date),
         status: "đã gửi",
-        form_data: {
-          ...formData,
-          type: 1, // nếu cần lặp lại
-        },
+        ...formData,
       };
 
       const response = await axios.post(
         "http://localhost:8000/api/contract/create",
         payload
       );
+      console.log(response)
 
       if (response.data.success) {
         alert("Tạo hợp đồng thành công");
