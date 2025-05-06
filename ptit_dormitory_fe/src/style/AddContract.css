@@ -388,3 +388,8 @@ button:disabled {
 .note {
   font-style: italic;
 }
+.form-container input,
+.form-container select,
+.form-container textarea {
+  background-color: white;
+}

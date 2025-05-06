@@ -29,6 +29,7 @@ const TopConTractList = () => {
       border: "1px solid #ccc",
       borderRadius: "5px",
       cursor: "pointer",
+      backgroundColor: "white",
     },
     searchInput: {
       padding: "5px 10px",
@@ -36,6 +37,7 @@ const TopConTractList = () => {
       borderRadius: "5px",
       marginLeft: "10px",
       width: "250px",
+      backgroundColor: "#fff",
     },
   };
 

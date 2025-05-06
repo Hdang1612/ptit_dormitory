@@ -215,6 +215,9 @@ const styles = {
     background: "#BC2626",
     color: "white",
   },
+  searchInput :{
+    background:"#fff"
+  }
 };
 
 export default ContractList;
