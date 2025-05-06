@@ -157,15 +157,11 @@ function AddContract() {
 
   const navigate = useNavigate();
 
-  const dateToDatetime = (dateStr) => {
-    return dateStr ? `${dateStr} 00:00:00` : null;
-  };
-
   const handleAccept = async () => {
     try {
       const payload = {
         type: 1,
-        apply_date: dateToDatetime(formData.apply_date),
+        apply_date: formData.apply_date,
         status: "đã gửi",
         ...formData,
       };
@@ -174,7 +170,7 @@ function AddContract() {
         "http://localhost:8000/api/contract/create",
         payload
       );
-      console.log(response)
+      console.log(response);
 
       if (response.data.success) {
         alert("Tạo hợp đồng thành công");
@@ -184,7 +180,7 @@ function AddContract() {
       }
     } catch (error) {
       console.error("Lỗi khi gửi API:", error);
-      alert("Có lỗi xảy ra khi tạo hợp đồng.");
+      alert("error");
     }
   };
 
