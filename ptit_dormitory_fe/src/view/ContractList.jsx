@@ -39,32 +39,40 @@ const ContractList = () => {
   };
 
   useEffect(() => {
-    const fetchContracts = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          "http://localhost:8000/api/contract/fetchlist",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    const fetchAllContracts = async () => {
+      const token = localStorage.getItem("token");
+      let allContracts = [];
+      let currentPage = 1;
+      let totalPages = 1;
 
-        if (response.data.success) {
-          setContracts(response.data.data.contracts);
-        } else {
-          console.error(
-            "Lỗi khi lấy danh sách hợp đồng:",
-            response.data.message
+      try {
+        while (currentPage <= totalPages) {
+          const response = await axios.get(
+            `http://localhost:8000/api/contract/fetchlist?page=${currentPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
+
+          if (response.data.success) {
+            allContracts = [...allContracts, ...response.data.data.contracts];
+            totalPages = response.data.data.pagination.totalPages;
+            currentPage++;
+          } else {
+            console.error("Lỗi khi lấy hợp đồng:", response.data.message);
+            break;
+          }
         }
+
+        setContracts(allContracts);
       } catch (error) {
-        console.error("Error fetching contracts:", error);
+        console.error("Lỗi khi lấy toàn bộ hợp đồng:", error);
       }
     };
 
-    fetchContracts();
+    fetchAllContracts();
   }, []);
 
   const handleView = () => navigate("/thongtinhopdong");
