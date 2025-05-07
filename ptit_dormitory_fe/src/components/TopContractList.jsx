@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+// TopContractList.jsx
+import React from "react";
 import { useNavigate } from "react-router-dom";
-const TopConTractList = () => {
-  const [entries, setEntries] = useState(10);
-  const [searchTerm, setSearchTerm] = useState("");
+
+const TopConTractList = ({
+  entries,
+  setEntries,
+  searchTerm,
+  setSearchTerm,
+}) => {
   const navigate = useNavigate();
 
-  const handleEntriesChange = (e) => setEntries(e.target.value);
+  const handleEntriesChange = (e) => setEntries(Number(e.target.value));
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-  const handleAddNew = () => navigate("/themdangky");
 
   const styles = {
     container: {
@@ -43,7 +47,6 @@ const TopConTractList = () => {
 
   return (
     <div style={styles.container}>
-      {/* Phân độ lớn bảng */}
       <div style={styles.selectWrapper}>
         <span>Show</span>
         <select
@@ -51,14 +54,13 @@ const TopConTractList = () => {
           onChange={handleEntriesChange}
           style={styles.select}
         >
+          <option value="5">5</option>
           <option value="10">10</option>
           <option value="20">20</option>
           <option value="50">50</option>
           <option value="100">100</option>
         </select>
       </div>
-
-      {/* Ô tìm kiếm */}
       <input
         type="text"
         placeholder="Tìm kiếm..."

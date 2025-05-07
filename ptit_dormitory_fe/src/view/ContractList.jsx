@@ -1,78 +1,117 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import TopConTractList from "../components/TopContractList";
 
 const ContractList = () => {
-  const data = [
-    {
-      id: "#20462",
-      name: "Nguyễn Văn A",
-      duration: "01/09/2024 - 30/06/2025",
-      addedDate: "13/05/2022",
-      status: "Còn hạn",
-    },
-    {
-      id: "#20462",
-      name: "Nguyễn Văn A",
-      duration: "01/09/2024 - 30/06/2025",
-      addedDate: "13/05/2022",
-      status: "Hết hạn",
-    },
-    {
-      id: "#20462",
-      name: "Nguyễn Văn A",
-      duration: "01/09/2024 - 30/06/2025",
-      addedDate: "13/05/2022",
-      status: "Còn hạn",
-    },
-  ];
-
+  const [contracts, setContracts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [contractsPerPage, setContractsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  const handleView = () => {
-    navigate("/thongtinhopdong");
+
+  const filteredContracts = contracts.filter(
+    (contract) =>
+      contract.student?.first_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      contract.student?.last_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      contract.id.toString().includes(searchTerm)
+  );
+
+  const indexOfLastContract = currentPage * contractsPerPage;
+  const indexOfFirstContract = indexOfLastContract - contractsPerPage;
+  const currentContracts = filteredContracts.slice(
+    indexOfFirstContract,
+    indexOfLastContract
+  );
+
+  const paginate = (pageNumber) => {
+    if (
+      pageNumber >= 1 &&
+      pageNumber <= Math.ceil(filteredContracts.length / contractsPerPage)
+    ) {
+      setCurrentPage(pageNumber);
+    }
   };
-  const handleRenewal = () => {
-    navigate("/giahanhopdong");
-  };
+
+  useEffect(() => {
+    const fetchContracts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://localhost:8000/api/contract/fetchlist",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          setContracts(response.data.data.contracts);
+        } else {
+          console.error(
+            "Lỗi khi lấy danh sách hợp đồng:",
+            response.data.message
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching contracts:", error);
+      }
+    };
+
+    fetchContracts();
+  }, []);
+
+  const handleView = () => navigate("/thongtinhopdong");
+  const handleRenewal = () => navigate("/giahanhopdong");
 
   return (
     <div style={styles.container}>
       <Sidebar role="admin" username="Hoàng Dũng" />
-
       <div style={styles.content}>
         <h2 style={styles.title}>Danh sách hợp đồng</h2>
-
         <div style={styles.tableContainer}>
-          <TopConTractList />
+          <TopConTractList
+            entries={contractsPerPage}
+            setEntries={setContractsPerPage}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
           <table style={styles.table}>
             <thead>
               <tr>
                 <th style={styles.th}>Mã hợp đồng</th>
                 <th style={styles.th}>Họ tên</th>
-                <th style={styles.th}>Thời hạn</th>
-                <th style={styles.th}>Ngày thêm</th>
+                <th style={styles.th}>Ngày nộp</th>
                 <th style={styles.th}>Trạng thái</th>
                 <th style={styles.th}>Action</th>
               </tr>
             </thead>
-
             <tbody>
-              {data.map((item, index) => (
+              {currentContracts.map((item, index) => (
                 <tr key={index} style={styles.tr}>
                   <td style={styles.td}>{item.id}</td>
-                  <td style={styles.td}>{item.name}</td>
-
-                  <td style={styles.td}>{item.duration}</td>
-                  <td style={styles.td}>{item.addedDate}</td>
+                  <td style={styles.td}>
+                    {item.student
+                      ? `${item.student.last_name} ${item.student.first_name}`
+                      : "Chưa có sinh viên"}
+                  </td>
+                  <td style={styles.td}>
+                    {new Date(item.apply_date).toLocaleDateString("vi-VN")}
+                  </td>
                   <td style={styles.td}>
                     <span
                       style={{
                         ...styles.status,
                         backgroundColor:
-                          item.status === "Còn hạn" ? "#d4edda" : "#f8d7da",
+                          item.status === "xác nhận" ? "#d4edda" : "#f8d7da",
                         color:
-                          item.status === "Còn hạn" ? "#155724" : "#721c24",
+                          item.status === "xác nhận" ? "#155724" : "#721c24",
                       }}
                     >
                       {item.status}
@@ -92,13 +131,39 @@ const ContractList = () => {
             </tbody>
           </table>
           <div style={styles.pagination}>
-            <button style={styles.pageBtn}>Trước</button>
-            <button style={{ ...styles.pageBtn, ...styles.pageBtnActive }}>
-              1
+            <button
+              style={styles.pageBtn}
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Trước
             </button>
-            <button style={styles.pageBtn2}>2</button>
-            <button style={styles.pageBtn2}>3</button>
-            <button style={styles.pageBtn}>Sau</button>
+            {[
+              ...Array(
+                Math.ceil(filteredContracts.length / contractsPerPage)
+              ).keys(),
+            ].map((number) => (
+              <button
+                key={number + 1}
+                style={{
+                  ...styles.pageBtn,
+                  ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+                }}
+                onClick={() => paginate(number + 1)}
+              >
+                {number + 1}
+              </button>
+            ))}
+            <button
+              style={styles.pageBtn}
+              onClick={() => paginate(currentPage + 1)}
+              disabled={
+                currentPage ===
+                Math.ceil(filteredContracts.length / contractsPerPage)
+              }
+            >
+              Sau
+            </button>
           </div>
         </div>
       </div>
@@ -106,11 +171,10 @@ const ContractList = () => {
   );
 };
 
-// Styles
 const styles = {
   container: {
     display: "flex",
-    heght: "100vh",
+    height: "100vh",
   },
   content: {
     flex: 1,
@@ -207,17 +271,10 @@ const styles = {
     borderRadius: "5px",
     transition: "background 0.2s",
   },
-
-  pageBtnHover: {
-    background: "#0056b3",
-  },
   pageBtnActive: {
     background: "#BC2626",
     color: "white",
   },
-  searchInput :{
-    background:"#fff"
-  }
 };
 
 export default ContractList;
