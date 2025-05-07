@@ -1,0 +1,45 @@
+{
+  "name": "ptit_dormitory_fe",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --open",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.1",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@react-three/drei": "^9.99.0",
+    "@react-three/fiber": "^8.15.16",
+    "@tailwindcss/vite": "^4.0.12",
+    "axios": "^1.8.4",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "2.1.1",
+    "lucide-react": "^0.453.0",
+    "prop-types": "^15.8.1",
+    "radix-ui": "^1.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.5.1",
+    "tailwind-merge": "2.5.4",
+    "tailwindcss": "^4.0.12",
+    "three": "^0.161.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
+    "tailwindcss": "3.4.16",
+    "vite": "^6.2.0"
+  }
+}
