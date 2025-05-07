@@ -1,4 +1,3 @@
-// ContractRenewalApp.js
 import { useEffect } from "react";
 import React, { useState } from "react";
 import "../style/AddContract.css";
@@ -7,31 +6,35 @@ import { useNavigate } from "react-router-dom";
 
 function InforContract() {
   const [formData, setFormData] = useState({
-    studentName: "",
-    birthDate: "",
-    studentId: "",
+    full_name: "",
+    dob: "",
+    student_code: "",
     gender: "",
-    class: "",
-    faculty: "",
-    khoa: "",
-    idNumber: "",
-    nganh: "",
+    class_code: "",
+    ethnicity: "",
+    school_year: "",
+    major: "",
     nationality: "",
-    hometown: "",
-    cityProvince: "",
-    residentialAddress: "",
+    education_type: "",
+    identification_code: "",
+    birth_place: "",
+    phone_number: "",
     email: "",
-    contractId: "",
-    dormitoryArea: "",
+    religion: "",
+    area: "",
     room: "",
     floor: "",
-    startDate: "",
-    endDate: "",
+    apply_date: "",
+    expired_date: "",
     renewalDuration: "",
-    renewalReason: "",
-    studentCommitment: "",
+    price: "",
+    studentNote: "",
     relativesName: "",
-    relativesAddress: "",
+    address: "",
+    father_name: "",
+    father_phone: "",
+    mother_name: "",
+    mother_phone: "",
   });
 
   const [showPrintView, setShowPrintView] = useState(false);
@@ -158,9 +161,9 @@ function InforContract() {
     setShowPrintView(false);
   };
   useEffect(() => {
-    if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate);
-      const end = new Date(formData.endDate);
+    if (formData.apply_date && formData.expired_date) {
+      const start = new Date(formData.apply_date);
+      const end = new Date(formData.expired_date);
 
       if (start < end) {
         const months =
@@ -178,11 +181,11 @@ function InforContract() {
         }));
       }
     }
-  }, [formData.startDate, formData.endDate]);
+  }, [formData.apply_date, formData.expired_date]);
 
   const navigate = useNavigate();
   const handleRenewal = () => {
-    navigate("/giahanhopdong");
+    navigate("/danhsachhopdong");
   };
   const handleCancel = () => {
     navigate("/huyhopdong");
@@ -537,7 +540,7 @@ function InforContract() {
 
   return (
     <div className="app-container">
-      <Sidebar />
+      <Sidebar role="admin" username="Hoàng Dũng" />
       <div className="main-content">
         <div className="form-container">
           <h2>Thông tin hợp đồng</h2>
@@ -551,20 +554,20 @@ function InforContract() {
                   <label>Họ tên sinh viên</label>
                   <input
                     type="text"
-                    name="studentName"
-                    value={formData.studentName}
+                    name="full_name"
+                    value={formData.full_name}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Ngày sinh</label>
                   <input
                     type="date"
-                    name="birthDate"
-                    value={formData.birthDate}
+                    name="dob"
+                    value={formData.dob}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -574,44 +577,64 @@ function InforContract() {
                   <label>Mã sinh viên</label>
                   <input
                     type="text"
-                    name="studentId"
-                    value={formData.studentId}
+                    name="student_code"
+                    value={formData.student_code}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Giới tính</label>
-                  <select
+                  <input
+                    type="text"
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                  </select>
+                    readOnly
+                  />
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
+                  <label>CMND/CCCD</label>
+                  <input
+                    type="text"
+                    name="identification_code"
+                    value={formData.identification_code}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Tôn giáo</label>
+                  <input
+                    type="text"
+                    name="religion"
+                    value={formData.religion}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
                   <label>Lớp</label>
                   <input
                     type="text"
-                    name="class"
-                    value={formData.class}
+                    name="class_code"
+                    value={formData.class_code}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Dân tộc</label>
                   <input
                     type="text"
-                    name="faculty"
-                    value={formData.faculty}
+                    name="ethnicity"
+                    value={formData.ethnicity}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -621,9 +644,10 @@ function InforContract() {
                   <label>Khóa</label>
                   <input
                     type="text"
-                    name="khoa"
-                    value={formData.khoa}
+                    name="school_year"
+                    value={formData.school_year}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -633,6 +657,7 @@ function InforContract() {
                     name="nationality"
                     value={formData.nationality}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -640,38 +665,22 @@ function InforContract() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Ngành</label>
-                  <select
-                    name="nganh"
-                    value={formData.nganh}
+                  <input
+                    type="text"
+                    name="major"
+                    value={formData.major}
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="Công nghệ thông tin">
-                      Công nghệ thông tin
-                    </option>
-                    <option value="Điện tử viễn thông">
-                      Điện tử viễn thông
-                    </option>
-                    <option value="Công nghệ đa phương tiện">
-                      Công nghệ đa phương tiện
-                    </option>
-                    <option value="TT">Truyền thông đa phương tiện</option>
-                    <option value="KTruyền thông đa phương tiệnT">
-                      Kế toán
-                    </option>
-                    <option value="Báo chí">Báo chí</option>
-                    <option value="Công nghệ tài chính">
-                      Công nghệ tài chính
-                    </option>
-                  </select>
+                    readOnly
+                  />
                 </div>
                 <div className="form-group">
                   <label>Hệ đào tạo</label>
                   <input
                     type="text"
-                    name="residentialAddress"
-                    value={formData.residentialAddress}
+                    name="education_type"
+                    value={formData.education_type}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -681,9 +690,10 @@ function InforContract() {
                   <label>Số điện thoại</label>
                   <input
                     type="tel"
-                    name="hometown"
-                    value={formData.hometown}
+                    name="phone_number"
+                    value={formData.phone_number}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -693,7 +703,7 @@ function InforContract() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -703,20 +713,20 @@ function InforContract() {
                   <label>Họ tên bố</label>
                   <input
                     type="text"
-                    name="fatherName"
-                    value={formData.fatherName}
+                    name="father_name"
+                    value={formData.father_name}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Số điện thoại bố</label>
                   <input
                     type="text"
-                    name="fatherNumber"
-                    value={formData.fatherNumber}
+                    name="father_phone"
+                    value={formData.father_phone}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -726,20 +736,20 @@ function InforContract() {
                   <label>Họ tên mẹ</label>
                   <input
                     type="text"
-                    name="motherName"
-                    value={formData.motherName}
+                    name="mother_name"
+                    value={formData.mother_name}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Số điện thoại mẹ</label>
                   <input
                     type="text"
-                    name="motherNumber"
-                    value={formData.motherNumber}
+                    name="mother_phone"
+                    value={formData.mother_phone}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -751,15 +761,17 @@ function InforContract() {
                     name="relativesName"
                     value={formData.relativesName}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Địa chỉ người thân</label>
                   <input
                     type="text"
-                    name="relativesAddress"
-                    value={formData.relativesAddress}
+                    name="address"
+                    value={formData.address}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -771,16 +783,13 @@ function InforContract() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Khu ký túc xá</label>
-                  <select
-                    name="dormitoryArea"
-                    value={formData.dormitoryArea}
+                  <input
+                    type="text"
+                    name="area"
+                    value={formData.area}
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="B1">B1</option>
-                    <option value="B2">B2</option>
-                    <option value="B5">B5</option>
-                  </select>
+                    readOnly
+                  />
                 </div>
                 <div className="form-group">
                   <label>Tầng</label>
@@ -789,7 +798,7 @@ function InforContract() {
                     name="floor"
                     value={formData.floor}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -799,7 +808,7 @@ function InforContract() {
                     name="room"
                     value={formData.room}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -809,20 +818,20 @@ function InforContract() {
                   <label>Ngày bắt đầu</label>
                   <input
                     type="date"
-                    name="startDate"
-                    value={formData.startDate}
+                    name="apply_date"
+                    value={formData.apply_date}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Ngày kết thúc</label>
                   <input
                     type="date"
-                    name="endDate"
-                    value={formData.endDate}
+                    name="expired_date"
+                    value={formData.expired_date}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -843,14 +852,17 @@ function InforContract() {
                 </div>
                 <div className="form-group">
                   <label>Mức thu/tháng</label>
-                  <select
-                    name="renewalReason"
-                    value={formData.renewalReason}
+                  <input
+                    type="text"
+                    name="price"
+                    value={
+                      formData.price
+                        ? `${Number(formData.price).toLocaleString()} VND`
+                        : ""
+                    }
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="1800000">1.800.000 VND</option>
-                  </select>
+                    readOnly
+                  />
                 </div>
               </div>
 
@@ -858,10 +870,11 @@ function InforContract() {
                 <div className="form-group full-width">
                   <label>Ghi chú</label>
                   <textarea
-                    name="studentCommitment"
-                    value={formData.studentCommitment}
+                    name="studentNote"
+                    value={formData.studentNote}
                     onChange={handleChange}
                     rows="4"
+                    readOnly
                   ></textarea>
                 </div>
               </div>
@@ -873,7 +886,7 @@ function InforContract() {
                 className="submit-btn"
                 onClick={handleRenewal}
               >
-                Gia hạn
+                Quay lại
               </button>
               <button
                 type="button"

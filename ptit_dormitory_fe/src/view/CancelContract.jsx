@@ -6,32 +6,19 @@ import { useNavigate } from "react-router-dom";
 function CancelContract() {
   const [formData, setFormData] = useState({
     studentName: "",
-    birthDate: "",
     studentId: "",
-    gender: "",
     class: "",
-    faculty: "",
     khoa: "",
-    idNumber: "",
     nganh: "",
-    nationality: "",
-    hometown: "",
-    cityProvince: "",
-    residentialAddress: "",
-    email: "",
+    phoneNumber: "",
     contractId: "",
     dormitoryArea: "",
     room: "",
     floor: "",
     startDate: "",
     endDate: "",
-    renewalDuration: "",
-    renewalReason: "",
-    studentCommitment: "",
-    relativesName: "",
-    relativesAddress: "",
     resonCancel: "",
-    note: "",
+    studentNote: "",
   });
 
   const [showPrintView, setShowPrintView] = useState(false);
@@ -47,37 +34,6 @@ function CancelContract() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setShowPrintView(true);
-  };
-
-  const handleReset = () => {
-    setFormData({
-      studentName: "",
-      birthDate: "",
-      studentId: "",
-      gender: "",
-      class: "",
-      faculty: "",
-      khoa: "",
-      idNumber: "",
-      nganh: "",
-      nationality: "",
-      hometown: "",
-      cityProvince: "",
-      residentialAddress: "",
-      email: "",
-      contractId: "",
-      dormitoryArea: "",
-      room: "",
-      startDate: "",
-      endDate: "",
-      renewalDuration: "",
-      renewalReason: "",
-      studentCommitment: "",
-      fatherName: "",
-      fatherNumber: "",
-      motherName: "",
-      motherNumber: "",
-    });
   };
 
   const handlePrint = () => {
@@ -270,7 +226,7 @@ function CancelContract() {
 
   return (
     <div className="app-container">
-      <Sidebar />
+      <Sidebar role="admin" username="Hoàng Dũng" />
       <div className="main-content">
         <div className="form-container">
           <h2>Hủy hợp đồng</h2>
@@ -294,8 +250,8 @@ function CancelContract() {
                   <label>Số điện thoại</label>
                   <input
                     type="tel"
-                    name="hometown"
-                    value={formData.hometown}
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
                     onChange={handleChange}
                   />
                 </div>
@@ -345,7 +301,7 @@ function CancelContract() {
                     name="contractId"
                     value={formData.contractId}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -353,16 +309,13 @@ function CancelContract() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Khu ký túc xá</label>
-                  <select
+                  <input
+                    type="text"
                     name="dormitoryArea"
                     value={formData.dormitoryArea}
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="B1">B1</option>
-                    <option value="B2">B2</option>
-                    <option value="B5">B5</option>
-                  </select>
+                    readOnly
+                  />
                 </div>
                 <div className="form-group">
                   <label>Tầng</label>
@@ -371,7 +324,7 @@ function CancelContract() {
                     name="floor"
                     value={formData.floor}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -381,7 +334,7 @@ function CancelContract() {
                     name="room"
                     value={formData.room}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -424,8 +377,8 @@ function CancelContract() {
                 <div className="form-group full-width">
                   <label>Các tài sản có giá trị để lại tại phòng ở KTX </label>
                   <textarea
-                    name="note"
-                    value={formData.note}
+                    name="studentNote"
+                    value={formData.studentNote}
                     onChange={handleChange}
                     rows="4"
                   ></textarea>

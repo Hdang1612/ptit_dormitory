@@ -3,9 +3,9 @@ import Sidebar from "../components/Sidebar";
 
 const UserIdentificationCard = () => {
   return (
-    <div style={{ display: "flex", height: "95vh" }}>
+    <div style={{ display: "flex", height: "120vh" }}>
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar role="sinhvien" username="Trần Văn A" />
 
       {/* Content */}
       <div
@@ -115,6 +115,55 @@ const UserIdentificationCard = () => {
               <div>
                 <b>Phòng:</b> <b>B-205</b>
               </div>
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            background: "white",
+            padding: "20px",
+            borderRadius: "10px",
+            maxWidth: "900px",
+            margin: "10px 200px 0px 400px",
+            height: "400px",
+          }}
+        >
+          <p>
+            (1) Bảo quản và sử dụng thẻ đúng mục đích. Khi thẻ bị mất, hỏng vì
+            lý do chính đáng, cần báo ngay cho Trung tâm dịch vụ để tiến hành
+            đổi thẻ. Khi hết hạn sử dụng cần thực hiện gia hạn theo quy định của
+            học viện.
+          </p>
+          <p>
+            (2) Sinh viên mang theo thẻ khi ra, vào Học viện và xuất trình với
+            bảo vệ, đơn vị sinh viên nội trú khi cần thiết.
+          </p>
+          <p>(3) Không được mượn hoặc cho người khác mượn thẻ.</p>
+          <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
+            <div
+              style={{
+                flex: 2,
+                flexDirection: "column",
+                display: "flex",
+                marginLeft: "50px",
+              }}
+            >
+              <div>Cấp lần 1</div>
+              <div>Gia hạn lần: </div>
+            </div>
+            <div
+              style={{
+                flex: 1,
+                display: "Center",
+                flexDirection: "column",
+              }}
+            >
+              <div>Hà Nội, Ngày..., tháng..., năm...</div>
+              <div>
+                <b>TL. GIÁM ĐỐC</b>
+              </div>
+              <div>KT. GIÁM ĐỐC</div>
+              <div>PHÓ GIÁM ĐỐC</div>
             </div>
           </div>
         </div>
