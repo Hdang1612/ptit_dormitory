@@ -1,107 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import DataTable from "../components/TopStudentList";
 import { useNavigate } from "react-router-dom";
+import { importVietnameseStudents, fetchUsers } from "../service/userService";
 
 const StudentList = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const studentsPerPage = 5;
+  const [students, setStudents] = useState([]);
+  const [totalPages, setTotalPages] = useState(0); // Để lưu tổng số trang
+  const [total, setTotal] = useState(0);
+  const [limit, setLimit] = useState(5);
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   const handleInfor = () => {
     navigate("/student-infor");
   };
-  const students = [
-    {
-      id: "SV001",
-      name: "Nguyễn Văn A",
-      studentId: "2021001",
-      phone: "0987654xxx",
-      email: "a@example.com",
-      hometown: "Hà Nội",
-    },
-    {
-      id: "SV002",
-      name: "Trần Thị B",
-      studentId: "2021002",
-      phone: "0976543xxx",
-      email: "b@example.com",
-      hometown: "Hải Phòng",
-    },
-    {
-      id: "SV003",
-      name: "Lê Văn C",
-      studentId: "2021003",
-      phone: "0965432xxx",
-      email: "c@example.com",
-      hometown: "Đà Nẵng",
-    },
-    {
-      id: "SV004",
-      name: "Phạm Văn D",
-      studentId: "2021004",
-      phone: "0954321xxx",
-      email: "d@example.com",
-      hometown: "Huế",
-    },
-    {
-      id: "SV005",
-      name: "Hoàng Thị E",
-      studentId: "2021005",
-      phone: "0943210xxx",
-      email: "e@example.com",
-      hometown: "Sài Gòn",
-    },
-    {
-      id: "SV006",
-      name: "Đặng Văn F",
-      studentId: "2021006",
-      phone: "0932109xxx",
-      email: "f@example.com",
-      hometown: "Cần Thơ",
-    },
-    {
-      id: "SV007",
-      name: "Ngô Thị G",
-      studentId: "2021007",
-      phone: "0921098xxx",
-      email: "g@example.com",
-      hometown: "Bắc Giang",
-    },
-    {
-      id: "SV008",
-      name: "Bùi Văn H",
-      studentId: "2021008",
-      phone: "0910987xxx",
-      email: "h@example.com",
-      hometown: "Nam Định",
-    },
-    {
-      id: "SV009",
-      name: "Vũ Thị L",
-      studentId: "2021009",
-      phone: "0909876xxx",
-      email: "l@example.com",
-      hometown: "Thanh Hóa",
-    },
-    {
-      id: "SV010",
-      name: "Dương Văn M",
-      studentId: "2021010",
-      phone: "0898765xxx",
-      email: "m@example.com",
-      hometown: "Nghệ An",
-    },
-  ];
 
-  const indexOfLastStudent = currentPage * studentsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = students.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent
-  );
+  const fetchStudents = async () => {
+    try {
+      const { data, pagination } = await fetchUsers({
+        page: currentPage,
+        limit: limit,
+      }); // Gọi API và lấy pagination từ phản hồi
+      setStudents(data); // Set danh sách sinh viên
+      setTotal(pagination.total); // Set tổng số trang
+      setTotalPages(pagination.totalPages); // Set tổng số trang
+      setCurrentPage(pagination.currentPage); // Set trang hiện tại
+    } catch (error) {
+      alert(error);
+    }
+  };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  useEffect(() => {
+    fetchStudents(currentPage);
+  }, [currentPage, limit]);
+  // Xác định các trang hiển thị trong thanh phân trang
+  const getPagesToDisplay = () => {
+    const totalPagesToShow = 4;
+    let start = Math.max(1, currentPage - Math.floor(totalPagesToShow / 2));
+    let end = start + totalPagesToShow - 1;
 
+    // Nếu end vượt quá tổng số trang thì dịch ngược start
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - totalPagesToShow + 1);
+    }
+
+    // Tạo mảng các trang
+    const pages = [];
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber); // Chuyển đến trang mới
+  };
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      await importVietnameseStudents(file);
+      alert("Cập nhật thành công!");
+      fetchStudents(currentPage);
+    } catch (error) {
+      alert(error);
+    }
+  };
   return (
     <div style={styles.container}>
       <Sidebar role="admin" username="Hoàng Dũng" />
@@ -122,7 +93,7 @@ const StudentList = () => {
               </tr>
             </thead>
             <tbody>
-              {currentStudents.map((student, index) => (
+              {students.map((student, index) => (
                 <tr key={index} style={styles.tr}>
                   <td style={styles.td}>{student.id}</td>
                   <td style={styles.td}>{student.name}</td>
@@ -147,36 +118,41 @@ const StudentList = () => {
             >
               Trước
             </button>
-            {[
-              ...Array(Math.ceil(students.length / studentsPerPage)).keys(),
-            ].map((number) => (
+            {getPagesToDisplay().map((number) => (
               <button
-                key={number + 1}
+                key={number}
                 style={{
                   ...styles.pageBtn,
-                  ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+                  ...(currentPage === number ? styles.pageBtnActive : {}),
                 }}
-                onClick={() => paginate(number + 1)}
+                onClick={() => paginate(number)}
               >
-                {number + 1}
+                {number}
               </button>
             ))}
             <button
               style={styles.pageBtn}
               onClick={() => paginate(currentPage + 1)}
-              disabled={
-                currentPage === Math.ceil(students.length / studentsPerPage)
-              }
+              disabled={currentPage === totalPages}
             >
               Sau
             </button>
           </div>
         </div>
-
         <div style={styles.buttonContainer}>
           <button style={styles.addButton}>Thêm sinh viên</button>
-          <button style={styles.updateButton}>Cập nhật từ Excel</button>
+          <button style={styles.updateButton} onClick={handleUploadClick}>
+            Cập nhật từ Excel
+          </button>
         </div>
+        <input
+          type="file"
+          accept=".xlsx,.xls"
+          style={{ display: "none" }}
+          ref={fileInputRef}
+          onChange={handleFileChange}
+        />
+        s
       </div>
     </div>
   );
