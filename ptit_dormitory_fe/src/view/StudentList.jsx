@@ -1,8 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import DataTable from "../components/TopStudentList";
+import StudentInfo from "./StudentInfo";
 import { useNavigate } from "react-router-dom";
-import { importVietnameseStudents, fetchUsers } from "../service/userService";
+import {
+  importVietnameseStudents,
+  fetchUsers,
+  getUserById,
+} from "../service/userService";
 
 const StudentList = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -10,10 +15,20 @@ const StudentList = () => {
   const [totalPages, setTotalPages] = useState(0); // Để lưu tổng số trang
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(5);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const handleInfor = () => {
-    navigate("/student-infor");
+  const handleInfor = async (id) => {
+    setLoading(true);
+    try {
+      const { data } = await getUserById(id);
+      setLoading(false);
+      // Sau khi lấy dữ liệu, chuyển hướng đến trang thông tin chi tiết
+      navigate(`/student/${id}`, { state: { student: data } }); // Gửi thông tin sinh viên qua state
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu sinh viên:", error);
+      setLoading(false);
+    }
   };
 
   const fetchStudents = async () => {
@@ -102,7 +117,10 @@ const StudentList = () => {
                   <td style={styles.td}>{student.email}</td>
                   <td style={styles.td}>{student.hometown}</td>
                   <td style={styles.td}>
-                    <button style={styles.viewBtn} onClick={handleInfor}>
+                    <button
+                      style={styles.viewBtn}
+                      onClick={() => handleInfor(student.id)}
+                    >
                       Xem
                     </button>
                   </td>
@@ -152,7 +170,8 @@ const StudentList = () => {
           ref={fileInputRef}
           onChange={handleFileChange}
         />
-        s
+        {loading && <p>Đang tải thông tin sinh viên...</p>}
+
       </div>
     </div>
   );
