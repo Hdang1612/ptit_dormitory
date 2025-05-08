@@ -133,3 +133,83 @@ export const importStudentRoomsService = async (filePath) => {
     throw new ApiError(400, 'Import failed');
   }
 };
+
+export const assignStudentToRoomService = async (studentCode, roomNumber, isLeader = false) => {
+  if (!studentCode || !roomNumber) {
+    throw new ApiError(400, 'Thiếu mã sinh viên hoặc tên phòng');
+  }
+
+  // Tìm sinh viên
+  const student = await User.findOne({ where: { student_code: studentCode } });
+  if (!student) {
+    throw new ApiError(404, `Không tìm thấy sinh viên có mã: ${studentCode}`);
+  }
+
+  // Tìm phòng
+  const room = await Place.findOne({
+    where: {
+      area_name: roomNumber,
+      level: 'room',
+    },
+  });
+  if (!room) {
+    throw new ApiError(404, `Không tìm thấy phòng  ${roomNumber}`);
+  }
+
+  // Cập nhật hoặc tạo bản ghi StudentRoom
+  const [studentRoom, created] = await StudentRoom.findOrCreate({
+    where: { student_id: student.id },
+    defaults: {
+      room_id: room.id,
+      apply_date: new Date(),
+    },
+  });
+
+  if (!created && studentRoom.room_id !== room.id) {
+    studentRoom.room_id = room.id;
+    await studentRoom.save();
+  }
+
+  // Nếu là trưởng phòng thì cập nhật vào RoomDetail
+  if (isLeader) {
+    await RoomDetail.update(
+      { leader: student.id },
+      { where: { room_number: roomNumber } }
+    );
+  }
+
+  return {
+    success: true,
+    student_code: studentCode,
+    room_number: roomNumber,
+    action: created ? 'inserted' : 'updated',
+    isLeader,
+  };
+};
+
+export const removeStudentFromRoomService = async (studentId) => {
+  const student = await User.findByPk(studentId);
+  if (!student) {
+    throw new Error('Không tìm thấy sinh viên');
+  }
+
+  const studentRoom = await StudentRoom.findOne({
+    where: { student_id: studentId },
+  });
+
+  if (!studentRoom) {
+    throw new Error('Sinh viên hiện không ở trong phòng nào');
+  }
+
+  const roomDetail = await RoomDetail.findOne({
+    where: { leader: studentId },
+  });
+
+  if (roomDetail) {
+    await roomDetail.update({ leader: null });
+  }
+
+  await studentRoom.destroy();
+
+  return { message: 'Đã xóa sinh viên khỏi phòng thành công' };
+};

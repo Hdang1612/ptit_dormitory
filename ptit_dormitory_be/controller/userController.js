@@ -7,15 +7,19 @@ import {
   importForeignStudentFromExcelService,
   importVnStudentFromExcelService,
 } from '../services/userServices.js';
-import { importStudentRoomsService } from '../services/StudentToRoomService.js';
+import {
+  importStudentRoomsService,
+  assignStudentToRoomService,
+  removeStudentFromRoomService,
+} from '../services/StudentToRoomService.js';
 export const getUsersList = async (req, res, next) => {
   try {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const search = req.query.search || '';
-    const {role,placeId} = req.query;
+    const { role, placeId } = req.query;
 
-    const data = await getListUserService(search, page, limit,role,placeId);
+    const data = await getListUserService(search, page, limit, role, placeId);
 
     res.status(200).json({
       success: true,
@@ -146,5 +150,51 @@ export const importStudentRooms = async (req, res) => {
     return res
       .status(500)
       .json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+// Thêm sinh viên vào phòng
+export const assignStudentToRoom = async (req, res, next) => {
+  try {
+    const { student_code, room_number, is_leader = false } = req.body;
+
+    if (!student_code || !room_number) {
+      throw new ApiError(400, 'Thiếu mã sinh viên hoặc phòng');
+    }
+
+    const result = await assignStudentToRoomService(
+      student_code,
+      room_number,
+      is_leader,
+    );
+
+    return res.status(200).json({
+      message: 'success',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// StudentRoomController.js
+
+export const removeStudentFromRoomById = async (req, res) => {
+  try {
+    const { student_id } = req.params;
+
+    if (!student_id) {
+      return res.status(400).json({ error: 'Thiếu student id' });
+    }
+
+    const result = await removeStudentFromRoomService(student_id);
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ error: error.message || 'Lỗi xóa sinh viên khỏi phòng' });
   }
 };
