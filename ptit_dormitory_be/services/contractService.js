@@ -30,7 +30,14 @@ export const getContractsService = async (query) => {
     where: whereClause,
     limit,
     offset,
-    attributes: ['id', 'student_id', 'type', 'status', 'apply_date'],
+    attributes: [
+      'id',
+      'student_id',
+      'type',
+      'status',
+      'apply_date',
+      'form_data',
+    ],
     include: [
       {
         model: User,
