@@ -75,7 +75,7 @@ const ContractList = () => {
     fetchAllContracts();
   }, []);
 
-  const handleView = () => navigate("/thongtinhopdong");
+  const handleView = () => navigate("/thongtinhopdong/${contractId}");
   const handleRenewal = () => navigate("/giahanhopdong");
 
   return (

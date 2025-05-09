@@ -139,7 +139,7 @@ function FormAddContract() {
   }, [formData.apply_date, formData.expired_date]);
 
   const handleRenewal = () => {
-    navigate("/danhsachhopdong");
+    navigate("/danhsachdondky");
   };
 
   const handleCancel = () => {
@@ -523,7 +523,7 @@ function FormAddContract() {
                 className="submit-btn"
                 onClick={handleRenewal}
               >
-                Quay lại
+                Duyệt
               </button>
               <button
                 type="button"
