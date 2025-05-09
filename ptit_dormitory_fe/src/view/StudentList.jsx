@@ -23,8 +23,7 @@ const StudentList = () => {
     try {
       const { data } = await getUserById(id);
       setLoading(false);
-      // Sau khi lấy dữ liệu, chuyển hướng đến trang thông tin chi tiết
-      navigate(`/student/${id}`, { state: { student: data } }); // Gửi thông tin sinh viên qua state
+      navigate(`/student/${id}`, { state: { student: data } });
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu sinh viên:", error);
       setLoading(false);
@@ -36,11 +35,11 @@ const StudentList = () => {
       const { data, pagination } = await fetchUsers({
         page: currentPage,
         limit: limit,
-      }); // Gọi API và lấy pagination từ phản hồi
-      setStudents(data); // Set danh sách sinh viên
-      setTotal(pagination.total); // Set tổng số trang
-      setTotalPages(pagination.totalPages); // Set tổng số trang
-      setCurrentPage(pagination.currentPage); // Set trang hiện tại
+      });
+      setStudents(data);
+      setTotal(pagination.total);
+      setTotalPages(pagination.totalPages);
+      setCurrentPage(pagination.currentPage);
     } catch (error) {
       alert(error);
     }
@@ -48,7 +47,7 @@ const StudentList = () => {
 
   useEffect(() => {
     fetchStudents(currentPage);
-  }, [currentPage, limit]);
+  }, [currentPage]);
   // Xác định các trang hiển thị trong thanh phân trang
   const getPagesToDisplay = () => {
     const totalPagesToShow = 4;
@@ -111,9 +110,11 @@ const StudentList = () => {
               {students.map((student, index) => (
                 <tr key={index} style={styles.tr}>
                   <td style={styles.td}>{student.id}</td>
-                  <td style={styles.td}>{student.name}</td>
-                  <td style={styles.td}>{student.studentId}</td>
-                  <td style={styles.td}>{student.phone}</td>
+                  <td style={styles.td}>
+                    {student.first_name} {student.last_name}
+                  </td>
+                  <td style={styles.td}>{student.student_code}</td>
+                  <td style={styles.td}>{student.phone_number}</td>
                   <td style={styles.td}>{student.email}</td>
                   <td style={styles.td}>{student.hometown}</td>
                   <td style={styles.td}>
@@ -171,7 +172,6 @@ const StudentList = () => {
           onChange={handleFileChange}
         />
         {loading && <p>Đang tải thông tin sinh viên...</p>}
-
       </div>
     </div>
   );

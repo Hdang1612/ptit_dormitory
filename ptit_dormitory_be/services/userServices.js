@@ -13,6 +13,7 @@ import {
   columnMappingForeignStudent,
   columnMappingStudent,
   genderMapping,
+  genderMappingUser,
 } from '../constants/mapping.js';
 import { parseDate } from '../utils/convertDate.js';
 
@@ -337,9 +338,9 @@ export const importVnStudentFromExcelService = async (filePath) => {
             continue;
           }
 
-          // if (dbField === 'gender') {
-          //   value = genderMapping[value] || 'Other';
-          // }
+          if (dbField === 'gender') {
+            value = genderMappingUser[value] || 'Other';
+          }
 
           // if (['dob', 'visa_start', 'visa_end'].includes(dbField)) {
           //   value = parseDate(value);
