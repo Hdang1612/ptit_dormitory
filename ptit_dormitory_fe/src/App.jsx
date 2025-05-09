@@ -16,6 +16,8 @@ import StaffDuty from "./view/StaffDuty";
 import StudentCheckin from "./view/StudentCheckin";
 import StudentInfo from "./view/StudentInfo";
 import StudentList from "./view/StudentList";
+import StudentEdit from "./view/StudentEdit";
+import AddStudent from "./view/AddStudent";
 
 import FormAddContract from "./view/FormAddContract";
 
@@ -51,6 +53,8 @@ function App() {
         <Route path="/studentcheckin" element={<StudentCheckin />}></Route>
         <Route path="/student-infor" element={<StudentInfo />}></Route>
         <Route path="/student-list" element={<StudentList />}></Route>
+        <Route path="/student-edit" element={<StudentEdit />}></Route>
+        <Route path="/add-student" element={<AddStudent />}></Route>
 
         {/* Hoàng Anh */}
         <Route path="/" element={<Frame />} />

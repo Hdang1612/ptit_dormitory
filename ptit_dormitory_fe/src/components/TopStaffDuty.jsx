@@ -12,13 +12,13 @@ const TopStaffDuty = () => {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      flexWrap: "nowrap",
       gap: "20px",
       marginBottom: "20px",
       padding: "10px",
       backgroundColor: "#f8f9fa",
       borderRadius: "8px",
       boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+      width: "100%",
     },
     dateWrapper: {
       display: "flex",
@@ -40,7 +40,7 @@ const TopStaffDuty = () => {
       width: "300px",
       backgroundColor: "white",
       color: "black",
-      marginLeft:"750px",
+      marginLeft:"400px",
     },
   };
 

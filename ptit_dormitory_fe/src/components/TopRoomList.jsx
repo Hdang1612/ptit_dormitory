@@ -1,36 +1,63 @@
 import React, { useState } from "react";
+import { getFloors } from "../service/placeService";
 
 const TopRoomList = ({
+  setParentId,
   area,
+  setArea,
   floor,
+  setFloor,
   gender,
+  setGender,
   status,
+  setStatus,
   search,
-  limit,
-  fetchData
+  setSearch,
+  pagination,
+  setPagination,
+  handlePaginationChange
 }) => {
-const handleClickArea = ()=>{
-  fetchData(null,)
-}
+  const [dataFloor, setDataFloor] = useState([]);
+  const handleFloorClick = async () => {
+    const data = await getFloors(area);
+    setDataFloor(data);
+    console.log("floor data", data);
+    
+  }
 
   // Hàm xử lý sự thay đổi khu vực
   const handleAreaChange = (e) => {
+    setFloor("");
     setArea(e.target.value);
+    setParentId(e.target.value);
+    
   };
 
   // Hàm xử lý sự thay đổi tầng
   const handleFloorChange = (e) => {
-    setFloor(e.target.value);
+    const val = e.target.value;
+    if (!val) {
+      // Nếu chọn 'Tất cả'
+      setFloor("");
+      setParentId(area);
+    } else {
+      setFloor(val);
+      setParentId(val);
+    }
+    // Reset trang về 1 mỗi khi thay đổi tầng
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
   // Hàm xử lý sự thay đổi giới tính
   const handleGenderChange = (e) => {
     setGender(e.target.value);
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
   // Hàm xử lý sự thay đổi trạng thái
   const handleStatusChange = (e) => {
     setStatus(e.target.value);
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
   // Hàm xử lý sự thay đổi tìm kiếm
@@ -40,8 +67,14 @@ const handleClickArea = ()=>{
 
   // Hàm xử lý sự thay đổi số lượng phòng mỗi trang
   const handleLimitChange = (e) => {
-    setLimit(Number(e.target.value));
+    const limitChange = parseInt(e.target.value);
+    setPagination((prev) => ({
+      ...prev,
+      limit: limitChange,
+      currentPage: 1,
+    }));
   };
+  
 
   return (
     <div style={styles.container}>
@@ -71,22 +104,27 @@ const handleClickArea = ()=>{
         <span>Trạng thái</span>
         <select value={status} onChange={handleStatusChange} style={styles.selectRed}>
           <option value="">Tất cả</option>
-          <option value="Còn chỗ">Còn chỗ</option>
-          <option value="Hết chỗ">Hết chỗ</option>
-          <option value="Tạm khóa">Tạm khóa</option>
+          <option value="notfull">Còn chỗ</option>
+          <option value="full">Hết chỗ</option>
+          <option value="available">Trống</option>
         </select>
       </div>
 
       {/* Chọn tầng */}
       <div style={styles.selectWrapper}>
         <span>Tầng</span>
-        <select value={floor} onChange={handleFloorChange} style={styles.selectRed}>
+        <select value={floor} onClick={handleFloorClick} onChange={handleFloorChange} style={styles.selectRed}>
           <option value="">Tất cả</option>
-          <option value="1">1</option>
+          {/* <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
           <option value="4">4</option>
-          <option value="5">5</option>
+          <option value="5">5</option> */}
+          {dataFloor.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.area_name}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -101,7 +139,7 @@ const handleClickArea = ()=>{
 
       <div style={styles.selectWrapper}>
         <span>Show</span>
-        <select value={limit} onChange={handleLimitChange} style={styles.select}>
+        <select value={pagination.limit} onChange={handleLimitChange} style={styles.select}>
           <option value={8}>8</option>
           <option value={12}>12</option>
           <option value={16}>16</option>

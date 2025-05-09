@@ -201,8 +201,9 @@ const styles = {
   },
   title: {
     textAlign: "center",
-    marginBottom: "40px",
-    color: "#333",
+    marginBottom: "20px",
+    fontWeight: "bold",
+    fontSize: "24px",
   },
   tableContainer: {
     background: "white",

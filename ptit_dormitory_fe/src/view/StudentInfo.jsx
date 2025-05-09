@@ -17,16 +17,16 @@ const StudentInfo = () => {
             </div>
             
             <div style={styles.column}>
-              <p><strong>Họ và tên:</strong> Nguyễn Văn A</p>
-              <p><strong>Giới tính:</strong> Nam</p>
-              <p><strong>Mã sinh viên:</strong> B21DCPTxxx</p>
-              <p><strong>Quê quán:</strong> Hà Nội</p>
+              <p style={styles.p}><strong>Họ và tên:</strong> Nguyễn Văn A</p>
+              <p style={styles.p}><strong>Giới tính:</strong> Nam</p>
+              <p style={styles.p}><strong>Mã sinh viên:</strong> B21DCPTxxx</p>
+              <p style={styles.p}><strong>Quê quán:</strong> Hà Nội</p>
             </div>
 
             <div style={styles.column}>
-              <p><strong>Ngày sinh:</strong> dd/mm/yyyy</p>
-              <p><strong>SDT:</strong> 0912345678</p>
-              <p><strong>Email:</strong> nguyenvanA@gmail.com</p>
+              <p style={styles.p}><strong>Ngày sinh:</strong> dd/mm/yyyy</p>
+              <p style={styles.p}><strong>SDT:</strong> 0912345678</p>
+              <p style={styles.p}><strong>Email:</strong> nguyenvanA@gmail.com</p>
             </div>
           </div>
 
@@ -36,15 +36,15 @@ const StudentInfo = () => {
           <div style={styles.gridContainer2}>
 
             <div style={styles.column}>
-              <p><strong>Mã hợp đồng:</strong> #20462</p>
-              <p><strong>Ngày bắt đầu:</strong> 01/09/2024</p>
-              <p><strong>Khu ký túc:</strong> Khu A</p>
+              <p style={styles.p}><strong>Mã hợp đồng:</strong> #20462</p>
+              <p style={styles.p}><strong>Ngày bắt đầu:</strong> 01/09/2024</p>
+              <p style={styles.p}><strong>Khu ký túc:</strong> Khu A</p>
             </div>
 
             <div style={styles.column}>
-              <p><strong>Trạng thái:</strong> Còn hạn</p>
-              <p><strong>Ngày kết thúc:</strong> 30/06/2025</p>
-              <p><strong>Số phòng:</strong> 101</p>
+              <p style={styles.p}><strong>Trạng thái:</strong> Còn hạn</p>
+              <p style={styles.p}><strong>Ngày kết thúc:</strong> 30/06/2025</p>
+              <p style={styles.p}><strong>Số phòng:</strong> 101</p>
             </div>
           </div>          
         
@@ -74,14 +74,16 @@ const styles = {
         color: "black",
     },
     title: {
-        textAlign: "center",
-        marginBottom: "40px",
+      textAlign: "center",
+      marginBottom: "20px",
+      fontWeight: "bold",
+      fontSize: "24px",
     },
     subTitle: {
         fontSize: "18px",
         fontWeight: "600",
         marginBottom: "20px",
-        marginLeft:"225px",
+        marginLeft:"30%",
     },
     card: {
         backgroundColor: "white",
@@ -95,7 +97,7 @@ const styles = {
         gap: "10px",
     },
     gridContainer2: {
-        marginLeft:"350px",
+        marginLeft:"33%",
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
         gap: "10px",
@@ -104,14 +106,17 @@ const styles = {
         display: "flex",
         flexDirection: "column",
     },
+    p: {
+      marginTop:"15px",
+      marginBottom:"15px",
+    },
     image: {
         width: "150px",
         height: "225px",
         backgroundColor: "#e0e0e0",
         borderRadius: "8px",
         border: "1px solid #ccc",
-        marginLeft:"225px",
-        marginRight:"225px",
+        alignSelf: "center",
     },
     hr: {
         marginTop: "20px",
@@ -122,7 +127,7 @@ const styles = {
     buttonContainer: {
         display: "flex",
         justifyContent: "flex-end",
-        marginTop: "20px",
+        marginTop: "50px",
     },
     deleteButton: {
         padding: "10px 20px",
@@ -132,6 +137,7 @@ const styles = {
         borderRadius: "5px",
         cursor: "pointer",
         marginLeft: "10px",
+        marginRight:"5%",
     },
     editButton: {
         padding: "10px 20px",

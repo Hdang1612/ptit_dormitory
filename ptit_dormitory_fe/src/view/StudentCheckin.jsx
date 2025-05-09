@@ -14,6 +14,8 @@ const studentData = [
 ];
 
 const StudentCheckin = () => {
+
+
     const [currentPage, setCurrentPage] = useState(1);
     const studentsPerPage = 6;
 
@@ -40,9 +42,8 @@ const StudentCheckin = () => {
                                     <div>{student.name}</div>
                                 </div>
                                 
-                                <div style={styles.buttonGroup}>
-                                    <button style={styles.buttonPresent}>Có mặt</button>
-                                    <button style={styles.buttonAbsent}>Vắng</button>
+                                <div style={{textAlign: "center", marginTop: "10px"}}>
+                                    <button style={styles.checkinBtn}>Xác thực</button>
                                 </div>
 
                                 <div style={styles.leftCol}><strong>Mã sinh viên:</strong> {student.studentId}</div>
@@ -50,9 +51,17 @@ const StudentCheckin = () => {
                                 <div style={{ textAlign: "center", marginTop: "10px" }}>
                                     <button style={styles.viewBtn}>Xem thông tin</button>
                                 </div>
+
+                                <div style={styles.leftCol}></div>
+
+                                <div style={{ textAlign: "center", marginTop: "10px" }}>
+                                    <button style={styles.checkinBtn}>Vi phạm</button>
+                                </div>
                             </div>
                         </div>
                     ))}
+
+                    
                 </div>
 
                 <div style={styles.pagination}>
@@ -104,8 +113,9 @@ const styles = {
     title: {
         textAlign: "center",
         marginBottom: "20px",
-        color: "black",
-    },
+        fontWeight: "bold",
+        fontSize: "24px",
+      },
     gridContainer: {
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
@@ -128,28 +138,14 @@ const styles = {
     leftCol:{
         marginLeft:"20px",
     },
-    buttonGroup: {
-        display: "flex",
-        justifyContent: "space-between",
-        marginTop: "10px",
-    },
-    buttonPresent: {
-        backgroundColor: "#1F9254",
-        color: "white",
-        padding: "8px 16px",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        width: "48%",
-    },
-    buttonAbsent: {
+    checkinBtn: {
         backgroundColor: "#A30D11",
         color: "white",
-        padding: "8px 16px",
-        border: "none",
+        border: "0px solid black",
+        padding: "5px 10px",
         borderRadius: "5px",
         cursor: "pointer",
-        width: "48%",
+        width:"80%",
     },
     viewBtn: {
         backgroundColor: "white",
@@ -157,7 +153,8 @@ const styles = {
         border: "2px solid black",
         padding: "5px 10px",
         borderRadius: "5px",
-        cursor: "pointer"
+        cursor: "pointer",
+        width:"80%",
     },
     pagination: {
         display: "flex",
