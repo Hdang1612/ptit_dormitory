@@ -85,3 +85,48 @@
  *       404:
  *         description: Không tìm thấy người dùng
  */
+
+
+/**
+ * @swagger
+ * /api/auth/resetpassword:
+ *   post:
+ *     summary: Đổi mật khẩu người dùng
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 example: 123456
+ *               newPassword:
+ *                 type: string
+ *                 example: newStrongPassword123
+ *     responses:
+ *       200:
+ *         description: Đổi mật khẩu thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Password has been changed successfully
+ *       401:
+ *         description: Mật khẩu hiện tại không đúng
+ *       404:
+ *         description: Không tìm thấy người dùng
+ */

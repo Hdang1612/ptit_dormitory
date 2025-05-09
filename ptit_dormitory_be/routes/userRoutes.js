@@ -11,6 +11,8 @@ import {
   importForeignStudent,
   importVnStudent,
   importStudentRooms,
+  assignStudentToRoom,
+  removeStudentFromRoomById
 } from '../controller/userController.js';
 
 const userRoutes = express.Router();
@@ -45,13 +47,25 @@ userRoutes.delete(
   authorizeRoles(['user_delete']),
   deleteUser,
 );
-userRoutes.post('/importForeign', verifyToken, upload.single('file'), importForeignStudent);
-userRoutes.post('/importVn', verifyToken, upload.single('file'), importVnStudent);
+userRoutes.post(
+  '/importForeign',
+  verifyToken,
+  upload.single('file'),
+  importForeignStudent,
+);
+userRoutes.post(
+  '/importVn',
+  verifyToken,
+  upload.single('file'),
+  importVnStudent,
+);
 userRoutes.post(
   '/importroomstudent',
   verifyToken,
   upload.single('file'),
   importStudentRooms,
 );
+userRoutes.post('/student-room', verifyToken, assignStudentToRoom);
+userRoutes.delete('/remove-student-room/:id', verifyToken, removeStudentFromRoomById);
 
 export default userRoutes;
