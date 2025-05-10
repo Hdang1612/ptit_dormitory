@@ -122,8 +122,11 @@ export const importVnStudent = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'Import successful',
-      inserted: result.inserted,
-      updated: result.updated,
+      user_inserted: result.user_inserted,
+      user_updated: result.user_updated,
+      room_inserted: result.room_inserted,
+      room_updated: result.room_updated,
+      room_skipped: result.room_skipped,
     });
   } catch (error) {
     next(error);

@@ -14,7 +14,7 @@ export const columnMappingForeignStudent = {
 export const columnMappingStudent = {
   'Họ tên sinh viên': 'name',
   'Giới tính': 'gender',
-  // 'Ngày sinh(Date of birth)': 'dob',
+  // 'Phòng ở': 'room_name',
   'Mã sinh viên': 'student_code',
   'Mã lớp': 'class_code',
   'Số điện thoại': 'phone_number',
@@ -23,12 +23,12 @@ export const columnMappingStudent = {
 export const genderMapping = {
   'Nam (Boy)': 'Male',
   'Nữ (Girl)': 'Female',
-  'Khác': 'Other',
+  Khác: 'Other',
 };
 export const genderMappingUser = {
-  'Nam': 'Male',
-  'Nữ': 'Female',
-  'Khác': 'Other',
+  Nam: 'Male',
+  Nữ: 'Female',
+  Khác: 'Other',
 };
 
 //test create contract
