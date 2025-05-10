@@ -31,6 +31,12 @@ export const genderMappingUser = {
   Khác: 'Other',
 };
 
+export const roomParentIdMapping = {
+      B1: ['B1-F1', 'B1-F2', 'B1-F3', 'B1-F4'],
+      B2: ['B2-F1', 'B2-F2', 'B2-F3', 'B2-F4', 'B2-F5'],
+      B5: ['B5-F1', 'B5-F2', 'B5-F3', 'B5-F4', 'B5-F5'],
+    };
+
 //test create contract
 // {
 //   "type":1,

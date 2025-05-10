@@ -14,6 +14,7 @@ import {
   columnMappingStudent,
   genderMapping,
   genderMappingUser,
+  roomParentIdMapping,
 } from '../constants/mapping.js';
 import { parseDate } from '../utils/convertDate.js';
 
@@ -307,12 +308,16 @@ export const importForeignStudentFromExcelService = async (filePath) => {
   }
 };
 
-export const importVnStudentFromExcelService = async (filePath) => {
+export const importVnStudentFromExcelService = async (filePath, area) => {
   try {
     const fileBuffer = fs.readFileSync(filePath);
     const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    const parentIds = roomParentIdMapping[area];
+    if (!parentIds) {
+      throw new ApiError(400, 'Invalid area');
+    }
 
     fs.unlinkSync(filePath);
 
@@ -385,7 +390,7 @@ export const importVnStudentFromExcelService = async (filePath) => {
           where: {
             area_name: roomNumber,
             parent_id: {
-              [Op.in]: ['B5-F1', 'B5-F2', 'B5-F3', 'B5-F4', 'B5-F5'],
+              [Op.in]: parentIds,
             },
           },
         });
