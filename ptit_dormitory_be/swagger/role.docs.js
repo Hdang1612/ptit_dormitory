@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /api/v1/roles:
+ * /api/role/fetchlist:
  *   get:
  *     summary: Lấy tất cả các vai trò
  *     tags: [Roles]
@@ -26,7 +26,7 @@
 
 /**
  * @swagger
- * /api/v1/roles:
+ * /api/role/create:
  *   post:
  *     summary: Tạo một vai trò mới
  *     tags: [Roles]
@@ -58,7 +58,7 @@
 
 /**
  * @swagger
- * /api/v1/roles/{roleId}:
+ * /api/role/fetch/{roleId}:
  *   get:
  *     summary: Lấy thông tin vai trò theo ID
  *     tags: [Roles]
@@ -82,7 +82,7 @@
 
 /**
  * @swagger
- * /api/v1/roles/{roleId}:
+ * /api/role/update/{roleId}:
  *   put:
  *     summary: Cập nhật thông tin vai trò theo ID
  *     tags: [Roles]

@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import User from '../models/Users.js';
 import StudentRoom from '../models/StudentRoom.js';
 import Place from '../models/Place.js';
+import Contract from '../models/Contract.js';
 
 import ApiError from '../utils/apiError.js';
 import {
@@ -108,6 +109,7 @@ export const getListUserService = async (
       'phone_number',
       'dob',
       'role_id',
+      'student_code',
       // 'room_id',
       'create_at',
     ],
@@ -148,6 +150,12 @@ export const getListUserService = async (
 export const getUserByIdService = async (id) => {
   const user = await User.findByPk(id, {
     attributes: { exclude: ['password'] },
+    include: [
+      {
+        model: Contract,
+        as: 'contracts',
+      },
+    ],
   });
 
   if (!user) {
