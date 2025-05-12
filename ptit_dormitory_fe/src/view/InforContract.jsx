@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import React, { useState } from "react";
 import "../style/AddContract.css";
 import Sidebar from "../components/Sidebar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 function InforContract() {
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     full_name: "",
     dob: "",
@@ -37,7 +39,100 @@ function InforContract() {
     mother_phone: "",
   });
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showPrintView, setShowPrintView] = useState(false);
+
+  useEffect(() => {
+    const fetchContractDetails = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `http://localhost:8000/api/contract/fetch/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          const contractData = response.data.data;
+          const studentData = contractData.student;
+
+          // Format dates for input fields
+          const formatDate = (dateStr) => {
+            if (!dateStr) return "";
+            const date = new Date(dateStr);
+            return date.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+          };
+
+          setFormData({
+            full_name: studentData?.full_name || "",
+            dob: formatDate(studentData?.dob),
+            student_code: studentData?.student_code || "",
+            gender: studentData?.gender || "",
+            class_code: studentData?.class_code || "",
+            ethnicity: studentData?.ethnicity || "",
+            school_year: studentData?.school_year || "",
+            major: studentData?.major || "",
+            nationality: studentData?.nationality || "",
+            education_type: studentData?.education_type || "",
+            identification_code: studentData?.identification_code || "",
+            birth_place: studentData?.birth_place || "",
+            phone_number: studentData?.phone_number || "",
+            email: studentData?.email || "",
+            religion: studentData?.religion || "",
+            area: studentData?.area || "",
+            room: studentData?.room || "",
+            floor: studentData?.floor || "",
+            apply_date: formatDate(studentData?.apply_date),
+            expired_date: formatDate(studentData?.expired_date),
+            renewalDuration: studentData?.renewalDuration || "",
+            price: studentData?.price || "",
+            studentNote: studentData?.studentNote || "",
+            relativesName: studentData?.relativesName || "",
+            address: studentData?.address || "",
+            father_name: studentData?.father_name || "",
+            father_phone: studentData?.father_phone || "",
+            mother_name: studentData?.mother_name || "",
+            mother_phone: studentData?.mother_phone || "",
+          });
+        } else {
+          setError("Không thể tải thông tin hợp đồng");
+        }
+      } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+        setError("Đã xảy ra lỗi khi tải thông tin hợp đồng");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchContractDetails();
+    }
+  }, [id]);
+
+  // Calculate contract duration when dates change
+  useEffect(() => {
+    if (formData.apply_date && formData.expired_date) {
+      const start = new Date(formData.apply_date);
+      const end = new Date(formData.expired_date);
+
+      if (start < end) {
+        const months =
+          (end.getFullYear() - start.getFullYear()) * 12 +
+          (end.getMonth() - start.getMonth());
+
+        setFormData((prev) => ({
+          ...prev,
+          renewalDuration: months.toString(),
+        }));
+      }
+    }
+  }, [formData.apply_date, formData.expired_date]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,9 +147,6 @@ function InforContract() {
     setShowPrintView(true);
   };
 
-  const reason = Number(formData.renewalReason);
-  const duration = Number(formData.renewalDuration);
-  const total = reason * duration;
   const formatVND = (value) => {
     if (!value) return "0";
     return Number(value).toLocaleString("vi-VN");
@@ -67,36 +159,42 @@ function InforContract() {
   const handleBack = () => {
     setShowPrintView(false);
   };
-  useEffect(() => {
-    if (formData.apply_date && formData.expired_date) {
-      const start = new Date(formData.apply_date);
-      const end = new Date(formData.expired_date);
-
-      if (start < end) {
-        const months =
-          (end.getFullYear() - start.getFullYear()) * 12 +
-          (end.getMonth() - start.getMonth());
-
-        setFormData((prev) => ({
-          ...prev,
-          renewalDuration: months.toString(), // Cập nhật giá trị
-        }));
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          renewalDuration: "", // Reset nếu ngày không hợp lệ
-        }));
-      }
-    }
-  }, [formData.apply_date, formData.expired_date]);
 
   const navigate = useNavigate();
-  const handleRenewal = () => {
+  const handleReturnToList = () => {
     navigate("/danhsachhopdong");
   };
+
   const handleCancel = () => {
-    navigate("/huyhopdong");
+    navigate(`/huyhopdong/${id}`);
   };
+
+  if (loading) {
+    return (
+      <div className="app-container">
+        <Sidebar role="admin" username="Hoàng Dũng" />
+        <div className="main-content">
+          <div className="loading-container">
+            <p>Đang tải thông tin hợp đồng...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="app-container">
+        <Sidebar role="admin" username="Hoàng Dũng" />
+        <div className="main-content">
+          <div className="error-container">
+            <p>{error}</p>
+            <button onClick={handleReturnToList}>Quay lại danh sách</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
@@ -104,6 +202,7 @@ function InforContract() {
       <div className="main-content">
         <div className="form-container">
           <h2>Thông tin hợp đồng</h2>
+          <h3 className="contract-id">Mã hợp đồng: {id}</h3>
 
           <form onSubmit={handleSubmit}>
             <div className="form-section">
@@ -163,7 +262,7 @@ function InforContract() {
                     name="identification_code"
                     value={formData.identification_code}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -173,6 +272,7 @@ function InforContract() {
                     name="religion"
                     value={formData.religion}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -214,8 +314,8 @@ function InforContract() {
                   <label>Quê quán</label>
                   <input
                     type="text"
-                    name="nationality"
-                    value={formData.nationality}
+                    name="birth_place"
+                    value={formData.birth_place}
                     onChange={handleChange}
                     readOnly
                   />
@@ -416,9 +516,7 @@ function InforContract() {
                     type="text"
                     name="price"
                     value={
-                      formData.price
-                        ? `${Number(formData.price).toLocaleString()} VND`
-                        : ""
+                      formData.price ? `${formatVND(formData.price)} VND` : ""
                     }
                     onChange={handleChange}
                     readOnly
@@ -444,7 +542,7 @@ function InforContract() {
               <button
                 type="button"
                 className="submit-btn"
-                onClick={handleRenewal}
+                onClick={handleReturnToList}
               >
                 Quay lại
               </button>

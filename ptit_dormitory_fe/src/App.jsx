@@ -42,13 +42,13 @@ function App() {
         ></Route>
         <Route path="/danhsachhopdong" element={<ContractList />}></Route>
         <Route path="/themdangky" element={<AddContract />}></Route>
-        <Route path="/thongtindangky" element={<FormAddContract />}></Route>
+        <Route path="/thongtindangky/:id" element={<FormAddContract />}></Route>
+        <Route path="/thongtinhopdong/:id" element={<InforContract />}></Route>
         <Route
-          path="//thongtinhopdong/:contractId"
-          element={<InforContract />}
+          path="/giahanhopdong/:contractId"
+          element={<ContractRenewalApp />}
         ></Route>
-        <Route path="/giahanhopdong" element={<ContractRenewalApp />}></Route>
-        <Route path="/huyhopdong" element={<CancelContract />}></Route>
+        <Route path="/huyhopdong/:id" element={<CancelContract />}></Route>
 
         {/* Quốc Anh */}
         <Route path="/dsphong" element={<RoomList />}></Route>

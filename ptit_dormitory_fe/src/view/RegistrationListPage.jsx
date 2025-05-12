@@ -22,60 +22,47 @@ const RegistrationtListPage = () => {
       contract.id.toString().includes(searchTerm)
   );
 
-  const indexOfLastContract = currentPage * contractsPerPage;
-  const indexOfFirstContract = indexOfLastContract - contractsPerPage;
-  const currentContracts = filteredContracts.slice(
-    indexOfFirstContract,
-    indexOfLastContract
-  );
+  const currentContracts = contracts; // Vì API đã trả đúng số hợp đồng theo trang
+
+  const [totalPages, setTotalPages] = useState(1);
 
   const paginate = (pageNumber) => {
-    if (
-      pageNumber >= 1 &&
-      pageNumber <= Math.ceil(filteredContracts.length / contractsPerPage)
-    ) {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
     }
   };
-
   useEffect(() => {
-    const fetchAllContracts = async () => {
+    const fetchContractsByPage = async () => {
       const token = localStorage.getItem("token");
-      let allContracts = [];
-      let currentPage = 1;
-      let totalPages = 1;
 
       try {
-        while (currentPage <= totalPages) {
-          const response = await axios.get(
-            `http://localhost:8000/api/contract/fetchlist?page=${currentPage}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (response.data.success) {
-            allContracts = [...allContracts, ...response.data.data.contracts];
-            totalPages = response.data.data.pagination.totalPages;
-            currentPage++;
-          } else {
-            console.error("Lỗi khi lấy hợp đồng:", response.data.message);
-            break;
+        const response = await axios.get(
+          `http://localhost:8000/api/contract/fetchlist?page=${currentPage}&limit=${contractsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        }
+        );
 
-        setContracts(allContracts);
+        if (response.data.success) {
+          setContracts(response.data.data.contracts);
+          setTotalPages(response.data.data.pagination.totalPages); // Cập nhật tổng số trang
+        } else {
+          console.error("Lỗi khi lấy hợp đồng:", response.data.message);
+        }
       } catch (error) {
-        console.error("Lỗi khi lấy toàn bộ hợp đồng:", error);
+        console.error("Lỗi khi lấy hợp đồng:", error);
       }
     };
 
-    fetchAllContracts();
-  }, []);
+    fetchContractsByPage();
+  }, [currentPage, contractsPerPage]);
 
-  const handleView = () => navigate("/thongtindangky");
+  // Hàm xử lý khi người dùng nhấn nút "Xem"
+  const handleView = (contractId) => {
+    navigate(`/thongtindangky/${contractId}`);
+  };
 
   return (
     <div style={styles.container}>
@@ -104,9 +91,7 @@ const RegistrationtListPage = () => {
                 <tr key={index} style={styles.tr}>
                   <td style={styles.td}>{item.id}</td>
                   <td style={styles.td}>
-                    {item.student
-                      ? `${item.student.last_name} ${item.student.first_name}`
-                      : "Chưa có sinh viên"}
+                    {item.form_data?.full_name || "Chưa có sinh viên"}
                   </td>
                   <td style={styles.td}>
                     {new Date(item.apply_date).toLocaleDateString("vi-VN")}
@@ -125,7 +110,10 @@ const RegistrationtListPage = () => {
                     </span>
                   </td>
                   <td style={styles.td}>
-                    <button style={styles.viewBtn} onClick={handleView}>
+                    <button
+                      style={styles.viewBtn}
+                      onClick={() => handleView(item.id)}
+                    >
                       Xem
                     </button>
 
@@ -143,11 +131,7 @@ const RegistrationtListPage = () => {
             >
               Trước
             </button>
-            {[
-              ...Array(
-                Math.ceil(filteredContracts.length / contractsPerPage)
-              ).keys(),
-            ].map((number) => (
+            {[...Array(totalPages).keys()].map((number) => (
               <button
                 key={number + 1}
                 style={{
@@ -162,10 +146,7 @@ const RegistrationtListPage = () => {
             <button
               style={styles.pageBtn}
               onClick={() => paginate(currentPage + 1)}
-              disabled={
-                currentPage ===
-                Math.ceil(filteredContracts.length / contractsPerPage)
-              }
+              disabled={currentPage === totalPages}
             >
               Sau
             </button>

@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
-import "../style/InforContract.css";
+import { useEffect } from "react";
+import React, { useState } from "react";
+import "../style/AddContract.css";
 import Sidebar from "../components/Sidebar";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 function FormAddContract() {
+  const { id } = useParams(); // Get the contract ID from URL
   const [formData, setFormData] = useState({
     full_name: "",
     dob: "",
@@ -38,83 +41,82 @@ function FormAddContract() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showPrintView, setShowPrintView] = useState(false);
 
-  const { contractId } = useParams();
-  const navigate = useNavigate();
-
+  // Fetch contract data when component mounts
   useEffect(() => {
-    const fetchContractData = async () => {
-      if (!contractId) {
-        setLoading(false);
-        return;
-      }
-
+    const fetchContractDetails = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const response = await fetch(
-          `http://localhost:8000/api/contract/fetch/${contractId}`
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `http://localhost:8000/api/contract/fetch/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
-        if (!response.ok) {
-          throw new Error("Không thể lấy dữ liệu hợp đồng");
+        if (response.data.success) {
+          const contractData = response.data.data;
+          const studentData = contractData.student;
+
+          // Format dates for input fields
+          const formatDate = (dateStr) => {
+            if (!dateStr) return "";
+            const date = new Date(dateStr);
+            return date.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+          };
+
+          setFormData({
+            full_name: studentData?.full_name || "",
+            dob: formatDate(studentData?.dob),
+            student_code: studentData?.student_code || "",
+            gender: studentData?.gender || "",
+            class_code: studentData?.class_code || "",
+            ethnicity: studentData?.ethnicity || "",
+            school_year: studentData?.school_year || "",
+            major: studentData?.major || "",
+            nationality: studentData?.nationality || "",
+            education_type: studentData?.education_type || "",
+            identification_code: studentData?.identification_code || "",
+            birth_place: studentData?.birth_place || "",
+            phone_number: studentData?.phone_number || "",
+            email: studentData?.email || "",
+            religion: studentData?.religion || "",
+            area: studentData?.area || "",
+            room: studentData?.room || "",
+            floor: studentData?.floor || "",
+            apply_date: formatDate(studentData?.apply_date),
+            expired_date: formatDate(studentData?.expired_date),
+            renewalDuration: studentData?.renewalDuration || "",
+            price: studentData?.price || "",
+            studentNote: studentData?.studentNote || "",
+            relativesName: studentData?.relativesName || "",
+            address: studentData?.address || "",
+            father_name: studentData?.father_name || "",
+            father_phone: studentData?.father_phone || "",
+            mother_name: studentData?.mother_name || "",
+            mother_phone: studentData?.mother_phone || "",
+          });
+        } else {
+          setError("Không thể tải thông tin hợp đồng");
         }
-
-        const data = await response.json();
-
-        setFormData({
-          full_name: data.full_name || "",
-          dob: data.dob || "",
-          student_code: data.student_code || "",
-          gender: data.gender || "",
-          class_code: data.class_code || "",
-          ethnicity: data.ethnicity || "",
-          school_year: data.school_year || "",
-          major: data.major || "",
-          nationality: data.nationality || "",
-          education_type: data.education_type || "",
-          phone_number: data.phone_number || "",
-          email: data.email || "",
-          area: data.area || "",
-          room: data.room || "",
-          floor: data.floor || "",
-          apply_date: data.apply_date || "",
-          expired_date: data.expired_date || "",
-          renewalDuration: data.renewalDuration || "",
-          price: data.price || "",
-          studentNote: data.studentNote || "",
-          relativesName: data.relativesName || "",
-          relativesAddress: data.relativesAddress || "",
-          father_name: data.father_name || "",
-          father_phone: data.father_phone || "",
-          mother_name: data.mother_name || "",
-          mother_phone: data.mother_phone || "",
-        });
-
-        setLoading(false);
-      } catch (err) {
-        console.error("Lỗi khi lấy dữ liệu:", err);
-        setError(err.message);
+      } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+        setError("Đã xảy ra lỗi khi tải thông tin hợp đồng");
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchContractData();
-  }, [contractId]);
+    if (id) {
+      fetchContractDetails();
+    }
+  }, [id]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Có thể thêm logic in đơn ở đây
-  };
-
-  // Tính thời hạn hợp đồng dựa vào ngày bắt đầu và kết thúc
+  // Calculate contract duration when dates change
   useEffect(() => {
     if (formData.apply_date && formData.expired_date) {
       const start = new Date(formData.apply_date);
@@ -129,21 +131,43 @@ function FormAddContract() {
           ...prev,
           renewalDuration: months.toString(),
         }));
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          renewalDuration: "",
-        }));
       }
     }
   }, [formData.apply_date, formData.expired_date]);
 
-  const handleRenewal = () => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setShowPrintView(true);
+  };
+
+  const formatVND = (value) => {
+    if (!value) return "0";
+    return Number(value).toLocaleString("vi-VN");
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleBack = () => {
+    setShowPrintView(false);
+  };
+
+  const navigate = useNavigate();
+  const handleReturnToList = () => {
     navigate("/danhsachdondky");
   };
 
   const handleCancel = () => {
-    navigate("/huyhopdong");
+    navigate("");
   };
 
   if (loading) {
@@ -165,10 +189,8 @@ function FormAddContract() {
         <Sidebar role="admin" username="Hoàng Dũng" />
         <div className="main-content">
           <div className="error-container">
-            <p>Có lỗi xảy ra: {error}</p>
-            <button onClick={() => navigate("/danhsachhopdong")}>
-              Quay lại danh sách
-            </button>
+            <p>{error}</p>
+            <button onClick={handleReturnToList}>Quay lại danh sách</button>
           </div>
         </div>
       </div>
@@ -181,6 +203,7 @@ function FormAddContract() {
       <div className="main-content">
         <div className="form-container">
           <h2>Thông tin đăng ký</h2>
+          <h3 className="contract-id">Mã hợp đồng: {id}</h3>
 
           <form onSubmit={handleSubmit}>
             <div className="form-section">
@@ -240,7 +263,7 @@ function FormAddContract() {
                     name="identification_code"
                     value={formData.identification_code}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -250,6 +273,7 @@ function FormAddContract() {
                     name="religion"
                     value={formData.religion}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -493,9 +517,7 @@ function FormAddContract() {
                     type="text"
                     name="price"
                     value={
-                      formData.price
-                        ? `${Number(formData.price).toLocaleString()} VND`
-                        : ""
+                      formData.price ? `${formatVND(formData.price)} VND` : ""
                     }
                     onChange={handleChange}
                     readOnly
@@ -521,20 +543,16 @@ function FormAddContract() {
               <button
                 type="button"
                 className="submit-btn"
-                onClick={handleRenewal}
+                onClick={handleReturnToList}
               >
-                Duyệt
+                Quay lại
               </button>
               <button
                 type="button"
                 className="submit-btn"
                 onClick={handleCancel}
               >
-                Hủy hợp đồng
-              </button>
-
-              <button type="submit" className="print-preview-btn">
-                In đơn
+                Duyệt
               </button>
             </div>
           </form>
