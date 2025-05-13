@@ -160,7 +160,7 @@
  *               status:
  *                 type: string
  *                 description: Trạng thái hợp đồng
- *                 example: "xác nhận"
+ *                 example: "xác nhận, từ chối"
  *               form_data:
  *                 type: object
  *                 description: Dữ liệu hợp đồng đã cập nhật

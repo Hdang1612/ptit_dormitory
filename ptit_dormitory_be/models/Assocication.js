@@ -56,6 +56,16 @@ Contract.belongsTo(User, {
   as: 'confirmBy',
 });
 
+// Quan hệ giữa hợp đồng và StudentRoom
+Contract.hasOne(StudentRoom, {
+  foreignKey: 'contract_id', 
+  as: 'studentRoom', 
+});
+StudentRoom.belongsTo(Contract, {
+  foreignKey: 'contract_id',
+  as: 'contract', 
+});
+
 //Quan hệ của Student_violation
 User.hasMany(StudentViolation, { foreignKey: 'student_id' });
 StudentViolation.belongsTo(User, { foreignKey: 'student_id' });
