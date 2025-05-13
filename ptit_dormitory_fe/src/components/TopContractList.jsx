@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+// TopContractList.jsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const TopTable = () => {
-  const [entries, setEntries] = useState(10);
-  const [searchTerm, setSearchTerm] = useState("");
+const TopConTractList = ({
+  entries,
+  setEntries,
+  searchTerm,
+  setSearchTerm,
+}) => {
+  const navigate = useNavigate();
 
-  const handleEntriesChange = (e) => setEntries(e.target.value);
+  const handleEntriesChange = (e) => setEntries(Number(e.target.value));
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-  const handleAddNew = () => alert("");
 
   const styles = {
     container: {
@@ -28,6 +33,7 @@ const TopTable = () => {
       border: "1px solid #ccc",
       borderRadius: "5px",
       cursor: "pointer",
+      backgroundColor: "white",
     },
     searchInput: {
       padding: "5px 10px",
@@ -35,23 +41,12 @@ const TopTable = () => {
       borderRadius: "5px",
       marginLeft: "10px",
       width: "250px",
-    },
-    addButton: {
-      backgroundColor: "#BC2626",
-      color: "white",
-      border: "none",
-      padding: "8px 15px",
-      borderRadius: "5px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      marginLeft: "700px",
+      backgroundColor: "#fff",
     },
   };
 
   return (
     <div style={styles.container}>
-      {/* Phân độ lớn bảng */}
       <div style={styles.selectWrapper}>
         <span>Show</span>
         <select
@@ -65,8 +60,6 @@ const TopTable = () => {
           <option value="100">100</option>
         </select>
       </div>
-
-      {/* Ô tìm kiếm */}
       <input
         type="text"
         placeholder="Tìm kiếm..."
@@ -74,13 +67,8 @@ const TopTable = () => {
         onChange={handleSearchChange}
         style={styles.searchInput}
       />
-
-      {/* Nút thêm mới */}
-      <button onClick={handleAddNew} style={styles.addButton}>
-        + Thêm mới
-      </button>
     </div>
   );
 };
 
-export default TopTable;
+export default TopConTractList;

@@ -1,6 +1,11 @@
 import "../style/ForgotPassword.css";
+import { useNavigate } from "react-router-dom";
 
 export default function ForgotPassword() {
+  const navigate = useNavigate();
+  const handleChangePassword = () => {
+    navigate("/dangnhap");
+  };
   return (
     <div className="forgot-container">
       <div className="forgot-box">
@@ -13,7 +18,9 @@ export default function ForgotPassword() {
           <input type="text" placeholder="Nhập số điện thoại" />
           <input type="password" placeholder="Nhập mật khẩu mới" />
           <input type="password" placeholder="Xác nhận mật khẩu mới" />
-          <button className="forgot-button">THAY ĐỔI MẬT KHẨU</button>
+          <button className="forgot-button" onClick={handleChangePassword}>
+            THAY ĐỔI MẬT KHẨU
+          </button>
         </div>
       </div>
     </div>

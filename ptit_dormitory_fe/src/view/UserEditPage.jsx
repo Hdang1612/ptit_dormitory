@@ -2,12 +2,12 @@ import React from "react";
 import Sidebar from "../components/Sidebar";
 
 const UserEditPage = () => {
+  const role = localStorage.getItem("role") || "guest";
+  const username = localStorage.getItem("username") || "Người dùng";
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      {/* Sidebar */}
-      <Sidebar />
+      <Sidebar role={role} username={username} />
 
-      {/* Content */}
       <div
         style={{
           margin: "0 auto",
@@ -65,27 +65,6 @@ const UserEditPage = () => {
                 placeholder="Nhập quê quán"
                 style={inputStyle}
               />
-            </div>
-
-            <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Tỉnh/Thành phố</label>
-                <select style={inputStyle}>
-                  <option>Chọn tỉnh/thành phố</option>
-                </select>
-              </div>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Quận/Huyện</label>
-                <select style={inputStyle}>
-                  <option>Chọn quận/huyện</option>
-                </select>
-              </div>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Phường/Xã</label>
-                <select style={inputStyle}>
-                  <option>Chọn phường/xã</option>
-                </select>
-              </div>
             </div>
 
             <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
