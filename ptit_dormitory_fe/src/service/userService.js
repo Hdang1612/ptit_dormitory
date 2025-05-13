@@ -2,7 +2,12 @@
 import { userApi } from "./axiosInstance";
 
 // Lấy danh sách người dùng (có thể search, phân trang, lọc theo role)
-export const fetchUsers = async ({ search, page = 1, limit = 10, role } = {}) => {
+export const fetchUsers = async ({
+  search,
+  page = 1,
+  limit = 10,
+  role,
+} = {}) => {
   try {
     const response = await userApi.get("/fetch", {
       params: { search, page, limit, role },
@@ -54,12 +59,12 @@ export const deleteUser = async (id) => {
 };
 
 // Import sinh viên Việt Nam từ file Excel
-export const importVietnameseStudents = async (file) => {
+export const importVietnameseStudents = async (file, area) => {
   try {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await userApi.post("/importVn", formData, {
+    const response = await userApi.post(`/importVn?area=${area}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
