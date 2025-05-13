@@ -137,7 +137,7 @@
 
 /**
  * @swagger
- * /api/contracts/update/{contractId}:
+ * /api/contract/update/{contractId}:
  *   put:
  *     summary: Cập nhật hợp đồng
  *     tags: [Contracts]
