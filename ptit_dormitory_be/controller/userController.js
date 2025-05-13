@@ -114,16 +114,23 @@ export const importForeignStudent = async (req, res, next) => {
 export const importVnStudent = async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: 'upload Excel file !!!' });
+      return res.status(400).json({ message: 'Thiếu file upload' });
+    }
+    const area = req.query.area;
+    if (!area) {
+      return res.status(400).json({ message: 'Thiếu khu vực' });
     }
 
-    const result = await importVnStudentFromExcelService(req.file.path);
+    const result = await importVnStudentFromExcelService(req.file.path, area);
 
     res.status(200).json({
       success: true,
       message: 'Import successful',
-      inserted: result.inserted,
-      updated: result.updated,
+      user_inserted: result.user_inserted,
+      user_updated: result.user_updated,
+      room_inserted: result.room_inserted,
+      room_updated: result.room_updated,
+      room_skipped: result.room_skipped,
     });
   } catch (error) {
     next(error);

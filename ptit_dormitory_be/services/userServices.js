@@ -7,12 +7,15 @@ import { Op } from 'sequelize';
 import User from '../models/Users.js';
 import StudentRoom from '../models/StudentRoom.js';
 import Place from '../models/Place.js';
+import Contract from '../models/Contract.js';
 
 import ApiError from '../utils/apiError.js';
 import {
   columnMappingForeignStudent,
   columnMappingStudent,
   genderMapping,
+  genderMappingUser,
+  roomParentIdMapping,
 } from '../constants/mapping.js';
 import { parseDate } from '../utils/convertDate.js';
 
@@ -106,6 +109,7 @@ export const getListUserService = async (
       'phone_number',
       'dob',
       'role_id',
+      'student_code',
       // 'room_id',
       'create_at',
     ],
@@ -146,6 +150,12 @@ export const getListUserService = async (
 export const getUserByIdService = async (id) => {
   const user = await User.findByPk(id, {
     attributes: { exclude: ['password'] },
+    include: [
+      {
+        model: Contract,
+        as: 'contracts',
+      },
+    ],
   });
 
   if (!user) {
@@ -306,16 +316,21 @@ export const importForeignStudentFromExcelService = async (filePath) => {
   }
 };
 
-export const importVnStudentFromExcelService = async (filePath) => {
+export const importVnStudentFromExcelService = async (filePath, area) => {
   try {
     const fileBuffer = fs.readFileSync(filePath);
     const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    const parentIds = roomParentIdMapping[area];
+    if (!parentIds) {
+      throw new ApiError(400, 'Invalid area');
+    }
 
-    const users = await Promise.all(
+    fs.unlinkSync(filePath);
+
+    const results = await Promise.all(
       data.map(async (row) => {
-        // console.log('Dữ liệu đọc từ Excel:', row);
         const mappedUser = {
           id: uuidv4(),
           role_id: '4',
@@ -337,16 +352,13 @@ export const importVnStudentFromExcelService = async (filePath) => {
             continue;
           }
 
-          // if (dbField === 'gender') {
-          //   value = genderMapping[value] || 'Other';
-          // }
-
-          // if (['dob', 'visa_start', 'visa_end'].includes(dbField)) {
-          //   value = parseDate(value);
-          // }
+          if (dbField === 'gender') {
+            value = genderMappingUser[value] || 'Other';
+          }
 
           mappedUser[dbField] = value;
         }
+
         let studentCode = row['Mã sinh viên']
           ? row['Mã sinh viên'].toString().trim()
           : '';
@@ -354,34 +366,100 @@ export const importVnStudentFromExcelService = async (filePath) => {
         if (studentCode.startsWith("'")) {
           studentCode = studentCode.slice(1);
         }
-
         mappedUser.student_code = studentCode;
-        // Thêm password mặc định
         const hashedPassword = await bcrypt.hash(DEFAULT_PWD, 10);
         mappedUser.password = hashedPassword;
 
-        //  check user exist
-        const existingUser = await User.findOne({
+        // Tạo hoặc cập nhật user
+        let userRecord = await User.findOne({
           where: { student_code: mappedUser.student_code },
         });
 
-        if (existingUser) {
-          await existingUser.update(mappedUser);
-          return { action: 'updated', student_code: mappedUser.student_code };
+        const action = userRecord ? 'updated' : 'inserted';
+        if (userRecord) {
+          await userRecord.update(mappedUser);
         } else {
-          await User.create(mappedUser);
-          return { action: 'inserted', student_code: mappedUser.student_code };
+          userRecord = await User.create(mappedUser);
         }
+
+        // Xử lý phòng
+        const roomNumber = row['Phòng ở'] || row['Phòng ở KTX'];
+        if (!roomNumber) {
+          return {
+            student_code: studentCode,
+            action,
+            room: null,
+            room_action: 'skipped',
+            error: 'Thiếu phòng ở',
+          };
+        }
+        console.log('Phòng ở từ Excel:', roomNumber);
+        const room = await Place.findOne({
+          where: {
+            area_name: roomNumber,
+            parent_id: {
+              [Op.in]: parentIds,
+            },
+          },
+        });
+
+        if (!room) {
+          return {
+            student_code: studentCode,
+            action,
+            room: roomNumber,
+            room_action: 'skipped',
+            error: 'Không tìm thấy phòng',
+          };
+        }
+
+        const existingSR = await StudentRoom.findOne({
+          where: { student_id: userRecord.id },
+        });
+
+        if (existingSR) {
+          await existingSR.update({ room_id: room.id, apply_date: new Date() });
+        } else {
+          await StudentRoom.create({
+            student_id: userRecord.id,
+            room_id: room.id,
+            apply_date: new Date(),
+          });
+        }
+
+        return {
+          student_code: studentCode,
+          action,
+          room: roomNumber,
+          room_action: existingSR ? 'updated' : 'inserted',
+        };
       }),
     );
 
-    // Đếm số lượng insert và update
-    const insertedCount = users.filter((u) => u.action === 'inserted').length;
-    const updatedCount = users.filter((u) => u.action === 'updated').length;
-
+    const inserted = results.filter((r) => r.action === 'inserted').length;
+    const updated = results.filter((r) => r.action === 'updated').length;
+    const roomInserted = results.filter(
+      (r) => r.room_action === 'inserted',
+    ).length;
+    const roomUpdated = results.filter(
+      (r) => r.room_action === 'updated',
+    ).length;
+    const skipped = results.filter((r) => r.room_action === 'skipped').length;
+    console.log(
+      '>>>>>>>>',
+      inserted,
+      updated,
+      roomInserted,
+      roomUpdated,
+      skipped,
+    );
     return {
-      inserted: insertedCount,
-      updated: updatedCount,
+      user_inserted: inserted,
+      user_updated: updated,
+      room_inserted: roomInserted,
+      room_updated: roomUpdated,
+      room_skipped: skipped,
+      details: results,
     };
   } catch (error) {
     console.error(error);

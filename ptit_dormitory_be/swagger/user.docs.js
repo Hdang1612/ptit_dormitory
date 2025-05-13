@@ -208,19 +208,49 @@
  *   post:
  *     summary: Import sinh viên Việt Nam từ file Excel
  *     tags: [User]
+ *     parameters:
+ *       - in: query
+ *         name: area
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [B1, B2, B5]
+ *         description: Khu vực ký túc xá tương ứng với file Excel (B1, B2, B5)
  *     requestBody:
  *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
+ *             required:
+ *               - file
  *             properties:
  *               file:
  *                 type: string
  *                 format: binary
+ *                 description: File Excel chứa danh sách sinh viên
  *     responses:
  *       200:
  *         description: Import thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 user_inserted:
+ *                   type: integer
+ *                 user_updated:
+ *                   type: integer
+ *                 room_inserted:
+ *                   type: integer
+ *                 room_updated:
+ *                   type: integer
+ *                 room_skipped:
+ *                   type: integer
  *       400:
  *         description: Lỗi khi import dữ liệu
  */

@@ -56,7 +56,7 @@ function App() {
         <Route path="/shiftschedule" element={<ShiftSchedule />}></Route>
         <Route path="/staffduty" element={<StaffDuty />}></Route>
         <Route path="/studentcheckin" element={<StudentCheckin />}></Route>
-        <Route path="/student-infor" element={<StudentInfo />}></Route>
+        <Route path="/student/:id" element={<StudentInfo />} />
         <Route path="/student-list" element={<StudentList />}></Route>
 
         {/* Hoàng Anh */}

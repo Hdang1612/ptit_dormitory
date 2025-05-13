@@ -7,7 +7,7 @@ import StudentRoom from '../models/StudentRoom.js';
 import User from '../models/Users.js';
 import Place from '../models/Place.js';
 import RoomDetail from '../models/RoomDetail.js';
-
+// Thêm sinh viên vào phòng 
 export const importStudentRoomsService = async (filePath) => {
   try {
     // Đọc file Excel
@@ -134,6 +134,7 @@ export const importStudentRoomsService = async (filePath) => {
   }
 };
 
+//Thêm sinh viên vào phòng thủ công
 export const assignStudentToRoomService = async (studentCode, roomNumber, isLeader = false) => {
   if (!studentCode || !roomNumber) {
     throw new ApiError(400, 'Thiếu mã sinh viên hoặc tên phòng');
@@ -186,7 +187,7 @@ export const assignStudentToRoomService = async (studentCode, roomNumber, isLead
     isLeader,
   };
 };
-
+//Xóa sinh viên khỏi phòng
 export const removeStudentFromRoomService = async (studentId) => {
   const student = await User.findByPk(studentId);
   if (!student) {

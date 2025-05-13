@@ -1,7 +1,13 @@
-import Sidebar from "../components/Sidebar";
 import React from "react";
-
+import Sidebar from "../components/Sidebar";
+import { useLocation } from "react-router-dom";
+// StudentInfo nhận props `student` để hiển thị thông tin sinh viên
 const StudentInfo = () => {
+  const location = useLocation();
+  const student = location.state?.student;
+
+  if (!student) return <p>Không có thông tin sinh viên!</p>;
+
   return (
     <div style={styles.container}>
       <Sidebar role="admin" username="Hoàng Dũng" />
@@ -17,33 +23,36 @@ const StudentInfo = () => {
 
             <div style={styles.column}>
               <p>
-                <strong>Họ và tên:</strong> Nguyễn Văn A
+                <strong>Họ và tên:</strong> {student.first_name}{" "}
+                {student.last_name}
               </p>
               <p>
-                <strong>Giới tính:</strong> Nam
+                <strong>Giới tính:</strong> {student.gender || "Chưa cập nhật"}
               </p>
               <p>
-                <strong>Mã sinh viên:</strong> B21DCPTxxx
+                <strong>Mã sinh viên:</strong>{" "}
+                {student.student_code || "Chưa cập nhật"}
               </p>
               <p>
-                <strong>Quê quán:</strong> Hà Nội
+                <strong>Quê quán:</strong>{" "}
+                {student.birth_place || "Chưa cập nhật"}
               </p>
             </div>
 
             <div style={styles.column}>
               <p>
-                <strong>Ngày sinh:</strong> dd/mm/yyyy
+                <strong>Ngày sinh:</strong> {formatDate(student.dob)}
               </p>
               <p>
-                <strong>SDT:</strong> 0912345678
+                <strong>SDT:</strong> {student.phone_number || "Chưa cập nhật"}
               </p>
               <p>
-                <strong>Email:</strong> nguyenvanA@gmail.com
+                <strong>Email:</strong> {student.email}
               </p>
             </div>
           </div>
 
-          {/* Contract Info */}
+          {/* Contract Info (Nếu có) */}
           <hr style={styles.hr} />
           <h3 style={styles.subTitle}>Thông tin hợp đồng</h3>
           <div style={styles.gridContainer2}>
@@ -80,6 +89,13 @@ const StudentInfo = () => {
       </div>
     </div>
   );
+};
+
+// Format ngày sinh (dd/mm/yyyy)
+const formatDate = (dateString) => {
+  if (!dateString) return "Chưa cập nhật";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("vi-VN");
 };
 
 const styles = {
