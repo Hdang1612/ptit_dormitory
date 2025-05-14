@@ -16,17 +16,17 @@ const StudentList = () => {
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(5);
   const [loading, setLoading] = useState(false);
+  const [selectedArea, setSelectedArea] = useState(null);
+  const [showAreaOptions, setShowAreaOptions] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const handleInfor = async (id) => {
-    setLoading(true);
     try {
       const { data } = await getUserById(id);
-      setLoading(false);
       navigate(`/student/${id}`, { state: { student: data } });
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu sinh viên:", error);
-      setLoading(false);
     }
   };
 
@@ -71,20 +71,33 @@ const StudentList = () => {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber); // Chuyển đến trang mới
   };
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
+  // Xử lý khi chọn khu vực
+  const handleAreaSelect = (area) => {
+    setSelectedArea(area);
   };
 
-  const handleFileChange = async (event) => {
+  const handleFileChange = (event) => {
     const file = event.target.files[0];
-    if (!file) return;
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleImportClick = async () => {
+    if (!selectedFile || !selectedArea) {
+      alert("Vui lòng chọn khu vực và file để import.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      await importVietnameseStudents(file);
+      await importVietnameseStudents(selectedFile, selectedArea);
       alert("Cập nhật thành công!");
-      fetchStudents(currentPage);
     } catch (error) {
       alert(error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -158,19 +171,58 @@ const StudentList = () => {
             </button>
           </div>
         </div>
+        {/* Nút Cập nhật từ Excel */}
         <div style={styles.buttonContainer}>
           <button style={styles.addButton}>Thêm sinh viên</button>
-          <button style={styles.updateButton} onClick={handleUploadClick}>
-            Cập nhật từ Excel
-          </button>
+
+          <select
+            style={styles.updateButton}
+            onChange={(e) => handleAreaSelect(e.target.value)}
+            value={selectedArea || ""}
+          >
+            <option className="text-white" value="" disabled>
+              Cập nhật từ Excel
+            </option>
+            <option value="B1">B1</option>
+            <option value="B2">B2</option>
+            <option value="B5">B5</option>
+          </select>
+          {/* Hiển thị nút "Chọn file" khi đã chọn khu vực */}
+          {selectedArea && (
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              style={{ padding: "10px", cursor: "pointer" }}
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+          )}
+
+          {/* Hiển thị nút "Import" sau khi chọn file */}
+          {selectedFile && selectedArea && (
+            <div>
+              <button
+                className="bg-white"
+                onClick={handleImportClick}
+                disabled={loading} // Vô hiệu hóa nút khi đang loading
+                style={{
+                  position: "relative",
+                  padding: "10px 20px",
+                  cursor: loading ? "wait" : "pointer",
+                }}
+              >
+                {loading ? (
+                  <div>
+                    <span className="visually-hidden">Importing ... </span>
+                  </div>
+                ) : (
+                  "Import"
+                )}
+              </button>
+            </div>
+          )}
         </div>
-        <input
-          type="file"
-          accept=".xlsx,.xls"
-          style={{ display: "none" }}
-          ref={fileInputRef}
-          onChange={handleFileChange}
-        />
+
         {loading && <p>Đang tải thông tin sinh viên...</p>}
       </div>
     </div>

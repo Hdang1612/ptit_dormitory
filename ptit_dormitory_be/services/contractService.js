@@ -11,6 +11,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import moment from 'moment';
+import bcrypt from 'bcryptjs';
 
 import { updateRoomStatusAuto } from './areaServices.js';
 
@@ -151,30 +152,62 @@ export const updateContractService = async (id, updateData) => {
   const prevStatus = contract.status;
   const newStatus = updateData.status;
   let updatePayload = { ...updateData };
-  console.log('prevStatus:', prevStatus);
-  console.log('newStatus:', newStatus);
+  // Nếu form_data không được cung cấp , giữ nguyên giá trị cũ
+  if (updateData.form_data && Object.keys(updateData.form_data).length > 0) {
+    updatePayload.form_data = {
+      ...contract.form_data,
+      ...updateData.form_data,
+    };
+  } else {
+    updatePayload.form_data = contract.form_data;
+  }
 
   // Nếu chuyển trạng thái từ "đã gửi" -> "xác nhận"
   if (prevStatus === 'đã gửi' && newStatus === 'xác nhận') {
     const studentData = contract.form_data;
+    console.log(studentData);
 
     // Kiểm tra xem user đã tồn tại chưa
-    // const existingUser = await User.findOne({
-    //   where: { student_code: studentData.student_code },
-    // });
+    const existingUser = await User.findOne({
+      where: { student_code: studentData.student_code },
+    });
 
-    // if (existingUser) {
-    //   throw new ApiError(400, 'Sinh viên đã tồn tại trong hệ thống');
-    // }
-
+    if (existingUser) {
+      throw new ApiError(400, 'Sinh viên đã tồn tại trong hệ thống');
+    }
+    const formattedFloorName = `Tầng ${studentData.floor.trim()}`;
     // Kiểm tra phòng còn chỗ không
-    const roomId = studentData.room;
-    const room = await RoomDetail.findByPk(roomId);
-    if (!room) throw new ApiError(404, 'Không tìm thấy phòng trong hợp đồng');
-    console.log('room', room);
-    if (room.status === 'full') {
+    // Tìm phòng dựa vào area, floor, room name
+    const area = await Place.findOne({
+      where: {
+        area_name: studentData.area,
+        level: 'area',
+      },
+    });
+    if (!area) throw new ApiError(404, 'Không tìm thấy khu vực');
+    const floor = await Place.findOne({
+      where: {
+        area_name: formattedFloorName,
+        level: 'floor',
+        parent_id: area.id,
+      },
+    });
+    if (!floor) throw new ApiError(404, 'Không tìm thấy tầng');
+    const room = await Place.findOne({
+      where: {
+        area_name: studentData.room,
+        level: 'room',
+        parent_id: floor.id,
+      },
+    });
+    if (!room) throw new ApiError(404, 'Không tìm thấy phòng');
+    const roomDetail = await RoomDetail.findOne({
+      where: { id: room.id },
+    });
+    if (roomDetail.status === 'full') {
       throw new ApiError(400, 'Phòng đã đầy, không thể xác nhận hợp đồng');
     }
+
     const newUserId = uuidv4();
 
     studentData.gender =
@@ -188,10 +221,14 @@ export const updateContractService = async (id, updateData) => {
     const nameParts = fullName.split(' ');
     studentData.first_name = nameParts.pop();
     studentData.last_name = nameParts.join(' ');
-
+    delete studentData.status;
+    const DEFAULT_PWD = process.env.DEFAULT_PASSWORD_STUDENT;
+    const hashedPassword = await bcrypt.hash(DEFAULT_PWD, 10);
     let user = await User.create({
       id: newUserId,
       role_id: 4,
+      status: 1,
+      password: hashedPassword,
       ...studentData,
     });
     console.log('new user ', user);
@@ -201,13 +238,13 @@ export const updateContractService = async (id, updateData) => {
     // Tạo bản ghi student_room
     await StudentRoom.create({
       student_id: updatePayload.student_id,
-      room_id: roomId,
+      room_id: room.id,
       apply_date: studentData.apply_date,
-      contrac_id: id,
+      contract_id: id,
       expired_date: studentData.expired_date,
     });
 
-    await updateRoomStatusAuto(roomId);
+    await updateRoomStatusAuto(room.id);
   }
 
   await contract.update(updatePayload);
