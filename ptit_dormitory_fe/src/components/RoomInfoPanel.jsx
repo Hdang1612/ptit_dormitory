@@ -12,7 +12,12 @@ const RoomInfoPanel = ({ room }) => {
     );
   }
 
-  const maxPower = Math.max(...room.powerUsage.history, room.powerUsage.current);
+  // Calculate power usage statistics
+  const currentPower = room.powerUsage.current;
+  const historyPower = room.powerUsage.history;
+  const maxPower = Math.max(currentPower, ...historyPower);
+  const minPower = Math.min(currentPower, ...historyPower);
+  const avgPower = [...historyPower, currentPower].reduce((a, b) => a + b, 0) / (historyPower.length + 1);
 
   return (
     <div className="p-6 space-y-6">
@@ -74,22 +79,47 @@ const RoomInfoPanel = ({ room }) => {
       {/* Power Usage */}
       <div>
         <h3 className="font-semibold mb-3">Mức điện tiêu thụ (kWh)</h3>
-        <div className="flex items-end gap-2 h-32">
-          {room.powerUsage.history.map((usage, index) => (
+        <div className="space-y-4">
+          <div className="flex items-end gap-2 h-32">
+            {historyPower.map((usage, index) => (
+              <div
+                key={index}
+                className="flex-1 bg-blue-200 rounded-t relative group"
+                style={{
+                  height: `${(usage / maxPower) * 100}%`
+                }}
+              >
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-800 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100">
+                  {usage} kWh
+                </div>
+              </div>
+            ))}
             <div
-              key={index}
-              className="flex-1 bg-blue-200 rounded-t"
+              className="flex-1 bg-blue-500 rounded-t relative group"
               style={{
-                height: `${(usage / maxPower) * 100}%`
+                height: `${(currentPower / maxPower) * 100}%`
               }}
-            />
-          ))}
-          <div
-            className="flex-1 bg-blue-500 rounded-t"
-            style={{
-              height: `${(room.powerUsage.current / maxPower) * 100}%`
-            }}
-          />
+            >
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-800 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100">
+                {currentPower} kWh
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="text-gray-600">Cao nhất</div>
+              <div className="font-semibold">{maxPower} kWh</div>
+            </div>
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="text-gray-600">Thấp nhất</div>
+              <div className="font-semibold">{minPower} kWh</div>
+            </div>
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="text-gray-600">Trung bình</div>
+              <div className="font-semibold">{Math.round(avgPower)} kWh</div>
+            </div>
+          </div>
         </div>
       </div>
 
