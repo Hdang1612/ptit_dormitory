@@ -1,7 +1,18 @@
 import React from "react";
 import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 const UserIdentificationCard = () => {
+  const navigate = useNavigate();
+
+  const handleExtendContract = () => {
+    navigate("/giahanhopdong");
+  };
+
+  const handleEndContract = () => {
+    navigate("/huyhopdong");
+  };
+
   return (
     <div style={{ display: "flex", height: "120vh" }}>
       {/* Sidebar */}
@@ -166,6 +177,45 @@ const UserIdentificationCard = () => {
               <div>PHÓ GIÁM ĐỐC</div>
             </div>
           </div>
+        </div>
+
+        {/* Contract Management Buttons */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "20px",
+          marginTop: "20px",
+          maxWidth: "900px",
+          margin: "20px 200px 0px 400px"
+        }}>
+          <button
+            onClick={handleExtendContract}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#a40000",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              fontSize: "16px"
+            }}
+          >
+            Gia hạn hợp đồng
+          </button>
+          <button
+            onClick={handleEndContract}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#a40000",
+              color: "white",
+              border: "none", 
+              borderRadius: "5px",
+              cursor: "pointer",
+              fontSize: "16px"
+            }}
+          >
+            Kết thúc hợp đồng
+          </button>
         </div>
       </div>
     </div>
