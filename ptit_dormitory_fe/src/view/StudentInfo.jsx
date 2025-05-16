@@ -1,12 +1,18 @@
 import React from "react";
 import Sidebar from "../components/Sidebar";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // StudentInfo nhận props `student` để hiển thị thông tin sinh viên
 const StudentInfo = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const student = location.state?.student;
 
   if (!student) return <p>Không có thông tin sinh viên!</p>;
+  const handleUpdate = (id) => {
+    console.log(">>>");
+    navigate(`/student-edit/${id}`, { state: { student: student } });
+  };
 
   return (
     <div style={styles.container}>
@@ -69,15 +75,26 @@ const StudentInfo = () => {
             </div>
 
             <div style={styles.column}>
-              <p><strong>Trạng thái:</strong> Còn hạn</p>
-              <p><strong>Ngày kết thúc:</strong> 30/06/2025</p>
-              <p><strong>Số phòng:</strong> 101</p>
+              <p>
+                <strong>Trạng thái:</strong> Còn hạn
+              </p>
+              <p>
+                <strong>Ngày kết thúc:</strong> 30/06/2025
+              </p>
+              <p>
+                <strong>Số phòng:</strong> 101
+              </p>
             </div>
           </div>
         </div>
 
         <div style={styles.buttonContainer}>
-          <button style={styles.editButton}>Chỉnh sửa</button>
+          <button
+            style={styles.editButton}
+            onClick={() => handleUpdate(student.id)}
+          >
+            Chỉnh sửa
+          </button>
           <button style={styles.deleteButton}>Xóa sinh viên</button>
         </div>
       </div>

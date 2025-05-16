@@ -17,7 +17,7 @@ const StudentList = () => {
   const [limit, setLimit] = useState(5);
   const [loading, setLoading] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
-  const [showAreaOptions, setShowAreaOptions] = useState(false);
+  // const [showAreaOptions, setShowAreaOptions] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);

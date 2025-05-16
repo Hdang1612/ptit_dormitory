@@ -59,11 +59,11 @@ function App() {
         <Route path="/studentcheckin" element={<StudentCheckin />}></Route>
         <Route path="/student/:id" element={<StudentInfo />} />
         <Route path="/student-list" element={<StudentList />}></Route>
-        <Route path="/student-edit" element={<StudentEdit />}></Route>
+        <Route path="/student-edit/:id" element={<StudentEdit />}></Route>
         <Route path="/add-student" element={<AddStudent />}></Route>
         <Route path="/shift-reports" element={<ShiftReports />}></Route>
         <Route path="/room-report" element={<RoomReport />}></Route>
-        
+
         {/* Hoàng Anh */}
         <Route path="/invoice" element={<Frame />} />
         <Route path="/power-monitoring" element={<PowerMonitoring />} />
