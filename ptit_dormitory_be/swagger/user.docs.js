@@ -308,3 +308,96 @@
  *         type: string
  *         description: Lý do bỏ qua (nếu có)
  */
+
+/**
+ * @swagger
+ * /api/user/student-room:
+ *   post:
+ *     summary: Gán sinh viên vào phòng
+ *     tags: [StudentRooms]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - student_code
+ *               - room_number
+ *             properties:
+ *               student_code:
+ *                 type: string
+ *                 example: SV001234
+ *                 description: Mã sinh viên
+ *               room_number:
+ *                 type: string
+ *                 example: B1-101
+ *                 description: Mã phòng (area_name)
+ *               is_leader:
+ *                 type: boolean
+ *                 example: true
+ *                 description: Sinh viên có phải là trưởng phòng không
+ *     responses:
+ *       200:
+ *         description: Gán sinh viên vào phòng thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Gán sinh viên vào phòng thành công
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     student_code:
+ *                       type: string
+ *                       example: SV001234
+ *                     room_number:
+ *                       type: string
+ *                       example: B1-101
+ *                     action:
+ *                       type: string
+ *                       enum: [inserted, updated]
+ *       400:
+ *         description: Dữ liệu không hợp lệ hoặc không tìm thấy sinh viên/phòng
+ *       500:
+ *         description: Lỗi máy chủ
+ */
+
+/**
+ * @swagger
+ * /api/user/remove-student-room/{student_id}:
+ *   delete:
+ *     summary: Xóa sinh viên khỏi phòng
+ *     tags: [StudentRooms]
+ *     parameters:
+ *       - name: student_id
+ *         in: path
+ *         required: true
+ *         description: ID của sinh viên cần xóa khỏi phòng
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Xóa sinh viên khỏi phòng thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Đã xóa sinh viên khỏi phòng thành công
+ *       400:
+ *         description: Dữ liệu không hợp lệ hoặc lỗi xử lý
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Không tìm thấy sinh viên
+ */

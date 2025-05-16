@@ -37,7 +37,7 @@ const RegistrationList = () => {
 
   return (
     <div style={styles.container}>
-      <Sidebar />
+      <Sidebar role="admin" username="Hoàng Dũng" />
 
       <div style={styles.content}>
         <h2 style={styles.title}>Danh sách đơn đăng ký lưu trú</h2>

@@ -3,98 +3,100 @@ import Sidebar from "../components/Sidebar";
 import TopStudentCheckin from "../components/TopStudentCheckin";
 
 const studentData = [
-    { name: "Nguyễn Văn A", studentId: "B21DCPT001" },
-    { name: "Trần Thị B", studentId: "B21DCPT002" },
-    { name: "Lê Văn C", studentId: "B21DCPT003" },
-    { name: "Phạm Thị D", studentId: "B21DCPT004" },
-    { name: "Hoàng Văn E", studentId: "B21DCPT005" },
-    { name: "Đỗ Thị F", studentId: "B21DCPT006" },
-    { name: "Ngô Văn G", studentId: "B21DCPT007" },
-    { name: "Vũ Thị H", studentId: "B21DCPT008" },
+  { name: "Nguyễn Văn A", studentId: "B21DCPT001" },
+  { name: "Trần Thị B", studentId: "B21DCPT002" },
+  { name: "Lê Văn C", studentId: "B21DCPT003" },
+  { name: "Phạm Thị D", studentId: "B21DCPT004" },
+  { name: "Hoàng Văn E", studentId: "B21DCPT005" },
+  { name: "Đỗ Thị F", studentId: "B21DCPT006" },
+  { name: "Ngô Văn G", studentId: "B21DCPT007" },
+  { name: "Vũ Thị H", studentId: "B21DCPT008" },
 ];
 
 const StudentCheckin = () => {
-
-
     const [currentPage, setCurrentPage] = useState(1);
     const studentsPerPage = 6;
 
-    const indexOfLastStudent = currentPage * studentsPerPage;
-    const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-    const currentStudents = studentData.slice(indexOfFirstStudent, indexOfLastStudent);
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const currentStudents = studentData.slice(
+    indexOfFirstStudent,
+    indexOfLastStudent
+  );
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    return (
-        <div style={styles.container}>
-            <Sidebar />
-            <div style={styles.content}>
-                <h2 style={styles.title}>Điểm danh phòng</h2>
+  return (
+    <div style={styles.container}>
+      <Sidebar role="nguoitruc" username="Nguyễn Thị B" />
+      <div style={styles.content}>
+        <h2 style={styles.title}>Điểm danh phòng</h2>
 
-                <TopStudentCheckin />
+        <TopStudentCheckin />
 
-                <div style={styles.gridContainer}>
-                    {currentStudents.map((student, index) => (
-                        <div key={index} style={styles.card}>
-                            <div style={styles.gridContent}>
-                                <div style={styles.leftCol}>
-                                    <div><strong>Họ và tên:</strong></div> 
-                                    <div>{student.name}</div>
-                                </div>
-                                
-                                <div style={{textAlign: "center", marginTop: "10px"}}>
-                                    <button style={styles.checkinBtn}>Xác thực</button>
-                                </div>
+        <div style={styles.gridContainer}>
+          {currentStudents.map((student, index) => (
+            <div key={index} style={styles.card}>
+              <div style={styles.gridContent}>
+                <div style={styles.leftCol}>
+                  <div>
+                    <strong>Họ và tên:</strong>
+                  </div>
+                  <div>{student.name}</div>
+                </div>
 
-                                <div style={styles.leftCol}><strong>Mã sinh viên:</strong> {student.studentId}</div>
+                <div style={styles.buttonGroup}>
+                  <button style={styles.buttonPresent}>Có mặt</button>
+                  <button style={styles.buttonAbsent}>Vắng</button>
+                </div>
+
+                <div style={styles.leftCol}>
+                  <strong>Mã sinh viên:</strong> {student.studentId}
+                </div>
 
                                 <div style={{ textAlign: "center", marginTop: "10px" }}>
                                     <button style={styles.viewBtn}>Xem thông tin</button>
                                 </div>
-
-                                <div style={styles.leftCol}></div>
-
-                                <div style={{ textAlign: "center", marginTop: "10px" }}>
-                                    <button style={styles.checkinBtn}>Vi phạm</button>
-                                </div>
                             </div>
                         </div>
                     ))}
-
-                    
                 </div>
 
-                <div style={styles.pagination}>
-                    <button
-                        style={styles.pageBtn}
-                        onClick={() => paginate(currentPage - 1)}
-                        disabled={currentPage === 1}
-                    >
-                        Trước
-                    </button>
-                    {[...Array(Math.ceil(studentData.length / studentsPerPage)).keys()].map((number) => (
-                        <button
-                            key={number + 1}
-                            style={{
-                                ...styles.pageBtn,
-                                ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
-                            }}
-                            onClick={() => paginate(number + 1)}
-                        >
-                            {number + 1}
-                        </button>
-                    ))}
-                    <button
-                        style={styles.pageBtn}
-                        onClick={() => paginate(currentPage + 1)}
-                        disabled={currentPage === Math.ceil(studentData.length / studentsPerPage)}
-                    >
-                        Sau
-                    </button>
-                </div>
-            </div>
+        <div style={styles.pagination}>
+          <button
+            style={styles.pageBtn}
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Trước
+          </button>
+          {[
+            ...Array(Math.ceil(studentData.length / studentsPerPage)).keys(),
+          ].map((number) => (
+            <button
+              key={number + 1}
+              style={{
+                ...styles.pageBtn,
+                ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+              }}
+              onClick={() => paginate(number + 1)}
+            >
+              {number + 1}
+            </button>
+          ))}
+          <button
+            style={styles.pageBtn}
+            onClick={() => paginate(currentPage + 1)}
+            disabled={
+              currentPage === Math.ceil(studentData.length / studentsPerPage)
+            }
+          >
+            Sau
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 const styles = {
@@ -113,9 +115,8 @@ const styles = {
     title: {
         textAlign: "center",
         marginBottom: "20px",
-        fontWeight: "bold",
-        fontSize: "24px",
-      },
+        color: "black",
+    },
     gridContainer: {
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
@@ -138,14 +139,28 @@ const styles = {
     leftCol:{
         marginLeft:"20px",
     },
-    checkinBtn: {
-        backgroundColor: "#A30D11",
+    buttonGroup: {
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: "10px",
+    },
+    buttonPresent: {
+        backgroundColor: "#1F9254",
         color: "white",
-        border: "0px solid black",
-        padding: "5px 10px",
+        padding: "8px 16px",
+        border: "none",
         borderRadius: "5px",
         cursor: "pointer",
-        width:"80%",
+        width: "48%",
+    },
+    buttonAbsent: {
+        backgroundColor: "#A30D11",
+        color: "white",
+        padding: "8px 16px",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        width: "48%",
     },
     viewBtn: {
         backgroundColor: "white",
@@ -153,8 +168,7 @@ const styles = {
         border: "2px solid black",
         padding: "5px 10px",
         borderRadius: "5px",
-        cursor: "pointer",
-        width:"80%",
+        cursor: "pointer"
     },
     pagination: {
         display: "flex",

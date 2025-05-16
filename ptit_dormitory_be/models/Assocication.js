@@ -6,6 +6,8 @@ import Place from './Place.js';
 import StudentRoom from './StudentRoom.js';
 import Contract from './Contract.js';
 import ContractType from './contractType.js';
+import StudentViolation from './StudentVIolation.js';
+import ShiftSchedule from './ShiftSchedule.js';
 
 Role.belongsToMany(Permission, {
   through: RolePermission,
@@ -53,3 +55,10 @@ Contract.belongsTo(User, {
   foreignKey: 'confirm_by',
   as: 'confirmBy',
 });
+
+//Quan hệ của Student_violation
+User.hasMany(StudentViolation, { foreignKey: 'student_id' });
+StudentViolation.belongsTo(User, { foreignKey: 'student_id' });
+
+ShiftSchedule.hasMany(StudentViolation, { foreignKey: 'shift_id' });
+StudentViolation.belongsTo(ShiftSchedule, { foreignKey: 'shift_id' });

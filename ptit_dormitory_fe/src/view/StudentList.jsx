@@ -104,7 +104,7 @@ const StudentList = () => {
 
   return (
     <div style={styles.container}>
-      <Sidebar />
+      <Sidebar role="admin" username="Hoàng Dũng" />
       <div style={styles.content}>
         <h2 style={styles.title}>Danh sách sinh viên</h2>
         <div style={styles.tableContainer}>

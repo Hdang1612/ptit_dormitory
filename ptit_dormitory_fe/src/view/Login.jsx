@@ -1,20 +1,64 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import authService from "../service/authService"; // ✅ import service
 import "../style/Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [usernameInput, setUsernameInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      const res = await authService.login(usernameInput, passwordInput);
+
+      if (res.success) {
+        const role = res.data.user.role_id;
+
+        // Điều hướng theo role
+        switch (role) {
+          case "1":
+            navigate("/danhsachdondky");
+            break;
+          case "4":
+            navigate("/thedinhdanh");
+            break;
+          case "3":
+            navigate("/shiftmanage");
+            break;
+          default:
+            alert("Không xác định được vai trò người dùng.");
+            navigate("/dangnhap");
+        }
+      } else {
+        alert("Đăng nhập thất bại: " + res.message);
+      }
+    } catch (err) {
+      alert(
+        "Lỗi khi đăng nhập: " + (err.response?.data?.message || err.message)
+      );
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="login-box">
         <h1 className="login-title">ĐĂNG NHẬP</h1>
         <p className="login-subtitle">Xin chào! Vui lòng đăng nhập</p>
         <div className="login-inputs">
-          <input type="text" placeholder="Nhập tài khoản" />
-          <input type="password" placeholder="Nhập mật khẩu" />
-          <button
-            className="login-button"
-            onClick={() => navigate("/danhsachdondky")}
-          >
+          <input
+            type="text"
+            placeholder="Nhập email"
+            value={usernameInput}
+            onChange={(e) => setUsernameInput(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Nhập mật khẩu"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+          />
+          <button className="login-button" onClick={handleLogin}>
             ĐĂNG NHẬP
           </button>
         </div>

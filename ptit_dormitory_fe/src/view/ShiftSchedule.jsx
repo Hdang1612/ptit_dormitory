@@ -7,17 +7,70 @@ const ShiftSchedule = () => {
   const shiftsPerPage = 5;
 
   const [shifts, setShifts] = useState([
-    { id: "1", date: "2025-04-08", shiftTime: "08:00 - 12:00", floor: "1", staff: "" },
-    { id: "2", date: "2025-04-08", shiftTime: "13:00 - 17:00", floor: "2", staff: "" },
-    { id: "3", date: "2025-04-09", shiftTime: "17:00 - 22:00", floor: "3", staff: "" },
-    { id: "4", date: "2025-04-10", shiftTime: "08:00 - 12:00", floor: "1", staff: "" },
-    { id: "5", date: "2025-04-10", shiftTime: "13:00 - 17:00", floor: "2", staff: "" },
-    { id: "6", date: "2025-04-10", shiftTime: "17:00 - 22:00", floor: "3", staff: "" },
-    { id: "7", date: "2025-04-11", shiftTime: "08:00 - 12:00", floor: "1", staff: "" },
-    { id: "8", date: "2025-04-11", shiftTime: "13:00 - 17:00", floor: "2", staff: "" },
+    {
+      id: "1",
+      date: "2025-04-08",
+      shiftTime: "08:00 - 12:00",
+      floor: "1",
+      staff: "",
+    },
+    {
+      id: "2",
+      date: "2025-04-08",
+      shiftTime: "13:00 - 17:00",
+      floor: "2",
+      staff: "",
+    },
+    {
+      id: "3",
+      date: "2025-04-09",
+      shiftTime: "17:00 - 22:00",
+      floor: "3",
+      staff: "",
+    },
+    {
+      id: "4",
+      date: "2025-04-10",
+      shiftTime: "08:00 - 12:00",
+      floor: "1",
+      staff: "",
+    },
+    {
+      id: "5",
+      date: "2025-04-10",
+      shiftTime: "13:00 - 17:00",
+      floor: "2",
+      staff: "",
+    },
+    {
+      id: "6",
+      date: "2025-04-10",
+      shiftTime: "17:00 - 22:00",
+      floor: "3",
+      staff: "",
+    },
+    {
+      id: "7",
+      date: "2025-04-11",
+      shiftTime: "08:00 - 12:00",
+      floor: "1",
+      staff: "",
+    },
+    {
+      id: "8",
+      date: "2025-04-11",
+      shiftTime: "13:00 - 17:00",
+      floor: "2",
+      staff: "",
+    },
   ]);
 
-  const staffOptions = ["Nguyễn Văn A", "Nguyễn Văn B", "Nguyễn Văn C", "Nguyễn Văn D"];
+  const staffOptions = [
+    "Nguyễn Văn A",
+    "Nguyễn Văn B",
+    "Nguyễn Văn C",
+    "Nguyễn Văn D",
+  ];
 
   const indexOfLastShift = currentPage * shiftsPerPage;
   const indexOfFirstShift = indexOfLastShift - shiftsPerPage;
@@ -39,7 +92,7 @@ const ShiftSchedule = () => {
 
   return (
     <div style={styles.container}>
-      <Sidebar />
+      <Sidebar role="nguoitruc" username="Nguyễn Thị B" />
       <div style={styles.content}>
         <h2 style={styles.title}>Sắp xếp ca trực</h2>
 
@@ -90,22 +143,26 @@ const ShiftSchedule = () => {
             >
               Trước
             </button>
-            {[...Array(Math.ceil(shifts.length / shiftsPerPage)).keys()].map((number) => (
-              <button
-                key={number + 1}
-                style={{
-                  ...styles.pageBtn,
-                  ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
-                }}
-                onClick={() => paginate(number + 1)}
-              >
-                {number + 1}
-              </button>
-            ))}
+            {[...Array(Math.ceil(shifts.length / shiftsPerPage)).keys()].map(
+              (number) => (
+                <button
+                  key={number + 1}
+                  style={{
+                    ...styles.pageBtn,
+                    ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+                  }}
+                  onClick={() => paginate(number + 1)}
+                >
+                  {number + 1}
+                </button>
+              )
+            )}
             <button
               style={styles.pageBtn}
               onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === Math.ceil(shifts.length / shiftsPerPage)}
+              disabled={
+                currentPage === Math.ceil(shifts.length / shiftsPerPage)
+              }
             >
               Sau
             </button>

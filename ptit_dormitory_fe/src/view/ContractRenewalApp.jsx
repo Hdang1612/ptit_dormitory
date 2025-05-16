@@ -12,14 +12,12 @@ function ContractRenewalApp() {
     studentId: "",
     gender: "",
     class: "",
-    faculty: "",
+    ethnicity: "",
     khoa: "",
-    idNumber: "",
     nganh: "",
     nationality: "",
-    hometown: "",
-    cityProvince: "",
-    residentialAddress: "",
+    studyProgram: "",
+    phoneNumber: "",
     email: "",
     contractId: "",
     dormitoryArea: "",
@@ -28,8 +26,8 @@ function ContractRenewalApp() {
     startDate: "",
     endDate: "",
     renewalDuration: "",
-    renewalReason: "",
-    studentCommitment: "",
+    price: "",
+    studentNote: "",
   });
 
   const [showPrintView, setShowPrintView] = useState(false);
@@ -47,32 +45,6 @@ function ContractRenewalApp() {
     setShowPrintView(true);
   };
 
-  const handleReset = () => {
-    setFormData({
-      studentName: "",
-      birthDate: "",
-      studentId: "",
-      gender: "",
-      class: "",
-      faculty: "",
-      khoa: "",
-      idNumber: "",
-      nganh: "",
-      nationality: "",
-      hometown: "",
-      cityProvince: "",
-      residentialAddress: "",
-      email: "",
-      contractId: "",
-      dormitoryArea: "",
-      room: "",
-      startDate: "",
-      endDate: "",
-      renewalDuration: "",
-      renewalReason: "",
-      studentCommitment: "",
-    });
-  };
   const numberToVietnamese = (number) => {
     const ChuSo = [
       "không",
@@ -176,6 +148,9 @@ function ContractRenewalApp() {
 
   const navigate = useNavigate();
   const handleAccept = () => {
+    navigate("/danhsachhopdong");
+  };
+  const handleBackList = () => {
     navigate("/danhsachhopdong");
   };
 
@@ -392,7 +367,7 @@ function ContractRenewalApp() {
 
   return (
     <div className="app-container">
-      <Sidebar />
+      <Sidebar role="admin" username="Hoàng Dũng" />
       <div className="main-content">
         <div className="form-container">
           <h2>Gia hạn hợp đồng</h2>
@@ -409,7 +384,7 @@ function ContractRenewalApp() {
                     name="studentName"
                     value={formData.studentName}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -419,7 +394,7 @@ function ContractRenewalApp() {
                     name="birthDate"
                     value={formData.birthDate}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -432,20 +407,18 @@ function ContractRenewalApp() {
                     name="studentId"
                     value={formData.studentId}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Giới tính</label>
-                  <select
+                  <input
+                    type="text"
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                  </select>
+                    readOnly
+                  />
                 </div>
               </div>
 
@@ -457,16 +430,17 @@ function ContractRenewalApp() {
                     name="class"
                     value={formData.class}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
                   <label>Dân tộc</label>
                   <input
                     type="text"
-                    name="faculty"
-                    value={formData.faculty}
+                    name="ethnicity"
+                    value={formData.ethnicity}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -479,6 +453,7 @@ function ContractRenewalApp() {
                     name="khoa"
                     value={formData.khoa}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -488,6 +463,7 @@ function ContractRenewalApp() {
                     name="nationality"
                     value={formData.nationality}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -495,38 +471,22 @@ function ContractRenewalApp() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Ngành</label>
-                  <select
+                  <input
+                    type="text"
                     name="nganh"
                     value={formData.nganh}
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="Công nghệ thông tin">
-                      Công nghệ thông tin
-                    </option>
-                    <option value="Điện tử viễn thông">
-                      Điện tử viễn thông
-                    </option>
-                    <option value="Công nghệ đa phương tiện">
-                      Công nghệ đa phương tiện
-                    </option>
-                    <option value="TT">Truyền thông đa phương tiện</option>
-                    <option value="KTruyền thông đa phương tiệnT">
-                      Kế toán
-                    </option>
-                    <option value="Báo chí">Báo chí</option>
-                    <option value="Công nghệ tài chính">
-                      Công nghệ tài chính
-                    </option>
-                  </select>
+                    readOnly
+                  />
                 </div>
                 <div className="form-group">
                   <label>Hệ đào tạo</label>
                   <input
                     type="text"
-                    name="residentialAddress"
-                    value={formData.residentialAddress}
+                    name="studyProgram"
+                    value={formData.studyProgram}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
               </div>
@@ -536,9 +496,10 @@ function ContractRenewalApp() {
                   <label>Số điện thoại</label>
                   <input
                     type="tel"
-                    name="hometown"
-                    value={formData.hometown}
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
                     onChange={handleChange}
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -548,7 +509,7 @@ function ContractRenewalApp() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -565,7 +526,7 @@ function ContractRenewalApp() {
                     name="contractId"
                     value={formData.contractId}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -573,16 +534,13 @@ function ContractRenewalApp() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Khu ký túc xá</label>
-                  <select
+                  <input
+                    type="text"
                     name="dormitoryArea"
                     value={formData.dormitoryArea}
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="B1">B1</option>
-                    <option value="B2">B2</option>
-                    <option value="B5">B5</option>
-                  </select>
+                    readOnly
+                  />
                 </div>
                 <div className="form-group">
                   <label>Tầng</label>
@@ -591,7 +549,7 @@ function ContractRenewalApp() {
                     name="floor"
                     value={formData.floor}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
                 <div className="form-group">
@@ -601,7 +559,7 @@ function ContractRenewalApp() {
                     name="room"
                     value={formData.room}
                     onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </div>
               </div>
@@ -645,14 +603,17 @@ function ContractRenewalApp() {
                 </div>
                 <div className="form-group">
                   <label>Mức thu/tháng</label>
-                  <select
-                    name="renewalReason"
-                    value={formData.renewalReason}
+                  <input
+                    type="text"
+                    name="price"
+                    value={
+                      formData.price
+                        ? `${Number(formData.price).toLocaleString()} VND`
+                        : ""
+                    }
                     onChange={handleChange}
-                  >
-                    <option value=""></option>
-                    <option value="1800000">1.800.000 VND</option>
-                  </select>
+                    readOnly
+                  />
                 </div>
               </div>
 
@@ -660,8 +621,8 @@ function ContractRenewalApp() {
                 <div className="form-group full-width">
                   <label>Ghi chú</label>
                   <textarea
-                    name="studentCommitment"
-                    value={formData.studentCommitment}
+                    name="studentNote"
+                    value={formData.studentNote}
                     onChange={handleChange}
                     rows="4"
                   ></textarea>
@@ -670,7 +631,11 @@ function ContractRenewalApp() {
             </div>
 
             <div className="form-actions">
-              <button type="button" className="reset-btn">
+              <button
+                type="button"
+                className="reset-btn"
+                onClick={handleBackList}
+              >
                 Hủy
               </button>
               <button
