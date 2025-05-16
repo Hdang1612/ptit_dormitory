@@ -22,7 +22,7 @@ import StudentCheckin from "./view/StudentCheckin";
 import StudentInfo from "./view/StudentInfo";
 import StudentList from "./view/StudentList";
 import FormAddContract from "./view/FormAddContract";
-import { Frame } from "./view/Frame/index.jsx";
+import { BillnPayment } from "./view/BillnPayment/index.jsx";
 import { PowerMonitoring } from "./view/PowerMonitoring/index.jsx";
 import { Reports } from "./view/Reports/index.jsx";
 
@@ -31,36 +31,38 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Navigate to="/dangnhap" replace />} />
+
         {/* Dũng */}
-        <Route path="/dangnhap" element={<Login />}></Route>
-        <Route path="/quenmatkhau" element={<ForgotPassword />}></Route>
-        <Route path="/thedinhdanh" element={<UserIdentificationCard />}></Route>
-        <Route path="/suathongtin" element={<UserEditPage />}></Route>
-        <Route
-          path="/danhsachdondky"
-          element={<RegistrationListPage />}
-        ></Route>
-        <Route path="/danhsachhopdong" element={<ContractList />}></Route>
-        <Route path="/themdangky" element={<AddContract />}></Route>
-        <Route path="/thongtindangky/:id" element={<FormAddContract />}></Route>
-        <Route path="/thongtinhopdong/:id" element={<InforContract />}></Route>
+        <Route path="/dangnhap" element={<Login />} />
+        <Route path="/quenmatkhau" element={<ForgotPassword />} />
+        <Route path="/thedinhdanh" element={<UserIdentificationCard />} />
+        <Route path="/suathongtin" element={<UserEditPage />} />
+        <Route path="/danhsachdondky" element={<RegistrationListPage />} />
+        <Route path="/danhsachhopdong" element={<ContractList />} />
+        <Route path="/themdangky" element={<AddContract />} />
+        <Route path="/thongtindangky" element={<FormAddContract />} />
+        <Route path="/thongtindangky/:id" element={<FormAddContract />} />
+        <Route path="/thongtinhopdong" element={<InforContract />} />
+        <Route path="/thongtinhopdong/:id" element={<InforContract />} />
+        <Route path="/giahanhopdong" element={<ContractRenewalApp />} />
         <Route
           path="/giahanhopdong/:contractId"
           element={<ContractRenewalApp />}
-        ></Route>
-        <Route path="/huyhopdong/:id" element={<CancelContract />}></Route>
+        />
+        <Route path="/huyhopdong" element={<CancelContract />} />
+        <Route path="/huyhopdong/:id" element={<CancelContract />} />
 
         {/* Quốc Anh */}
-        <Route path="/dsphong" element={<RoomList />}></Route>
-        <Route path="/shiftmanage" element={<ShiftManagement />}></Route>
-        <Route path="/shiftschedule" element={<ShiftSchedule />}></Route>
-        <Route path="/staffduty" element={<StaffDuty />}></Route>
-        <Route path="/studentcheckin" element={<StudentCheckin />}></Route>
-        <Route path="/student/:id" element={<StudentInfo />} />
-        <Route path="/student-list" element={<StudentList />}></Route>
+        <Route path="/dsphong" element={<RoomList />} />
+        <Route path="/shiftmanage" element={<ShiftManagement />} />
+        <Route path="/shiftschedule" element={<ShiftSchedule />} />
+        <Route path="/staffduty" element={<StaffDuty />} />
+        <Route path="/studentcheckin" element={<StudentCheckin />} />
+        <Route path="/student-infor" element={<StudentInfo />} />
+        <Route path="/student-list" element={<StudentList />} />
 
         {/* Hoàng Anh */}
-        <Route path="/invoice" element={<Frame />} />
+        <Route path="/invoice" element={<BillnPayment />} />
         <Route path="/power-monitoring" element={<PowerMonitoring />} />
         <Route path="/reports" element={<Reports />} />
       </Routes>

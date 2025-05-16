@@ -20,6 +20,7 @@ function ContractRenewalApp() {
     school_year: "",
     major: "",
     birth_place: "",
+    nationality: "",
     education_type: "",
     phone_number: "",
     email: "",
@@ -60,6 +61,7 @@ function ContractRenewalApp() {
         if (response.data.success) {
           const contractData = response.data.data;
           const studentData = contractData.student || {};
+          const formDataFromAPI = contractData.form_data || {};
 
           // Set today's date as the default start date for renewal
           const today = new Date();
@@ -71,23 +73,34 @@ function ContractRenewalApp() {
           const formattedEndDate = defaultEndDate.toISOString().split("T")[0];
 
           setFormData({
-            full_name: studentData.full_name || "",
-            dob: studentData.dob || "",
-            student_code: studentData.student_code || "",
-            gender: studentData.gender || "",
-            class_code: studentData.class_code || "",
-            ethnicity: studentData.ethnicity || "",
-            school_year: studentData.school_year || "",
-            major: studentData.major || "",
-            birth_place: studentData.birth_place || "",
-            education_type: studentData.education_type || "",
-            phone_number: studentData.phone_number || "",
-            email: studentData.email || "",
+            full_name: studentData.full_name || formDataFromAPI.full_name || "",
+            dob: studentData.dob || formDataFromAPI.dob || "",
+            student_code:
+              studentData.student_code || formDataFromAPI.student_code || "",
+            gender: studentData.gender || formDataFromAPI.gender || "",
+            class_code:
+              studentData.class_code || formDataFromAPI.class_code || "",
+            ethnicity: studentData.ethnicity || formDataFromAPI.ethnicity || "",
+            school_year:
+              studentData.school_year || formDataFromAPI.school_year || "",
+            major: studentData.major || formDataFromAPI.major || "",
+            nationality:
+              studentData.nationality || formDataFromAPI.nationality || "",
+            education_type:
+              studentData.education_type ||
+              formDataFromAPI.education_type ||
+              "",
+            phone_number:
+              studentData.phone_number || formDataFromAPI.phone_number || "",
+            email: studentData.email || formDataFromAPI.email || "",
             contractId: contractData.id || "",
-            area: studentData.area || "",
-            room: studentData.room || "",
-            floor: studentData.floor || "",
-            price: studentData.price || "",
+            area: studentData.area || formDataFromAPI.area || "",
+            room: studentData.room || formDataFromAPI.room || "",
+            floor: studentData.floor || formDataFromAPI.floor || "",
+            price: formDataFromAPI.price || "1800000", // Default price
+            apply_date: formattedToday, // Set default application date to today
+            expired_date: formattedEndDate, // Set default expiration date to 6 months from today
+            studentNote: "",
           });
           setLoading(false);
         } else {
@@ -132,6 +145,7 @@ function ContractRenewalApp() {
     setShowPrintView(false);
   };
 
+  // Calculate renewal duration when dates change
   useEffect(() => {
     if (formData.apply_date && formData.expired_date) {
       const start = new Date(formData.apply_date);
@@ -144,30 +158,47 @@ function ContractRenewalApp() {
 
         setFormData((prev) => ({
           ...prev,
-          renewalDuration: months.toString(), // Cập nhật giá trị
+          renewalDuration: months.toString(),
         }));
       } else {
         setFormData((prev) => ({
           ...prev,
-          renewalDuration: "", // Reset nếu ngày không hợp lệ
+          renewalDuration: "",
         }));
       }
     }
   }, [formData.apply_date, formData.expired_date]);
 
   const handleAccept = async () => {
-    // Submit renewal data to API
+    // Validate form data
+    if (!formData.apply_date || !formData.expired_date) {
+      alert("Vui lòng điền đầy đủ thông tin ngày gia hạn!");
+      return;
+    }
+
+    if (!formData.price) {
+      alert("Vui lòng chọn mức thu!");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
+
+      // Prepare payload according to your API requirements
       const payload = {
-        contractId: formData.contractId,
-        apply_date: formData.apply_date,
-        expired_date: formData.expired_date,
-        studentNote: formData.studentNote,
+        status: "xác nhận", // As specified in your requirements
+        form_data: {
+          apply_date: formData.apply_date,
+          expired_date: formData.expired_date,
+          renewalDuration: formData.renewalDuration,
+          price: formData.price,
+          studentNote: formData.studentNote,
+        },
       };
 
-      const response = await axios.post(
-        "http://localhost:8000/api/contract/renew",
+      // Call the update API as specified in your requirements
+      const response = await axios.put(
+        `http://localhost:8000/api/contract/update/${formData.contractId}`,
         payload,
         {
           headers: {
@@ -185,7 +216,11 @@ function ContractRenewalApp() {
       }
     } catch (error) {
       console.error("Lỗi khi gọi API:", error);
-      alert("Lỗi khi gia hạn hợp đồng. Vui lòng thử lại sau.");
+      alert(
+        `Lỗi khi gia hạn hợp đồng: ${
+          error.response?.data?.message || "Vui lòng thử lại sau."
+        }`
+      );
     }
   };
 
@@ -527,8 +562,8 @@ function ContractRenewalApp() {
                     <label>Quê quán</label>
                     <input
                       type="text"
-                      name="birth_place"
-                      value={formData.birth_place}
+                      name="nationality"
+                      value={formData.nationality}
                       onChange={handleChange}
                       readOnly
                     />
@@ -675,6 +710,7 @@ function ContractRenewalApp() {
                       value={formData.price}
                       onChange={handleChange}
                       className="form-control"
+                      required
                     >
                       <option value="">-- Chọn mức thu --</option>
                       <option value="1800000">1.800.000 đồng</option>

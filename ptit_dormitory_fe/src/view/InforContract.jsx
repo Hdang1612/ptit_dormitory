@@ -314,8 +314,8 @@ function InforContract() {
                   <label>Quê quán</label>
                   <input
                     type="text"
-                    name="birth_place"
-                    value={formData.birth_place}
+                    name="nationality"
+                    value={formData.nationality}
                     onChange={handleChange}
                     readOnly
                   />
@@ -554,9 +554,9 @@ function InforContract() {
                 Hủy hợp đồng
               </button>
 
-              <button type="submit" className="print-preview-btn">
+              {/* <button type="submit" className="print-preview-btn">
                 In đơn
-              </button>
+              </button> */}
             </div>
           </form>
         </div>

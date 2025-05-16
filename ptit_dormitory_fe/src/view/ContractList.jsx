@@ -49,16 +49,16 @@ const ContractList = () => {
   };
 
   // Lọc theo họ tên / mã hợp đồng
-  const filteredContracts = contracts.filter(
-    (contract) =>
-      contract.student?.first_name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      contract.student?.last_name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      contract.id.toString().includes(searchTerm)
-  );
+  const filteredContracts = contracts.filter((contract) => {
+    const contractIdMatch = contract.id.toString().includes(searchTerm);
+    const expiredDateMatch = contract.form_data?.expired_date
+      ? new Date(contract.form_data.expired_date)
+          .toLocaleDateString("vi-VN")
+          .includes(searchTerm)
+      : false;
+
+    return contractIdMatch || expiredDateMatch;
+  });
 
   return (
     <div style={styles.container}>
@@ -77,7 +77,7 @@ const ContractList = () => {
               <tr>
                 <th style={styles.th}>Mã hợp đồng</th>
                 <th style={styles.th}>Họ tên</th>
-                <th style={styles.th}>Ngày nộp</th>
+                <th style={styles.th}>Thời hạn</th>
                 <th style={styles.th}>Trạng thái</th>
                 <th style={styles.th}>Action</th>
               </tr>
@@ -90,21 +90,35 @@ const ContractList = () => {
                     {item.form_data?.full_name || "Chưa có sinh viên"}
                   </td>
                   <td style={styles.td}>
-                    {new Date(item.apply_date).toLocaleDateString("vi-VN")}
+                    {item.form_data?.expired_date
+                      ? new Date(
+                          item.form_data.expired_date
+                        ).toLocaleDateString("vi-VN")
+                      : "Chưa có"}
                   </td>
+
                   <td style={styles.td}>
-                    <span
-                      style={{
-                        ...styles.status,
-                        backgroundColor:
-                          item.status === "xác nhận" ? "#d4edda" : "#f8d7da",
-                        color:
-                          item.status === "xác nhận" ? "#155724" : "#721c24",
-                      }}
-                    >
-                      {item.status}
-                    </span>
+                    {(() => {
+                      const now = new Date();
+                      const expiredDate = new Date(
+                        item.form_data?.expired_date
+                      );
+                      const isExpired = expiredDate < now;
+
+                      return (
+                        <span
+                          style={{
+                            ...styles.status,
+                            backgroundColor: isExpired ? "#f8d7da" : "#d4edda",
+                            color: isExpired ? "#721c24" : "#155724",
+                          }}
+                        >
+                          {isExpired ? "Hết hạn" : "Còn hạn"}
+                        </span>
+                      );
+                    })()}
                   </td>
+
                   <td style={styles.td}>
                     <button
                       style={styles.viewBtn}
@@ -118,7 +132,7 @@ const ContractList = () => {
                     >
                       Gia hạn
                     </button>
-                    <button style={styles.deleteBtn}>Xóa</button>
+                    {/* <button style={styles.deleteBtn}>Xóa</button> */}
                   </td>
                 </tr>
               ))}
@@ -162,7 +176,7 @@ const ContractList = () => {
 const styles = {
   container: {
     display: "flex",
-    height: "100vh",
+    height: "130vh",
   },
   content: {
     flex: 1,
@@ -217,7 +231,7 @@ const styles = {
     cursor: "pointer",
   },
   renewalBtn: {
-    background: "#007bff",
+    background: "#BC2626",
     color: "white",
     border: "none",
     padding: "5px 10px",

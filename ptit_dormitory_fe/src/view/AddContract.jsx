@@ -53,7 +53,10 @@ function AddContract() {
     e.preventDefault();
     setShowPrintView(true);
   };
-
+  const formatVND = (value) => {
+    if (!value) return "0";
+    return Number(value).toLocaleString("vi-VN");
+  };
   const numberToVietnamese = (number) => {
     const ChuSo = [
       "không",
@@ -117,13 +120,28 @@ function AddContract() {
     return finalStr.charAt(0).toUpperCase() + finalStr.slice(1);
   };
 
-  const reason = Number(formData.renewalReason);
-  const duration = Number(formData.renewalDuration);
-  const total = reason * duration;
-  const formatVND = (value) => {
-    if (!value) return "0";
-    return Number(value).toLocaleString("vi-VN");
-  };
+  useEffect(() => {
+    if (formData.apply_date && formData.expired_date) {
+      const start = new Date(formData.apply_date);
+      const end = new Date(formData.expired_date);
+
+      if (start < end) {
+        const months =
+          (end.getFullYear() - start.getFullYear()) * 12 +
+          (end.getMonth() - start.getMonth());
+
+        setFormData((prev) => ({
+          ...prev,
+          renewalDuration: months.toString(),
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          renewalDuration: "",
+        }));
+      }
+    }
+  }, [formData.apply_date, formData.expired_date]);
 
   const handlePrint = () => {
     window.print();
@@ -225,30 +243,30 @@ function AddContract() {
               <table>
                 <tbody>
                   <tr>
-                    <td width="50%">- Tên sinh viên: {formData.studentName}</td>
+                    <td width="50%">- Tên sinh viên: {formData.full_name}</td>
                     <td width="50%">Nam/Nữ: {formData.gender}</td>
                   </tr>
                   <tr>
                     <td>
                       - Sinh ngày:{" "}
-                      {new Date(formData.birthDate).toLocaleDateString("vi-VN")}
+                      {new Date(formData.dob).toLocaleDateString("vi-VN")}
                     </td>
-                    <td>Dân tộc: {formData.faculty}</td>
+                    <td>Dân tộc: {formData.ethnicity}</td>
                   </tr>
                   <tr>
                     <td>- Nơi sinh [tỉnh/thành]: {formData.nationality}</td>
-                    <td>Lớp: {formData.class}</td>
+                    <td>Lớp: {formData.class_code}</td>
                   </tr>
                   <tr>
-                    <td>- Khóa: {formData.khoa}</td>
-                    <td>Mã SV: {formData.studentId}</td>
+                    <td>- Khóa: {formData.school_year}</td>
+                    <td>Mã SV: {formData.student_code}</td>
                   </tr>
                   <tr>
-                    <td>- Ngành: {formData.nganh}</td>
-                    <td>Hệ đào tạo: {formData.residentialAddress}</td>
+                    <td>- Ngành: {formData.major}</td>
+                    <td>Hệ đào tạo: {formData.education_type}</td>
                   </tr>
                   <tr>
-                    <td>- Điện thoại: {formData.hometown}</td>
+                    <td>- Điện thoại: {formData.phone_number}</td>
                     <td>Email: {formData.email}</td>
                   </tr>
                 </tbody>
@@ -263,12 +281,12 @@ function AddContract() {
               <table>
                 <tbody>
                   <tr>
-                    <td width="50%">- Họ tên bố: {formData.fatherName}</td>
-                    <td width="50%">Số điện thoại: {formData.fatherNumber}</td>
+                    <td width="50%">- Họ tên bố: {formData.father_name}</td>
+                    <td width="50%">Số điện thoại: {formData.father_phone}</td>
                   </tr>
                   <tr>
-                    <td width="50%">- Họ tên mẹ: {formData.motherName}</td>
-                    <td width="50%">Số điện thoại: {formData.motherNumber}</td>
+                    <td width="50%">- Họ tên mẹ: {formData.mother_name}</td>
+                    <td width="50%">Số điện thoại: {formData.mother_phone}</td>
                   </tr>
                   <tr>
                     <td width="50%">
@@ -278,8 +296,7 @@ function AddContract() {
                   </tr>
                   <tr>
                     <td colSpan="6">
-                      + Địa chỉ liên hệ [người thân]:{" "}
-                      {formData.relativesAddress}
+                      + Địa chỉ liên hệ [người thân]: {formData.address}
                     </td>
                   </tr>
                 </tbody>
@@ -296,7 +313,7 @@ function AddContract() {
               <table>
                 <tbody>
                   <tr align="center">
-                    <td width="34%">KTX (Nhà): {formData.dormitoryArea}....</td>
+                    <td width="34%">KTX (Nhà): {formData.area}....</td>
                     <td width="33%">Tầng: {formData.floor}....</td>
                     <td width="33%">- Phòng ở: {formData.room}....</td>
                   </tr>
@@ -312,9 +329,13 @@ function AddContract() {
                   <tr>
                     <td colSpan="6" style={{ paddingLeft: "60px" }}>
                       - Thời gian: từ ngày{" "}
-                      {new Date(formData.startDate).toLocaleDateString("vi-VN")}{" "}
+                      {new Date(formData.apply_date).toLocaleDateString(
+                        "vi-VN"
+                      )}{" "}
                       đến ngày{" "}
-                      {new Date(formData.endDate).toLocaleDateString("vi-VN")}
+                      {new Date(formData.expired_date).toLocaleDateString(
+                        "vi-VN"
+                      )}
                     </td>
                   </tr>
                   <tr>
@@ -436,11 +457,11 @@ function AddContract() {
               </p>
               <p className="payment">
                 <strong>
-                  {formatVND(reason)} đồng/tháng x {duration} tháng ={" "}
-                  {formatVND(total)} VNĐ
+                  {formatVND(formData.price)} đồng/tháng x{" "}
+                  {formData.renewalDuration} tháng ={" "}
+                  {formatVND(formData.price * formData.renewalDuration)} VNĐ
                 </strong>
                 <br />
-                <em>(Bằng chữ: {numberToVietnamese(total)})</em>
               </p>
 
               <p style={{ marginLeft: "70px", color: "red" }}>
@@ -500,7 +521,7 @@ function AddContract() {
                       </p>
                       <p>(Ký, ghi rõ họ tên)</p>
                       <div className="signature-space"></div>
-                      <p>{formData.studentName}</p>
+                      <p>{formData.full_name}</p>
                     </td>
                   </tr>
                 </tbody>
@@ -844,7 +865,7 @@ function AddContract() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Thời hạn hợp đồng</label>
+                  <label>Thời hạn</label>
                   <input
                     type="text"
                     name="renewalDuration"

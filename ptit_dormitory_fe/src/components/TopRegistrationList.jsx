@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 
-const TopRegistrationList = () => {
-  const [entries, setEntries] = useState(10);
-  const [searchTerm, setSearchTerm] = useState("");
+const TopRegistrationList = ({
+  entries,
+  setEntries,
+  searchTerm,
+  setSearchTerm,
+}) => {
   const navigate = useNavigate();
 
-  const handleEntriesChange = (e) => setEntries(e.target.value);
+  const handleEntriesChange = (e) => setEntries(Number(e.target.value));
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleAddNew = () => navigate("/themdangky");
 
@@ -30,15 +33,15 @@ const TopRegistrationList = () => {
       border: "1px solid #ccc",
       borderRadius: "5px",
       cursor: "pointer",
-      backgroundColor:"white"
+      backgroundColor: "white",
     },
     searchInput: {
       padding: "5px 10px",
       border: "1px solid #ccc",
       borderRadius: "5px",
       marginLeft: "10px",
-      width: "250px",
-      backgroundColor:"white"
+      width: "350px",
+      backgroundColor: "white",
     },
     addButton: {
       backgroundColor: "#BC2626",
@@ -49,7 +52,7 @@ const TopRegistrationList = () => {
       cursor: "pointer",
       display: "flex",
       alignItems: "center",
-      marginLeft: "700px",
+      marginLeft: "600px",
     },
   };
 
@@ -73,7 +76,7 @@ const TopRegistrationList = () => {
       {/* Ô tìm kiếm */}
       <input
         type="text"
-        placeholder="Tìm kiếm..."
+        placeholder="Nhập mã hoặc ngày nộp (dd/mm/yyyy)"
         value={searchTerm}
         onChange={handleSearchChange}
         style={styles.searchInput}

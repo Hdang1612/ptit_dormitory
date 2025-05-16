@@ -8,6 +8,7 @@ function CancelContract() {
   const { id } = useParams(); // Get contract ID from URL
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [formData, setFormData] = useState({
     full_name: "",
     student_code: "",
@@ -24,8 +25,9 @@ function CancelContract() {
     resonCancel: "",
     studentNote: "",
   });
-
+  const [originalContractData, setOriginalContractData] = useState(null);
   const [showPrintView, setShowPrintView] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchContractDetails = async () => {
@@ -43,6 +45,7 @@ function CancelContract() {
 
         if (response.data.success) {
           const contractData = response.data.data;
+          setOriginalContractData(contractData);
           const studentData = contractData.student;
 
           // Format dates for input fields
@@ -63,8 +66,8 @@ function CancelContract() {
             area: studentData?.area || "",
             room: studentData?.room || "",
             floor: studentData?.floor || "",
-            apply_date: formatDate(studentData?.apply_date),
-            expired_date: formatDate(studentData?.expired_date),
+            apply_date: "",
+            expired_date: "",
             resonCancel: "", // User will input this
             studentNote: "", // User will input this
           });
@@ -92,20 +95,64 @@ function CancelContract() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowPrintView(true);
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+
+      // Merge the original form_data with new cancellation details
+      const updatedFormData = {
+        ...originalContractData.form_data,
+        apply_date: formData.apply_date,
+        expired_date: formData.expired_date,
+        resonCancel: formData.resonCancel,
+        studentNote: formData.studentNote,
+      };
+
+      // Prepare the request payload
+      const payload = {
+        status: "Xác nhận",
+        form_data: updatedFormData,
+      };
+
+      // Send the API request to update the contract
+      const response = await axios.put(
+        `http://localhost:8000/api/contract/update/${id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setSuccess("Đơn hủy hợp đồng đã được gửi thành công!");
+        setTimeout(() => {
+          navigate(`/thongtinhopdong/${id}`);
+        }, 2000);
+      } else {
+        setError("Không thể cập nhật hợp đồng");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API:", error);
+      setError("Đã xảy ra lỗi khi gửi đơn hủy hợp đồng");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePrint = () => {
     window.print();
   };
 
-  const handleBack = () => {
-    setShowPrintView(false);
-  };
-
-  const navigate = useNavigate();
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   setShowPrintView(true);
+  // };
   const handleCancel = () => {
     navigate(`/thongtinhopdong/${id}`);
   };
@@ -139,7 +186,19 @@ function CancelContract() {
     );
   }
 
-  // Print view
+  if (success) {
+    return (
+      <div className="app-container">
+        <Sidebar role="admin" username="Hoàng Dũng" />
+        <div className="main-content">
+          <div className="success-container">
+            <p>{success}</p>
+            <p>Đang chuyển hướng về trang thông tin hợp đồng...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
@@ -432,23 +491,23 @@ function CancelContract() {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Ngày bắt đầu</label>
+                    <label>Hủy từ ngày</label>
                     <input
                       type="date"
                       name="apply_date"
                       value={formData.apply_date}
                       onChange={handleChange}
-                      readOnly
+                      required
                     />
                   </div>
                   <div className="form-group">
-                    <label>Ngày kết thúc</label>
+                    <label>Đến ngày</label>
                     <input
                       type="date"
                       name="expired_date"
                       value={formData.expired_date}
                       onChange={handleChange}
-                      readOnly
+                      required
                     />
                   </div>
                 </div>

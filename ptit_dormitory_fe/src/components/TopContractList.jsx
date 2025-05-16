@@ -40,7 +40,7 @@ const TopConTractList = ({
       border: "1px solid #ccc",
       borderRadius: "5px",
       marginLeft: "10px",
-      width: "250px",
+      width: "400px",
       backgroundColor: "#fff",
     },
   };
@@ -62,7 +62,7 @@ const TopConTractList = ({
       </div>
       <input
         type="text"
-        placeholder="Tìm kiếm..."
+        placeholder="Nhập hoặc ngày hết hạn (dd/mm/yyyy)"
         value={searchTerm}
         onChange={handleSearchChange}
         style={styles.searchInput}

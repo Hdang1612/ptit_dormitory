@@ -11,16 +11,13 @@ const RegistrationtListPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  const filteredContracts = contracts.filter(
-    (contract) =>
-      contract.student?.first_name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      contract.student?.last_name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      contract.id.toString().includes(searchTerm)
-  );
+  const filteredContracts = contracts.filter((contract) => {
+    const contractIdMatch = contract.id.toString().includes(searchTerm);
+    const applyDateMatch = new Date(contract.apply_date)
+      .toLocaleDateString("vi-VN")
+      .includes(searchTerm);
+    return contractIdMatch || applyDateMatch;
+  });
 
   const currentContracts = contracts; // Vì API đã trả đúng số hợp đồng theo trang
 
@@ -76,6 +73,7 @@ const RegistrationtListPage = () => {
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
+
           <table style={styles.table}>
             <thead>
               <tr>
@@ -87,7 +85,7 @@ const RegistrationtListPage = () => {
               </tr>
             </thead>
             <tbody>
-              {currentContracts.map((item, index) => (
+              {filteredContracts.map((item, index) => (
                 <tr key={index} style={styles.tr}>
                   <td style={styles.td}>{item.id}</td>
                   <td style={styles.td}>
@@ -116,8 +114,6 @@ const RegistrationtListPage = () => {
                     >
                       Xem
                     </button>
-
-                    <button style={styles.deleteBtn}>Xóa</button>
                   </td>
                 </tr>
               ))}
@@ -160,7 +156,7 @@ const RegistrationtListPage = () => {
 const styles = {
   container: {
     display: "flex",
-    height: "100vh",
+    height: "130vh",
   },
   content: {
     flex: 1,
