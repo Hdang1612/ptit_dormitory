@@ -211,7 +211,8 @@ const styles = {
   title: {
     textAlign: "center",
     marginBottom: "20px",
-    color: "black",
+    fontWeight: "bold",
+    fontSize: "24px",
   },
   gridContainer: {
     display: "grid",
@@ -220,10 +221,9 @@ const styles = {
   },
   shiftCard: {
     background: "#F7F6FE",
-    // border: "1px solid #ccc",  dùng 2 border nên lỗi?
     borderRadius: "10px",
     padding: "15px",
-    width: "380px",
+    width: "auto",
     display: "flex",
     justifyContent: "space-between",
     flexDirection: "column",

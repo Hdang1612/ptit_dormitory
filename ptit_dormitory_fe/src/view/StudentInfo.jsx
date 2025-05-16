@@ -69,15 +69,9 @@ const StudentInfo = () => {
             </div>
 
             <div style={styles.column}>
-              <p>
-                <strong>Trạng thái:</strong> Còn hạn
-              </p>
-              <p>
-                <strong>Ngày kết thúc:</strong> 30/06/2025
-              </p>
-              <p>
-                <strong>Số phòng:</strong> 101
-              </p>
+              <p><strong>Trạng thái:</strong> Còn hạn</p>
+              <p><strong>Ngày kết thúc:</strong> 30/06/2025</p>
+              <p><strong>Số phòng:</strong> 101</p>
             </div>
           </div>
         </div>

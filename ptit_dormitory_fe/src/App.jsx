@@ -21,6 +21,10 @@ import StaffDuty from "./view/StaffDuty";
 import StudentCheckin from "./view/StudentCheckin";
 import StudentInfo from "./view/StudentInfo";
 import StudentList from "./view/StudentList";
+import StudentEdit from "./view/StudentEdit";
+import AddStudent from "./view/AddStudent";
+import ShiftReports from "./view/ShiftReports";
+import RoomReport from "./view/RoomReport";
 import FormAddContract from "./view/FormAddContract";
 import { Frame } from "./view/Frame/index.jsx";
 import { PowerMonitoring } from "./view/PowerMonitoring/index.jsx";
@@ -55,7 +59,11 @@ function App() {
         <Route path="/studentcheckin" element={<StudentCheckin />}></Route>
         <Route path="/student/:id" element={<StudentInfo />} />
         <Route path="/student-list" element={<StudentList />}></Route>
-
+        <Route path="/student-edit" element={<StudentEdit />}></Route>
+        <Route path="/add-student" element={<AddStudent />}></Route>
+        <Route path="/shift-reports" element={<ShiftReports />}></Route>
+        <Route path="/room-report" element={<RoomReport />}></Route>
+        
         {/* Hoàng Anh */}
         <Route path="/invoice" element={<Frame />} />
         <Route path="/power-monitoring" element={<PowerMonitoring />} />
