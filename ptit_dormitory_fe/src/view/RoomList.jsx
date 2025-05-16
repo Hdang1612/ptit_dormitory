@@ -44,7 +44,8 @@ const RoomList = () => {
       setFormCapacity(detail.room_detail.capacity || "");
       setFormStatus  (detail.room_detail.status   || "");
       setFormGender  (detail.room_detail.gender   || "");
-      setFormLeader  (detail.room_detail.leader   || "");
+      setFormLeader  (detail.room_detail.leaderUser
+                        ? `${detail.room_detail.leaderUser.first_name} ${detail.room_detail.leaderUser.last_name}` : "");
 
       setEditModalIsOpen(true);
     } catch (err) {
@@ -185,6 +186,26 @@ const handleSaveCreate = async () => {
     }));
   };
   
+  const getPageNumbers = (current, total, maxButtons = 3) => {
+  const half = Math.floor(maxButtons / 2);
+  let start = Math.max(1, current - half);
+  let end   = Math.min(total, current + half);
+
+  // Nếu ở đầu, đẩy end ra để đủ maxButtons
+  if (current <= half) {
+    end = Math.min(total, maxButtons);
+  }
+  // Nếu ở cuối, đẩy start vào để đủ maxButtons
+  if (current + half >= total) {
+    start = Math.max(1, total - maxButtons + 1);
+  }
+
+  const pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+    return pages;
+  };
 
   const handlePaginationChange = ()=>{
     fetchData(parentId, gender, status, search, pagination.currentPage, pagination.limit);
@@ -530,10 +551,10 @@ const handleSaveCreate = async () => {
 
                 {/* Nhập ID sinh viên */}
                 <div style={{ marginBottom: "15px", marginLeft:"20px", textAlign: "left", }}>
-                  <label><strong>ID sinh viên:</strong></label>
+                  <label><strong>Mã sinh viên:</strong></label>
                   <input
                     type="text"
-                    placeholder="Nhập ID sinh viên"
+                    placeholder="Nhập Mã sinh viên"
                     style={styles.input}
                   />
                 </div>
@@ -679,31 +700,71 @@ const handleSaveCreate = async () => {
 
         {/* Pagination */}
         <div style={styles.pagination}>
+          {/* nút lui */}
+          <button
+            style={styles.pageBtn}
+            onClick={() => paginate(1)}
+            disabled={pagination.currentPage === 1}
+          >
+            «
+          </button>
           <button
             style={styles.pageBtn}
             onClick={() => paginate(pagination.currentPage - 1)}
             disabled={pagination.currentPage === 1}
           >
-            Trước
+            ‹
           </button>
-          {[...Array(pagination.totalPages).keys()].map((number) => (
+
+          {/* nếu nhóm pageNumbers không chứa trang 1, thêm nút 1 và dấu ... */}
+          {(getPageNumbers(pagination.currentPage, pagination.totalPages)[0] > 1) && (
+            <>
+              <button style={styles.pageBtn} onClick={() => paginate(1)}>1</button>
+              <span style={{ padding: "8px" }}>…</span>
+            </>
+          )}
+
+          {/* render nhóm nút trang */}
+          {getPageNumbers(pagination.currentPage, pagination.totalPages).map((num) => (
             <button
-              key={number + 1}
+              key={num}
               style={{
                 ...styles.pageBtn,
-                ...(pagination.currentPage === number + 1 ? styles.pageBtnActive : {}),
+                ...(pagination.currentPage === num ? styles.pageBtnActive : {}),
               }}
-              onClick={() => paginate(number + 1)}
+              onClick={() => paginate(num)}
             >
-              {number + 1}
+              {num}
             </button>
           ))}
+
+          {/* nếu nhóm pageNumbers không chứa trang cuối, thêm dấu ... và nút cuối */}
+          {getPageNumbers(pagination.currentPage, pagination.totalPages).slice(-1)[0] < pagination.totalPages && (
+            <>
+              <span style={{ padding: "8px" }}>…</span>
+              <button
+                style={styles.pageBtn}
+                onClick={() => paginate(pagination.totalPages)}
+              >
+                {pagination.totalPages}
+              </button>
+            </>
+          )}
+
+          {/* nút tới */}
           <button
             style={styles.pageBtn}
             onClick={() => paginate(pagination.currentPage + 1)}
             disabled={pagination.currentPage === pagination.totalPages}
           >
-            Sau
+            ›
+          </button>
+          <button
+            style={styles.pageBtn}
+            onClick={() => paginate(pagination.totalPages)}
+            disabled={pagination.currentPage === pagination.totalPages}
+          >
+            »
           </button>
         </div>
 

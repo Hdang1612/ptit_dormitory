@@ -117,16 +117,6 @@ const TopShiftSchedule = () => {
         </div>
       </div>
 
-      {/* Thanh tìm kiếm ở giữa */}
-      <div style={styles.centerSearch}>
-        <input
-          type="text"
-          placeholder="Tìm kiếm..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          style={styles.searchInput}
-        />
-      </div>
 
       {/* Dropdown số dòng hiển thị bên phải */}
       <div style={styles.rightEntries}>

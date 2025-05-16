@@ -115,7 +115,8 @@ const styles = {
     title: {
         textAlign: "center",
         marginBottom: "20px",
-        color: "black",
+        fontWeight: "bold",
+        fontSize: "24px",
     },
     gridContainer: {
         display: "grid",
