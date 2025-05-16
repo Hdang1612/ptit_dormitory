@@ -1,10 +1,11 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 import { menuConfig } from "../config/menuConfig";
 
 export default function Sidebar({ role = "admin", username = "User" }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const menuItems = menuConfig[role] || [];
 
   return (
@@ -23,7 +24,7 @@ export default function Sidebar({ role = "admin", username = "User" }) {
       <div className="menu">
         {menuItems.map((item, index) => (
           <div
-            className="menu-item"
+            className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
             key={index}
             onClick={() => navigate(item.path)}
           >

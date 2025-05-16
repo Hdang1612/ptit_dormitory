@@ -13,10 +13,7 @@ const BigRoomMoney = ({ room, onClose }) => {
   };
 
   return (
-    <Card 
-      className="absolute top-0 left-0 w-full bg-white rounded-xl overflow-hidden shadow-2xl p-8 cursor-pointer z-50"
-      onClick={handleCardClick}
-    >
+    <Card className="absolute top-0 left-0 w-full bg-white rounded-xl overflow-hidden shadow-2xl p-8 cursor-pointer z-[9999]" onClick={handleCardClick}>
       <div className="space-y-6">
         <div className="flex justify-between items-start">
           <div>
@@ -28,7 +25,7 @@ const BigRoomMoney = ({ room, onClose }) => {
           </div>
           <Button
             variant="ghost"
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 transition-transform duration-300"
             onClick={(e) => {
               e.stopPropagation();
               onClose();
@@ -51,7 +48,7 @@ const BigRoomMoney = ({ room, onClose }) => {
           <div className="space-y-3">
             <Button 
               variant="outline" 
-              className="w-full justify-start gap-3"
+              className="w-full justify-start gap-3 transition-transform duration-300"
               onClick={(e) => e.stopPropagation()}
             >
               <FileText className="w-5 h-5" />
@@ -59,7 +56,7 @@ const BigRoomMoney = ({ room, onClose }) => {
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start gap-3"
+              className="w-full justify-start gap-3 transition-transform duration-300"
               onClick={(e) => e.stopPropagation()}
             >
               <Download className="w-5 h-5" />
@@ -67,7 +64,7 @@ const BigRoomMoney = ({ room, onClose }) => {
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start gap-3"
+              className="w-full justify-start gap-3 transition-transform duration-300"
               onClick={(e) => e.stopPropagation()}
             >
               <Bell className="w-5 h-5" />

@@ -10,7 +10,7 @@ const PowerUsageCard = ({ room, onClick }) => {
 
   return (
     <Card 
-      className="bg-red rounded-xl overflow-hidden shadow-sm p-6 cursor-pointer hover:shadow-md transition-all duration-500 ease-in-out hover:scale-102 transform will-change-transform"
+      className="bg-white rounded-xl overflow-hidden shadow-sm p-6 cursor-pointer hover:shadow-md transition-all duration-500 ease-in-out hover:scale-102 transform will-change-transform"
       onClick={onClick}
     >
       <div className="space-y-4">

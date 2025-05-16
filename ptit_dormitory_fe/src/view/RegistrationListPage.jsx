@@ -1,80 +1,107 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import TopRegistrationList from "../components/TopRegistrationList";
-import { useNavigate } from "react-router-dom";
 
-const RegistrationList = () => {
-  const data = [
-    {
-      id: "#20462",
-      name: "Nguyễn Văn A",
-      roomType: "4 người / phòng",
-      dorm: "KTX A",
-      duration: "01/09/2024 - 30/06/2025",
-      addedDate: "13/05/2022",
-      status: "Đã duyệt",
-    },
-    {
-      id: "#20463",
-      name: "Nguyễn Văn B",
-      roomType: "2 người / phòng",
-      dorm: "KTX B",
-      duration: "01/09/2024 - 30/06/2025",
-      addedDate: "13/05/2022",
-      status: "Chưa duyệt",
-    },
-    {
-      id: "#20464",
-      name: "Nguyễn Văn C",
-      roomType: "1 người / phòng",
-      dorm: "KTX C",
-      duration: "01/09/2024 - 30/06/2025",
-      addedDate: "13/05/2022",
-      status: "Đã duyệt",
-    },
-  ];
+const RegistrationtListPage = () => {
+  const [contracts, setContracts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [contractsPerPage, setContractsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+
+  const filteredContracts = contracts.filter((contract) => {
+    const contractIdMatch = contract.id.toString().includes(searchTerm);
+    const applyDateMatch = new Date(contract.apply_date)
+      .toLocaleDateString("vi-VN")
+      .includes(searchTerm);
+    return contractIdMatch || applyDateMatch;
+  });
+
+  const currentContracts = contracts; // Vì API đã trả đúng số hợp đồng theo trang
+
+  const [totalPages, setTotalPages] = useState(1);
+
+  const paginate = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+  useEffect(() => {
+    const fetchContractsByPage = async () => {
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/contract/fetchlist?page=${currentPage}&limit=${contractsPerPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          setContracts(response.data.data.contracts);
+          setTotalPages(response.data.data.pagination.totalPages); // Cập nhật tổng số trang
+        } else {
+          console.error("Lỗi khi lấy hợp đồng:", response.data.message);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy hợp đồng:", error);
+      }
+    };
+
+    fetchContractsByPage();
+  }, [currentPage, contractsPerPage]);
+
+  // Hàm xử lý khi người dùng nhấn nút "Xem"
+  const handleView = (contractId) => {
+    navigate(`/thongtindangky/${contractId}`);
+  };
 
   return (
     <div style={styles.container}>
       <Sidebar role="admin" username="Hoàng Dũng" />
-
       <div style={styles.content}>
-        <h2 style={styles.title}>Danh sách đơn đăng ký lưu trú</h2>
-
+        <h2 style={styles.title}>Danh sách đơn đăng ký </h2>
         <div style={styles.tableContainer}>
-          <TopRegistrationList />
+          <TopRegistrationList
+            entries={contractsPerPage}
+            setEntries={setContractsPerPage}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
+
           <table style={styles.table}>
             <thead>
               <tr>
-                <th style={styles.th}>Mã đơn</th>
+                <th style={styles.th}>Mã hợp đồng</th>
                 <th style={styles.th}>Họ tên</th>
-                <th style={styles.th}>Loại phòng</th>
-                <th style={styles.th}>Khu ký túc</th>
-                <th style={styles.th}>Thời hạn lưu trú</th>
-                <th style={styles.th}>Ngày thêm</th>
+                <th style={styles.th}>Ngày nộp</th>
                 <th style={styles.th}>Trạng thái</th>
                 <th style={styles.th}>Action</th>
               </tr>
             </thead>
-
             <tbody>
-              {data.map((item, index) => (
+              {filteredContracts.map((item, index) => (
                 <tr key={index} style={styles.tr}>
                   <td style={styles.td}>{item.id}</td>
-                  <td style={styles.td}>{item.name}</td>
-                  <td style={styles.td}>{item.roomType}</td>
-                  <td style={styles.td}>{item.dorm}</td>
-                  <td style={styles.td}>{item.duration}</td>
-                  <td style={styles.td}>{item.addedDate}</td>
+                  <td style={styles.td}>
+                    {item.form_data?.full_name || "Chưa có sinh viên"}
+                  </td>
+                  <td style={styles.td}>
+                    {new Date(item.apply_date).toLocaleDateString("vi-VN")}
+                  </td>
                   <td style={styles.td}>
                     <span
                       style={{
                         ...styles.status,
                         backgroundColor:
-                          item.status === "Đã duyệt" ? "#d4edda" : "#f8d7da",
+                          item.status === "xác nhận" ? "#d4edda" : "#f8d7da",
                         color:
-                          item.status === "Đã duyệt" ? "#155724" : "#721c24",
+                          item.status === "xác nhận" ? "#155724" : "#721c24",
                       }}
                     >
                       {item.status}
@@ -83,24 +110,42 @@ const RegistrationList = () => {
                   <td style={styles.td}>
                     <button
                       style={styles.viewBtn}
-                      onClick={() => navigate("/thongtindangky")}
+                      onClick={() => handleView(item.id)}
                     >
                       Xem
                     </button>
-                    <button style={styles.deleteBtn}>Xóa</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <div style={styles.pagination}>
-            <button style={styles.pageBtn}>Trước</button>
-            <button style={{ ...styles.pageBtn, ...styles.pageBtnActive }}>
-              1
+            <button
+              style={styles.pageBtn}
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Trước
             </button>
-            <button style={styles.pageBtn2}>2</button>
-            <button style={styles.pageBtn2}>3</button>
-            <button style={styles.pageBtn}>Sau</button>
+            {[...Array(totalPages).keys()].map((number) => (
+              <button
+                key={number + 1}
+                style={{
+                  ...styles.pageBtn,
+                  ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+                }}
+                onClick={() => paginate(number + 1)}
+              >
+                {number + 1}
+              </button>
+            ))}
+            <button
+              style={styles.pageBtn}
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Sau
+            </button>
           </div>
         </div>
       </div>
@@ -108,11 +153,10 @@ const RegistrationList = () => {
   );
 };
 
-// Styles
 const styles = {
   container: {
     display: "flex",
-    height: "100vh",
+    height: "130vh",
   },
   content: {
     flex: 1,
@@ -128,13 +172,12 @@ const styles = {
   tableContainer: {
     background: "white",
     padding: "20px",
-    borderRadius: "10px ",
+    borderRadius: "10px",
     boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
   },
   table: {
     width: "100%",
     borderColor: "#ccc",
-    // borderCollapse: "collapse",
     marginTop: "10px",
     backgroundColor: "#F7F6FE",
   },
@@ -159,6 +202,15 @@ const styles = {
     fontWeight: "bold",
   },
   viewBtn: {
+    background: "#007bff",
+    color: "white",
+    border: "none",
+    padding: "5px 10px",
+    marginRight: "5px",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
+  renewalBtn: {
     background: "#007bff",
     color: "white",
     border: "none",
@@ -201,14 +253,10 @@ const styles = {
     borderRadius: "5px",
     transition: "background 0.2s",
   },
-
-  pageBtnHover: {
-    background: "#0056b3",
-  },
   pageBtnActive: {
     background: "#BC2626",
     color: "white",
   },
 };
 
-export default RegistrationList;
+export default RegistrationtListPage;

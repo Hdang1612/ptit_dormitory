@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
-import "../style/InforContract.css";
+import { useEffect } from "react";
+import React, { useState } from "react";
+import "../style/AddContract.css";
 import Sidebar from "../components/Sidebar";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 function FormAddContract() {
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     full_name: "",
     dob: "",
@@ -35,86 +38,83 @@ function FormAddContract() {
     mother_name: "",
     mother_phone: "",
   });
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [showPrintView, setShowPrintView] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const { contractId } = useParams();
-  const navigate = useNavigate();
-
+  // Fetch contract data when component mounts
   useEffect(() => {
-    const fetchContractData = async () => {
-      if (!contractId) {
-        setLoading(false);
-        return;
-      }
-
+    const fetchContractDetails = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const response = await fetch(
-          `http://localhost:8000/api/contract/fetch/${contractId}`
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `http://localhost:8000/api/contract/fetch/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-
-        if (!response.ok) {
-          throw new Error("Không thể lấy dữ liệu hợp đồng");
+        if (response.data.success) {
+          const contractData = response.data.data;
+          const studentData = contractData.student;
+          // Format dates for input fields
+          const formatDate = (dateStr) => {
+            if (!dateStr) return "";
+            const date = new Date(dateStr);
+            return date.toISOString().split("T")[0];
+          };
+          setFormData({
+            full_name: studentData?.full_name || "",
+            dob: formatDate(studentData?.dob),
+            student_code: studentData?.student_code || "",
+            gender: studentData?.gender || "",
+            class_code: studentData?.class_code || "",
+            ethnicity: studentData?.ethnicity || "",
+            school_year: studentData?.school_year || "",
+            major: studentData?.major || "",
+            nationality: studentData?.nationality || "",
+            education_type: studentData?.education_type || "",
+            identification_code: studentData?.identification_code || "",
+            birth_place: studentData?.birth_place || "",
+            phone_number: studentData?.phone_number || "",
+            email: studentData?.email || "",
+            religion: studentData?.religion || "",
+            area: studentData?.area || "",
+            room: studentData?.room || "",
+            floor: studentData?.floor || "",
+            apply_date: formatDate(studentData?.apply_date),
+            expired_date: formatDate(studentData?.expired_date),
+            renewalDuration: studentData?.renewalDuration || "",
+            price: studentData?.price || "",
+            studentNote: studentData?.studentNote || "",
+            relativesName: studentData?.relativesName || "",
+            address: studentData?.address || "",
+            father_name: studentData?.father_name || "",
+            father_phone: studentData?.father_phone || "",
+            mother_name: studentData?.mother_name || "",
+            mother_phone: studentData?.mother_phone || "",
+          });
+        } else {
+          setError("Không thể tải thông tin hợp đồng");
         }
-
-        const data = await response.json();
-
-        setFormData({
-          full_name: data.full_name || "",
-          dob: data.dob || "",
-          student_code: data.student_code || "",
-          gender: data.gender || "",
-          class_code: data.class_code || "",
-          ethnicity: data.ethnicity || "",
-          school_year: data.school_year || "",
-          major: data.major || "",
-          nationality: data.nationality || "",
-          education_type: data.education_type || "",
-          phone_number: data.phone_number || "",
-          email: data.email || "",
-          area: data.area || "",
-          room: data.room || "",
-          floor: data.floor || "",
-          apply_date: data.apply_date || "",
-          expired_date: data.expired_date || "",
-          renewalDuration: data.renewalDuration || "",
-          price: data.price || "",
-          studentNote: data.studentNote || "",
-          relativesName: data.relativesName || "",
-          relativesAddress: data.relativesAddress || "",
-          father_name: data.father_name || "",
-          father_phone: data.father_phone || "",
-          mother_name: data.mother_name || "",
-          mother_phone: data.mother_phone || "",
-        });
-
-        setLoading(false);
-      } catch (err) {
-        console.error("Lỗi khi lấy dữ liệu:", err);
-        setError(err.message);
+      } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+        setError("Đã xảy ra lỗi khi tải thông tin hợp đồng");
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchContractData();
-  }, [contractId]);
+    if (id) {
+      fetchContractDetails();
+    }
+  }, [id]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Có thể thêm logic in đơn ở đây
-  };
-
-  // Tính thời hạn hợp đồng dựa vào ngày bắt đầu và kết thúc
+  // Calculate contract duration when dates change
   useEffect(() => {
     if (formData.apply_date && formData.expired_date) {
       const start = new Date(formData.apply_date);
@@ -129,21 +129,109 @@ function FormAddContract() {
           ...prev,
           renewalDuration: months.toString(),
         }));
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          renewalDuration: "",
-        }));
       }
     }
   }, [formData.apply_date, formData.expired_date]);
 
-  const handleRenewal = () => {
-    navigate("/danhsachhopdong");
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
-  const handleCancel = () => {
-    navigate("/huyhopdong");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setShowPrintView(true);
+  };
+
+  const formatVND = (value) => {
+    if (!value) return "0";
+    return Number(value).toLocaleString("vi-VN");
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleBack = () => {
+    setShowPrintView(false);
+  };
+
+  const navigate = useNavigate();
+  const handleReturnToList = () => {
+    navigate("/danhsachdondky");
+  };
+
+  // Xử lý duyệt đơn đăng ký
+  const handleApprove = async () => {
+    setSubmitLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+
+      console.log(
+        "Gửi request đến:",
+        `http://localhost:8000/api/contract/update/${id}`
+      );
+      console.log("Dữ liệu gửi đi:", {
+        status: "xác nhận",
+        form_data: formData,
+      });
+
+      // Thay đổi cấu trúc dữ liệu gửi đi để phù hợp với API
+      const response = await axios.put(
+        `http://localhost:8000/api/contract/update/${id}`,
+        {
+          status: "xác nhận",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setSuccessMessage("Đã duyệt đơn đăng ký thành công!");
+        // Hiển thị thông báo thành công trong 2 giây, sau đó chuyển về trang danh sách
+        setTimeout(() => {
+          navigate("/danhsachdondky");
+        }, 2000);
+      } else {
+        setError(
+          "Không thể duyệt đơn đăng ký: " +
+            (response.data.message || "Lỗi không xác định")
+        );
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API duyệt đơn:", error);
+
+      // Xử lý lỗi chi tiết hơn
+      if (error.response) {
+        // Lỗi có response từ server
+        console.error("Server trả về lỗi:", error.response.status);
+        console.error("Dữ liệu lỗi:", error.response.data);
+        setError(
+          `Lỗi từ server (${error.response.status}): ${
+            error.response.data.message || "Không có thông tin chi tiết"
+          }`
+        );
+      } else if (error.request) {
+        // Request được gửi nhưng không nhận được response
+        console.error("Không nhận được phản hồi từ server:", error.request);
+        setError(
+          "Không nhận được phản hồi từ server. Vui lòng kiểm tra kết nối mạng."
+        );
+      } else {
+        // Lỗi khi thiết lập request
+        console.error("Lỗi khi chuẩn bị request:", error.message);
+        setError(`Lỗi: ${error.message}`);
+      }
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   if (loading) {
@@ -165,10 +253,8 @@ function FormAddContract() {
         <Sidebar role="admin" username="Hoàng Dũng" />
         <div className="main-content">
           <div className="error-container">
-            <p>Có lỗi xảy ra: {error}</p>
-            <button onClick={() => navigate("/danhsachhopdong")}>
-              Quay lại danh sách
-            </button>
+            <p>{error}</p>
+            <button onClick={handleReturnToList}>Quay lại danh sách</button>
           </div>
         </div>
       </div>
@@ -181,363 +267,730 @@ function FormAddContract() {
       <div className="main-content">
         <div className="form-container">
           <h2>Thông tin đăng ký</h2>
+          {/* <h3 className="contract-id">Mã hợp đồng: {id}</h3> */}
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-section">
-              <h3>Thông tin sinh viên</h3>
+          {successMessage && (
+            <div className="success-message">
+              <p>{successMessage}</p>
+            </div>
+          )}
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Họ tên sinh viên</label>
-                  <input
-                    type="text"
-                    name="full_name"
-                    value={formData.full_name}
-                    onChange={handleChange}
-                    readOnly
-                  />
+          {error && (
+            <div className="error-message">
+              <p>{error}</p>
+              <button onClick={() => setError(null)}>Đóng</button>
+            </div>
+          )}
+          {showPrintView ? (
+            <div className="print-container">
+              <div className="print-document">
+                <div className="header">
+                  <div className="school-info">
+                    <h2 style={{ marginLeft: "240px" }}>
+                      HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG
+                    </h2>
+                    <p style={{ marginLeft: "400px" }}>
+                      Km10, Đường Nguyễn Trãi, Hà Đông, Hà Nội
+                    </p>
+                    <p style={{ marginLeft: "350px" }}>
+                      Tel: 024-33525248 (B5); 33510435 (B2), 33501463 (B1)
+                    </p>
+                    <p className="date" style={{ marginLeft: "400px" }}>
+                      Hà Nội, ngày {new Date().getDate()} tháng{" "}
+                      {new Date().getMonth() + 1} năm {new Date().getFullYear()}
+                    </p>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Ngày sinh</label>
-                  <input
-                    type="date"
-                    name="dob"
-                    value={formData.dob}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-              </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Mã sinh viên</label>
-                  <input
-                    type="text"
-                    name="student_code"
-                    value={formData.student_code}
-                    onChange={handleChange}
-                    readOnly
-                  />
+                <div className="document-title">
+                  <h2>ĐƠN ĐĂNG KÝ CHỖ Ở NỘI TRÚ KTX </h2>
+                  <p className="document-number" align="center">
+                    Số:...... Kỳ I (2024-2025)
+                  </p>
                 </div>
-                <div className="form-group">
-                  <label>Giới tính</label>
-                  <input
-                    type="text"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-              </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>CMND/CCCD</label>
-                  <input
-                    type="text"
-                    name="identification_code"
-                    value={formData.identification_code}
-                    onChange={handleChange}
-                    required
-                  />
+                <div className="recipient" align="center">
+                  <p>
+                    <strong>Kính gửi:</strong> - Học viện Công nghệ Bưu chính
+                    Viễn thông
+                  </p>
+                  <p>- Trung tâm Dịch vụ - KTX</p>
                 </div>
-                <div className="form-group">
-                  <label>Tôn giáo</label>
-                  <input
-                    type="text"
-                    name="religion"
-                    value={formData.religion}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Lớp</label>
-                  <input
-                    type="text"
-                    name="class_code"
-                    value={formData.class_code}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Dân tộc</label>
-                  <input
-                    type="text"
-                    name="ethnicity"
-                    value={formData.ethnicity}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-              </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Khóa</label>
-                  <input
-                    type="text"
-                    name="school_year"
-                    value={formData.school_year}
-                    onChange={handleChange}
-                    readOnly
-                  />
+                <div className="student-info">
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td width="50%">
+                          - Tên sinh viên: {formData.full_name}
+                        </td>
+                        <td width="50%">Nam/Nữ: {formData.gender}</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          - Sinh ngày:{" "}
+                          {new Date(formData.dob).toLocaleDateString("vi-VN")}
+                        </td>
+                        <td>Dân tộc: {formData.ethnicity}</td>
+                      </tr>
+                      <tr>
+                        <td>- Nơi sinh [tỉnh/thành]: {formData.nationality}</td>
+                        <td>Lớp: {formData.class_code}</td>
+                      </tr>
+                      <tr>
+                        <td>- Khóa: {formData.school_year}</td>
+                        <td>Mã SV: {formData.student_code}</td>
+                      </tr>
+                      <tr>
+                        <td>- Ngành: {formData.major}</td>
+                        <td>Hệ đào tạo: {formData.education_type}</td>
+                      </tr>
+                      <tr>
+                        <td>- Điện thoại: {formData.phone_number}</td>
+                        <td>Email: {formData.email}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <div className="form-group">
-                  <label>Quê quán</label>
-                  <input
-                    type="text"
-                    name="nationality"
-                    value={formData.nationality}
-                    onChange={handleChange}
-                    readOnly
-                  />
+                <p>
+                  <strong style={{ marginLeft: "50px" }}>
+                    - Khi cần báo tin cho gia đình/ người thân:
+                  </strong>{" "}
+                </p>
+                <div className="relative-infor">
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td width="50%">- Họ tên bố: {formData.father_name}</td>
+                        <td width="50%">
+                          Số điện thoại: {formData.father_phone}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%">- Họ tên mẹ: {formData.mother_name}</td>
+                        <td width="50%">
+                          Số điện thoại: {formData.mother_phone}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td width="50%">
+                          - hoặc người thân [Ưu tiên tại Hà Nội nếu có]: {""}
+                          {formData.relativesName}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6">
+                          + Địa chỉ liên hệ [người thân]: {formData.address}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-              </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Ngành</label>
-                  <input
-                    type="text"
-                    name="major"
-                    value={formData.major}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Hệ đào tạo</label>
-                  <input
-                    type="text"
-                    name="education_type"
-                    value={formData.education_type}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-              </div>
+                <div className="content">
+                  <p style={{ marginLeft: "50px" }}>
+                    <strong>1. Nội dung:</strong> Sinh viên đăng ký chỗ ở nội
+                    trú tại KTX sinh viên của Học viện (Km10, đường Nguyễn Trãi,
+                    Q.Hà Đông, TP.Hà Nội). Cụ thể:
+                  </p>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Số điện thoại</label>
-                  <input
-                    type="tel"
-                    name="phone_number"
-                    value={formData.phone_number}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-              </div>
+                  <table>
+                    <tbody>
+                      <tr align="center">
+                        <td width="34%">KTX (Nhà): {formData.area}....</td>
+                        <td width="33%">Tầng: {formData.floor}....</td>
+                        <td width="33%">- Phòng ở: {formData.room}....</td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            - phòng có nhà tắm và vệ sinh khép kín, được trang
+                            bị các tiện nghi cơ bản : giường, đệm, chiếu, quạt,
+                            điều hòa, bình nóng lạnh và ở chung : 04 sinh
+                            viên/phòng
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          - Thời gian: từ ngày{" "}
+                          {new Date(formData.apply_date).toLocaleDateString(
+                            "vi-VN"
+                          )}{" "}
+                          đến ngày{" "}
+                          {new Date(formData.expired_date).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            - Sinh viên được sử dụng các trang thiết bị, tiện
+                            nghi trong phòng ở KTX theo quy định và theo biên
+                            bản giao nhận phòng ở giữa Tổ quản lý KTX và đại
+                            diện phòng ở.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            - Mức thu lưu trú hàng tháng theo quy định, thu đủ
+                            theo tháng ở nội trú(30 hoặc 31 ngày/tháng).
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            - Trường hợp sinh viên xin ra khỏi KTX ở giữa kỳ đã
+                            đóng tiền, sinh viên không được hoàn lại tiền lệ phí
+                            KTX đã đóng.
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p style={{ marginLeft: "50px" }}>
+                    <strong>2. Trách nhiệm của Học viện (TTDV- KTX):</strong>
+                  </p>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            2.1. Cung cấp thông tin, thông báo về các quy chế,
+                            quy định, nội quy KTX, các mức thu, khoản thu hoặc
+                            thông báo có liên quan cho sinh viên biết để thực
+                            hiện.
+                          </p>
+                        </td>
+                      </tr>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Họ tên bố</label>
-                  <input
-                    type="text"
-                    name="father_name"
-                    value={formData.father_name}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Số điện thoại bố</label>
-                  <input
-                    type="text"
-                    name="father_phone"
-                    value={formData.father_phone}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
-              </div>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            2.2. Bố trí phòng ở cho sinh viên theo đúng các nội
+                            dung đã ghi ở (phần 1).
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            2.3. Thực hiện đúng trách nhiệm quản lý KTX theo các
+                            quy chế, quy định hiện hành của Bộ GD&ĐT và của Học
+                            viện.
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Họ tên mẹ</label>
-                  <input
-                    type="text"
-                    name="mother_name"
-                    value={formData.mother_name}
-                    onChange={handleChange}
-                    readOnly
-                  />
+                  <p style={{ marginLeft: "50px" }}>
+                    <strong>
+                      3. Trách nhiệm của Sinh viên (ở Nội trú KTX):
+                    </strong>
+                  </p>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            3.1. Tuân thủ và thực hiện đúng nội quy KTX của Học
+                            viện.
+                          </p>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            3.2. Nộp lệ phí KTX, tiền điện phụ trội và các khoản
+                            thu khác (nếu có) theo đúng hạn, đúng thông báo của
+                            Học viện.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            3.3. Phải trả phòng ở và rời khỏi KTX theo thông báo
+                            của Học viện hoặc chậm nhất vào ngày hết hiệu lực
+                            đơn đăng ký nội trú.
+                          </p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan="6" style={{ paddingLeft: "60px" }}>
+                          <p>
+                            3.4. Nếu tiếp tục ở lại KTX phải làm đơn đăng ký chỗ
+                            ở nội trú KTX lại trước khi đơn đăng ký hết hiệu lực
+                            15 ngày (có biểu mẫu kèm theo)
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <p>
+                    <strong style={{ marginLeft: "50px" }}>
+                      2. Mức thu, hình thức thanh toán và thời hạn đăng ký tiếp
+                      theo:
+                    </strong>
+                  </p>
+
+                  <p style={{ marginLeft: "70px", color: "red" }}>
+                    {" "}
+                    1. Mức thu tính tại thời điểm:
+                  </p>
+                  <p className="payment">
+                    <strong>
+                      {formatVND(formData.price)} đồng/tháng x{" "}
+                      {formData.renewalDuration} tháng ={" "}
+                      {formatVND(formData.price * formData.renewalDuration)} VNĐ
+                    </strong>
+                    <br />
+                  </p>
+
+                  <p style={{ marginLeft: "70px", color: "red" }}>
+                    2.2. Hình thức thanh toán:
+                  </p>
+                  <p style={{ marginLeft: "130px", marginRight: "50px" }}>
+                    + Nộp tiền ngay tại bộ phận Kế toán của Học viện sau khi
+                    được chấp thuận đơn vào ở nội trú KTX.
+                  </p>
+                  <p align="center">
+                    + Hình thức thanh toán: Chuyển khoản hoặc tiền mặt (bằng
+                    tiền VNĐ).
+                  </p>
                 </div>
-                <div className="form-group">
-                  <label>Số điện thoại mẹ</label>
-                  <input
-                    type="text"
-                    name="mother_phone"
-                    value={formData.mother_phone}
-                    onChange={handleChange}
-                    readOnly
-                  />
+
+                <div className="commitment">
+                  <p>
+                    Sau khi nghiên cứu: Nội quy Ký túc xá của Học viện và Bản
+                    cam kết, em làm đơn này kính gửi Học viện xem xét cho em
+                    được đăng ký chỗ ở tại KTX của Học viện.
+                  </p>
+                  <p style={{ marginTop: "5px" }}>
+                    Tôi cam kết thực hiện đúng và chấp hành nghiêm túc các quy
+                    định về Nội trú của Học viện.
+                  </p>
+                  <p className="thanks">
+                    <strong>Xin chân thành cảm ơn!</strong>
+                  </p>
                 </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Họ tên người thân(nếu có)</label>
-                  <input
-                    type="text"
-                    name="relativesName"
-                    value={formData.relativesName}
-                    onChange={handleChange}
-                    readOnly
-                  />
+
+                <div className="signatures">
+                  <table width="100%">
+                    <tbody>
+                      <tr>
+                        <td width="33%" align="center">
+                          <p>
+                            <strong>KT.GIÁM ĐỐC</strong>
+                          </p>
+                          <p>
+                            <strong>PHÓ GIÁM ĐỐC</strong>
+                          </p>
+                          <p>(Ký, ghi rõ họ tên)</p>
+                          <div className="signature-space"></div>
+                          <p></p>
+                        </td>
+                        <td width="33%" align="center" valign="top">
+                          <p>
+                            <strong>TỔ QUẢN LÝ KTX</strong>
+                          </p>
+                          <p>(Ký, ghi rõ họ tên)</p>
+                          <div className="signature-space"></div>
+                          <p></p>
+                        </td>
+                        <td width="34%" align="center">
+                          <p>
+                            <strong>NGƯỜI ĐĂNG KÝ</strong>
+                          </p>
+                          <p>(Ký, ghi rõ họ tên)</p>
+                          <div className="signature-space"></div>
+                          <p>{formData.full_name}</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <div className="form-group">
-                  <label>Địa chỉ người thân</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    readOnly
-                  />
+
+                <div className="footer">
+                  <p>
+                    -------------------------------------------------------------
+                  </p>
+                  <p className="note">
+                    Đơn này được lưu kèm cùng bản cam kết tại Tổ phận quản lý
+                    KTX
+                  </p>
+                </div>
+
+                <div className="print-controls no-print">
+                  <button className="print-btn" onClick={handlePrint}>
+                    In đơn
+                  </button>
+                  <button className="back-btn" onClick={handleBack}>
+                    Quay lại chỉnh sửa
+                  </button>
                 </div>
               </div>
             </div>
-
-            <div className="form-section">
-              <h3>Thông tin hợp đồng</h3>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Khu ký túc xá</label>
-                  <input
-                    type="text"
-                    name="area"
-                    value={formData.area}
-                    onChange={handleChange}
-                    readOnly
-                  />
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="form-section">
+                <h3>Thông tin sinh viên</h3>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Họ tên sinh viên</label>
+                    <input
+                      type="text"
+                      name="full_name"
+                      value={formData.full_name}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Ngày sinh</label>
+                    <input
+                      type="date"
+                      name="dob"
+                      value={formData.dob}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Tầng</label>
-                  <input
-                    type="text"
-                    name="floor"
-                    value={formData.floor}
-                    onChange={handleChange}
-                    readOnly
-                  />
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Mã sinh viên</label>
+                    <input
+                      type="text"
+                      name="student_code"
+                      value={formData.student_code}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Giới tính</label>
+                    <input
+                      type="text"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Phòng</label>
-                  <input
-                    type="text"
-                    name="room"
-                    value={formData.room}
-                    onChange={handleChange}
-                    readOnly
-                  />
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>CMND/CCCD</label>
+                    <input
+                      type="text"
+                      name="identification_code"
+                      value={formData.identification_code}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Tôn giáo</label>
+                    <input
+                      type="text"
+                      name="religion"
+                      value={formData.religion}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Lớp</label>
+                    <input
+                      type="text"
+                      name="class_code"
+                      value={formData.class_code}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Dân tộc</label>
+                    <input
+                      type="text"
+                      name="ethnicity"
+                      value={formData.ethnicity}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Khóa</label>
+                    <input
+                      type="text"
+                      name="school_year"
+                      value={formData.school_year}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Quê quán</label>
+                    <input
+                      type="text"
+                      name="nationality"
+                      value={formData.nationality}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Ngành</label>
+                    <input
+                      type="text"
+                      name="major"
+                      value={formData.major}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Hệ đào tạo</label>
+                    <input
+                      type="text"
+                      name="education_type"
+                      value={formData.education_type}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Số điện thoại</label>
+                    <input
+                      type="tel"
+                      name="phone_number"
+                      value={formData.phone_number}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Họ tên bố</label>
+                    <input
+                      type="text"
+                      name="father_name"
+                      value={formData.father_name}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Số điện thoại bố</label>
+                    <input
+                      type="text"
+                      name="father_phone"
+                      value={formData.father_phone}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Họ tên mẹ</label>
+                    <input
+                      type="text"
+                      name="mother_name"
+                      value={formData.mother_name}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Số điện thoại mẹ</label>
+                    <input
+                      type="text"
+                      name="mother_phone"
+                      value={formData.mother_phone}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Họ tên người thân(nếu có)</label>
+                    <input
+                      type="text"
+                      name="relativesName"
+                      value={formData.relativesName}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Địa chỉ người thân</label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Ngày bắt đầu</label>
-                  <input
-                    type="date"
-                    name="apply_date"
-                    value={formData.apply_date}
-                    onChange={handleChange}
-                    readOnly
-                  />
+              <div className="form-section">
+                <h3>Thông tin hợp đồng</h3>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Khu ký túc xá</label>
+                    <input
+                      type="text"
+                      name="area"
+                      value={formData.area}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Tầng</label>
+                    <input
+                      type="text"
+                      name="floor"
+                      value={formData.floor}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Phòng</label>
+                    <input
+                      type="text"
+                      name="room"
+                      value={formData.room}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Ngày kết thúc</label>
-                  <input
-                    type="date"
-                    name="expired_date"
-                    value={formData.expired_date}
-                    onChange={handleChange}
-                    readOnly
-                  />
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Ngày bắt đầu</label>
+                    <input
+                      type="date"
+                      name="apply_date"
+                      value={formData.apply_date}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Ngày kết thúc</label>
+                    <input
+                      type="date"
+                      name="expired_date"
+                      value={formData.expired_date}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Thời hạn hợp đồng</label>
+                    <input
+                      type="text"
+                      name="renewalDuration"
+                      value={
+                        formData.renewalDuration
+                          ? `${formData.renewalDuration} tháng`
+                          : ""
+                      }
+                      readOnly
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Mức thu/tháng</label>
+                    <input
+                      type="text"
+                      name="price"
+                      value={
+                        formData.price ? `${formatVND(formData.price)} VND` : ""
+                      }
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group full-width">
+                    <label>Ghi chú</label>
+                    <textarea
+                      name="studentNote"
+                      value={formData.studentNote}
+                      onChange={handleChange}
+                      rows="4"
+                      readOnly
+                    ></textarea>
+                  </div>
                 </div>
               </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Thời hạn hợp đồng</label>
-                  <input
-                    type="text"
-                    name="renewalDuration"
-                    value={
-                      formData.renewalDuration
-                        ? `${formData.renewalDuration} tháng`
-                        : ""
-                    }
-                    readOnly
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Mức thu/tháng</label>
-                  <input
-                    type="text"
-                    name="price"
-                    value={
-                      formData.price
-                        ? `${Number(formData.price).toLocaleString()} VND`
-                        : ""
-                    }
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </div>
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="submit-btn"
+                  onClick={handleReturnToList}
+                >
+                  Quay lại
+                </button>
+                <button
+                  type="button"
+                  className="submit-btn"
+                  onClick={handleApprove}
+                  disabled={submitLoading}
+                >
+                  {submitLoading ? "Đang xử lý..." : "Duyệt"}
+                </button>
+                <button type="submit" className="print-preview-btn">
+                  In đơn
+                </button>
               </div>
-
-              <div className="form-row">
-                <div className="form-group full-width">
-                  <label>Ghi chú</label>
-                  <textarea
-                    name="studentNote"
-                    value={formData.studentNote}
-                    onChange={handleChange}
-                    rows="4"
-                    readOnly
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-
-            <div className="form-actions">
-              <button
-                type="button"
-                className="submit-btn"
-                onClick={handleRenewal}
-              >
-                Quay lại
-              </button>
-              <button
-                type="button"
-                className="submit-btn"
-                onClick={handleCancel}
-              >
-                Hủy hợp đồng
-              </button>
-
-              <button type="submit" className="print-preview-btn">
-                In đơn
-              </button>
-            </div>
-          </form>
+            </form>
+          )}
         </div>
       </div>
     </div>

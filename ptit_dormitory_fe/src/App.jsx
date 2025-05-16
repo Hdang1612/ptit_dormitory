@@ -26,7 +26,7 @@ import AddStudent from "./view/AddStudent";
 import ShiftReports from "./view/ShiftReports";
 import RoomReport from "./view/RoomReport";
 import FormAddContract from "./view/FormAddContract";
-import { Frame } from "./view/Frame/index.jsx";
+import { BillnPayment } from "./view/BillnPayment/index.jsx";
 import { PowerMonitoring } from "./view/PowerMonitoring/index.jsx";
 import { Reports } from "./view/Reports/index.jsx";
 
@@ -35,21 +35,26 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Navigate to="/dangnhap" replace />} />
+
         {/* Dũng */}
-        <Route path="/dangnhap" element={<Login />}></Route>
-        <Route path="/quenmatkhau" element={<ForgotPassword />}></Route>
-        <Route path="/thedinhdanh" element={<UserIdentificationCard />}></Route>
-        <Route path="/suathongtin" element={<UserEditPage />}></Route>
+        <Route path="/dangnhap" element={<Login />} />
+        <Route path="/quenmatkhau" element={<ForgotPassword />} />
+        <Route path="/thedinhdanh" element={<UserIdentificationCard />} />
+        <Route path="/suathongtin" element={<UserEditPage />} />
+        <Route path="/danhsachdondky" element={<RegistrationListPage />} />
+        <Route path="/danhsachhopdong" element={<ContractList />} />
+        <Route path="/themdangky" element={<AddContract />} />
+        <Route path="/thongtindangky" element={<FormAddContract />} />
+        <Route path="/thongtindangky/:id" element={<FormAddContract />} />
+        <Route path="/thongtinhopdong" element={<InforContract />} />
+        <Route path="/thongtinhopdong/:id" element={<InforContract />} />
+        <Route path="/giahanhopdong" element={<ContractRenewalApp />} />
         <Route
-          path="/danhsachdondky"
-          element={<RegistrationListPage />}
-        ></Route>
-        <Route path="/danhsachhopdong" element={<ContractList />}></Route>
-        <Route path="/themdangky" element={<AddContract />}></Route>
-        <Route path="/thongtindangky" element={<FormAddContract />}></Route>
-        <Route path="/thongtinhopdong" element={<InforContract />}></Route>
-        <Route path="/giahanhopdong" element={<ContractRenewalApp />}></Route>
-        <Route path="/huyhopdong" element={<CancelContract />}></Route>
+          path="/giahanhopdong/:contractId"
+          element={<ContractRenewalApp />}
+        />
+        <Route path="/huyhopdong" element={<CancelContract />} />
+        <Route path="/huyhopdong/:id" element={<CancelContract />} />
 
         {/* Quốc Anh */}
         <Route path="/dsphong" element={<RoomList />}></Route>
@@ -65,7 +70,7 @@ function App() {
         <Route path="/room-report" element={<RoomReport />}></Route>
 
         {/* Hoàng Anh */}
-        <Route path="/invoice" element={<Frame />} />
+        <Route path="/invoice" element={<BillnPayment />} />
         <Route path="/power-monitoring" element={<PowerMonitoring />} />
         <Route path="/reports" element={<Reports />} />
       </Routes>

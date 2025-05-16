@@ -51,13 +51,20 @@ export default function Login() {
             placeholder="Nhập email"
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
           />
           <input
             type="password"
             placeholder="Nhập mật khẩu"
             value={passwordInput}
             onChange={(e) => setPasswordInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
           />
+
           <button className="login-button" onClick={handleLogin}>
             ĐĂNG NHẬP
           </button>
