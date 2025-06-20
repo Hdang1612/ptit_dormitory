@@ -18,7 +18,7 @@ export default function Login() {
         // Điều hướng theo role
         switch (role) {
           case "1":
-            navigate("/danhsachdondky");
+            navigate("/reports");
             break;
           case "4":
             navigate("/thedinhdanh");
