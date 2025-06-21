@@ -147,18 +147,65 @@ const ContractList = () => {
             >
               Trước
             </button>
-            {[...Array(totalPages).keys()].map((number) => (
+
+            {/* Trang 1 luôn hiển thị */}
+            <button
+              style={{
+                ...styles.pageBtn,
+                ...(currentPage === 1 ? styles.pageBtnActive : {}),
+              }}
+              onClick={() => setCurrentPage(1)}
+            >
+              1
+            </button>
+
+            {/* Nếu currentPage > 2, hiển thị trang trước */}
+            {currentPage === 3 && (
+              <button style={styles.pageBtn} onClick={() => setCurrentPage(2)}>
+                2
+              </button>
+            )}
+
+            {/* Hiển thị currentPage nếu nó không phải 1 hoặc cuối */}
+            {currentPage !== 1 && currentPage !== totalPages && (
               <button
-                key={number + 1}
                 style={{
                   ...styles.pageBtn,
-                  ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+                  ...styles.pageBtnActive,
                 }}
-                onClick={() => setCurrentPage(number + 1)}
               >
-                {number + 1}
+                {currentPage}
               </button>
-            ))}
+            )}
+
+            {/* Nếu currentPage + 1 < totalPages, hiển thị trang sau */}
+            {currentPage + 1 < totalPages && (
+              <button
+                style={styles.pageBtn}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                {currentPage + 1}
+              </button>
+            )}
+
+            {/* Nếu cần, hiển thị dấu ... */}
+            {currentPage + 2 < totalPages && (
+              <span style={styles.ellipsis}>...</span>
+            )}
+
+            {/* Hiển thị trang cuối nếu cần */}
+            {totalPages > 1 && (
+              <button
+                style={{
+                  ...styles.pageBtn,
+                  ...(currentPage === totalPages ? styles.pageBtnActive : {}),
+                }}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                {totalPages}
+              </button>
+            )}
+
             <button
               style={styles.pageBtn}
               onClick={() => setCurrentPage(currentPage + 1)}

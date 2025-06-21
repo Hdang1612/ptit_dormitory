@@ -8,6 +8,7 @@ export const menuConfig = {
     { label: "Danh sách sinh viên", path: "/student-list" },
     { label: "Thanh toán & Hoá đơn", path: "/invoice" },
     { label: "Giám sát tiêu thụ điện", path: "/power-monitoring" },
+    { label: "Quản lý ca trực ", path: "/shiftmanage" },
   ],
   sinhvien: [
     { label: "Thông báo chung", path: "" },
@@ -15,7 +16,7 @@ export const menuConfig = {
     { label: "Thông tin cá nhân", path: "" },
   ],
   nguoitruc: [
-    { label: "Phân ca", path: "/shiftmanage" },
+    // { label: "Phân ca", path: "/shiftmanage" },
     { label: "Điểm danh", path: "/staffduty" },
   ],
 };

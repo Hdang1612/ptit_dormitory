@@ -57,68 +57,68 @@ function AddContract() {
     if (!value) return "0";
     return Number(value).toLocaleString("vi-VN");
   };
-  const numberToVietnamese = (number) => {
-    const ChuSo = [
-      "không",
-      "một",
-      "hai",
-      "ba",
-      "bốn",
-      "năm",
-      "sáu",
-      "bảy",
-      "tám",
-      "chín",
-    ];
-    const DonVi = ["", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ"];
+  // const numberToVietnamese = (number) => {
+  //   const ChuSo = [
+  //     "không",
+  //     "một",
+  //     "hai",
+  //     "ba",
+  //     "bốn",
+  //     "năm",
+  //     "sáu",
+  //     "bảy",
+  //     "tám",
+  //     "chín",
+  //   ];
+  //   const DonVi = ["", "nghìn", "triệu", "tỷ", "nghìn tỷ", "triệu tỷ"];
 
-    if (number === 0) return "Không đồng";
+  //   if (number === 0) return "Không đồng";
 
-    const blocks = [];
-    while (number > 0) {
-      blocks.push(number % 1000);
-      number = Math.floor(number / 1000);
-    }
+  //   const blocks = [];
+  //   while (number > 0) {
+  //     blocks.push(number % 1000);
+  //     number = Math.floor(number / 1000);
+  //   }
 
-    const result = [];
-    for (let i = blocks.length - 1; i >= 0; i--) {
-      const block = blocks[i];
-      const isFirstBlock = i === blocks.length - 1; // khối bên trái nhất
+  //   const result = [];
+  //   for (let i = blocks.length - 1; i >= 0; i--) {
+  //     const block = blocks[i];
+  //     const isFirstBlock = i === blocks.length - 1; // khối bên trái nhất
 
-      if (block === 0) continue;
+  //     if (block === 0) continue;
 
-      let str = "";
-      const hundreds = Math.floor(block / 100);
-      const tens = Math.floor((block % 100) / 10);
-      const units = block % 10;
+  //     let str = "";
+  //     const hundreds = Math.floor(block / 100);
+  //     const tens = Math.floor((block % 100) / 10);
+  //     const units = block % 10;
 
-      if (hundreds > 0) {
-        str += ChuSo[hundreds] + " trăm ";
-      } else if (!isFirstBlock && (tens > 0 || units > 0)) {
-        str += "không trăm ";
-      }
+  //     if (hundreds > 0) {
+  //       str += ChuSo[hundreds] + " trăm ";
+  //     } else if (!isFirstBlock && (tens > 0 || units > 0)) {
+  //       str += "không trăm ";
+  //     }
 
-      if (tens > 1) {
-        str += ChuSo[tens] + " mươi ";
-        if (units === 1) str += "mốt ";
-        else if (units === 5) str += "lăm ";
-        else if (units > 0) str += ChuSo[units] + " ";
-      } else if (tens === 1) {
-        str += "mười ";
-        if (units === 5) str += "lăm ";
-        else if (units > 0) str += ChuSo[units] + " ";
-      } else if (units > 0) {
-        if (tens === 0 && hundreds !== 0) str += "lẻ ";
-        str += ChuSo[units] + " ";
-      }
+  //     if (tens > 1) {
+  //       str += ChuSo[tens] + " mươi ";
+  //       if (units === 1) str += "mốt ";
+  //       else if (units === 5) str += "lăm ";
+  //       else if (units > 0) str += ChuSo[units] + " ";
+  //     } else if (tens === 1) {
+  //       str += "mười ";
+  //       if (units === 5) str += "lăm ";
+  //       else if (units > 0) str += ChuSo[units] + " ";
+  //     } else if (units > 0) {
+  //       if (tens === 0 && hundreds !== 0) str += "lẻ ";
+  //       str += ChuSo[units] + " ";
+  //     }
 
-      str += DonVi[i] + " ";
-      result.push(str.trim());
-    }
+  //     str += DonVi[i] + " ";
+  //     result.push(str.trim());
+  //   }
 
-    const finalStr = result.join(" ").replace(/\s+/g, " ").trim() + " đồng";
-    return finalStr.charAt(0).toUpperCase() + finalStr.slice(1);
-  };
+  //   const finalStr = result.join(" ").replace(/\s+/g, " ").trim() + " đồng";
+  //   return finalStr.charAt(0).toUpperCase() + finalStr.slice(1);
+  // };
 
   useEffect(() => {
     if (formData.apply_date && formData.expired_date) {

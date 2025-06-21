@@ -48,35 +48,41 @@ const TopStudentList = () => {
       color: "black",
     },
     selectRed: {
-        marginLeft: "8px",
-        padding: "5px 0px",
-        border: "1px solid #ccc",
-        borderRadius: "5px",
-        cursor: "pointer",
-        backgroundColor: "#BC2626",
-        color: "white",
-      },
+      marginLeft: "8px",
+      padding: "5px 10px",
+      border: "1px solid #ccc",
+      borderRadius: "5px",
+      cursor: "pointer",
+      backgroundColor: "#BC2626",
+      color: "white",
+    },
   };
 
   return (
     <div style={styles.container}>
-      
-      
       {/* Chọn khu ký túc */}
       <div style={styles.selectWrapper}>
         <span>Chọn khu ký túc</span>
-        <select value={dormitory} onChange={handleDormitoryChange} style={styles.selectRed}>
+        <select
+          value={dormitory}
+          onChange={handleDormitoryChange}
+          style={styles.selectRed}
+        >
           <option value="A">Khu A</option>
           <option value="B">Khu B</option>
           <option value="C">Khu C</option>
           <option value="D">Khu D</option>
         </select>
       </div>
-      
+
       {/* Chọn phòng */}
       <div style={styles.selectWrapper}>
         <span>Chọn phòng</span>
-        <select value={room} onChange={handleRoomChange} style={styles.selectRed}>
+        <select
+          value={room}
+          onChange={handleRoomChange}
+          style={styles.selectRed}
+        >
           <option value="Tất cả">Tất cả</option>
           <option value="101">101</option>
           <option value="102">102</option>
@@ -85,20 +91,24 @@ const TopStudentList = () => {
           <option value="105">105</option>
         </select>
       </div>
-      
-        {/* Ô tìm kiếm */}
-        <input
-            type="text"
-            placeholder="Tìm kiếm..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            style={styles.searchInput}
-        />
+
+      {/* Ô tìm kiếm */}
+      <input
+        type="text"
+        placeholder="Tìm kiếm..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={styles.searchInput}
+      />
 
       {/* Phân độ lớn bảng */}
       <div style={styles.selectWrapper}>
         <span>Show</span>
-        <select value={entries} onChange={handleEntriesChange} style={styles.select}>
+        <select
+          value={entries}
+          onChange={handleEntriesChange}
+          style={styles.select}
+        >
           <option value="5">5</option>
           <option value="10">10</option>
         </select>

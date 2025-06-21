@@ -11,7 +11,12 @@ export default function Sidebar({ role = "admin", username = "User" }) {
   return (
     <div className="sidebar-container">
       <div className="user-info">
-        <div className="avatar"></div>
+        <div className="avatar">
+          <img
+            src="/476159892_606573272129995_3942815568264271579_n.jpg"
+            alt="avt"
+          />
+        </div>
         <div className="user-details" onClick={() => navigate("/suathongtin")}>
           <div className="username">{username}</div>
           <div className="role-badge">{role.toUpperCase()}</div>
@@ -24,7 +29,9 @@ export default function Sidebar({ role = "admin", username = "User" }) {
       <div className="menu">
         {menuItems.map((item, index) => (
           <div
-            className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
+            className={`menu-item ${
+              location.pathname === item.path ? "active" : ""
+            }`}
             key={index}
             onClick={() => navigate(item.path)}
           >

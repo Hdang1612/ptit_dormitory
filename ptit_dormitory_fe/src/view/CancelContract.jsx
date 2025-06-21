@@ -95,6 +95,7 @@ function CancelContract() {
     }));
   };
 
+  // Hàm xử lý khi nhấn nút "Lưu"
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -145,14 +146,33 @@ function CancelContract() {
     }
   };
 
+  // Hàm xử lý khi nhấn nút "In đơn"
+  const handlePrintPreview = (e) => {
+    e.preventDefault();
+
+    // Kiểm tra validation trước khi hiển thị preview
+    if (
+      !formData.apply_date ||
+      !formData.expired_date ||
+      !formData.resonCancel
+    ) {
+      alert(
+        "Vui lòng điền đầy đủ thông tin bắt buộc (Ngày hủy, đến ngày, lý do hủy)"
+      );
+      return;
+    }
+
+    setShowPrintView(true);
+  };
+
   const handlePrint = () => {
     window.print();
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   setShowPrintView(true);
-  // };
+  const handleBack = () => {
+    setShowPrintView(false);
+  };
+
   const handleCancel = () => {
     navigate(`/thongtinhopdong/${id}`);
   };
@@ -550,7 +570,11 @@ function CancelContract() {
                 <button type="submit" className="submit-btn">
                   Lưu
                 </button>
-                <button type="submit" className="print-preview-btn">
+                <button
+                  type="button"
+                  className="print-preview-btn"
+                  onClick={handlePrintPreview}
+                >
                   In đơn
                 </button>
               </div>

@@ -22,8 +22,9 @@
 .avatar {
   width: 50px;
   height: 50px;
-  background: #a40000;
+  /* background: #a40000; */
   border-radius: 50%;
+  overflow: hidden;
 }
 
 .user-details {
@@ -92,9 +93,8 @@
 
 .menu-item::before {
   content: "";
-  width: 30px;
-  height: 30px;
-  background: white;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   margin-right: 10px;
 }

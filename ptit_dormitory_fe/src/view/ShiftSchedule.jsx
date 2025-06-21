@@ -92,7 +92,7 @@ const ShiftSchedule = () => {
 
   return (
     <div style={styles.container}>
-      <Sidebar role="nguoitruc" username="Nguyễn Thị B" />
+      <Sidebar role="admin" username="Nguyễn Thị B" />
       <div style={styles.content}>
         <h2 style={styles.title}>Sắp xếp ca trực</h2>
 

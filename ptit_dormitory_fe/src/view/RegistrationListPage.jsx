@@ -19,15 +19,15 @@ const RegistrationtListPage = () => {
     return contractIdMatch || applyDateMatch;
   });
 
-  const currentContracts = contracts; // Vì API đã trả đúng số hợp đồng theo trang
+  // const currentContracts = contracts; // Vì API đã trả đúng số hợp đồng theo trang
 
   const [totalPages, setTotalPages] = useState(1);
 
-  const paginate = (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
-    }
-  };
+  // const paginate = (pageNumber) => {
+  //   if (pageNumber >= 1 && pageNumber <= totalPages) {
+  //     setCurrentPage(pageNumber);
+  //   }
+  // };
   useEffect(() => {
     const fetchContractsByPage = async () => {
       const token = localStorage.getItem("token");
@@ -122,26 +122,79 @@ const RegistrationtListPage = () => {
           <div style={styles.pagination}>
             <button
               style={styles.pageBtn}
-              onClick={() => paginate(currentPage - 1)}
+              onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
             >
               Trước
             </button>
-            {[...Array(totalPages).keys()].map((number) => (
+
+            {/* Trang 1 */}
+            <button
+              style={{
+                ...styles.pageBtn,
+                ...(currentPage === 1 ? styles.pageBtnActive : {}),
+              }}
+              onClick={() => setCurrentPage(1)}
+            >
+              1
+            </button>
+
+            {/* Hiển thị "..." nếu cách xa trang 1 */}
+            {currentPage > 3 && <span style={styles.ellipsis}>...</span>}
+
+            {/* Trang trước current */}
+            {currentPage > 2 && currentPage < totalPages && (
               <button
-                key={number + 1}
+                style={styles.pageBtn}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                {currentPage - 1}
+              </button>
+            )}
+
+            {/* Trang hiện tại */}
+            {currentPage !== 1 && currentPage !== totalPages && (
+              <button
                 style={{
                   ...styles.pageBtn,
-                  ...(currentPage === number + 1 ? styles.pageBtnActive : {}),
+                  ...styles.pageBtnActive,
                 }}
-                onClick={() => paginate(number + 1)}
               >
-                {number + 1}
+                {currentPage}
               </button>
-            ))}
+            )}
+
+            {/* Trang sau current */}
+            {currentPage < totalPages - 1 && (
+              <button
+                style={styles.pageBtn}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                {currentPage + 1}
+              </button>
+            )}
+
+            {/* Hiển thị "..." nếu cách xa trang cuối */}
+            {currentPage < totalPages - 2 && (
+              <span style={styles.ellipsis}>...</span>
+            )}
+
+            {/* Trang cuối */}
+            {totalPages > 1 && (
+              <button
+                style={{
+                  ...styles.pageBtn,
+                  ...(currentPage === totalPages ? styles.pageBtnActive : {}),
+                }}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                {totalPages}
+              </button>
+            )}
+
             <button
               style={styles.pageBtn}
-              onClick={() => paginate(currentPage + 1)}
+              onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
               Sau

@@ -15,22 +15,20 @@ const TopRoomList = ({
   setSearch,
   pagination,
   setPagination,
-  handlePaginationChange
+  handlePaginationChange,
 }) => {
   const [dataFloor, setDataFloor] = useState([]);
   const handleFloorClick = async () => {
     const data = await getFloors(area);
     setDataFloor(data);
     console.log("floor data", data);
-    
-  }
+  };
 
   // Hàm xử lý sự thay đổi khu vực
   const handleAreaChange = (e) => {
     setFloor("");
     setArea(e.target.value);
     setParentId(e.target.value);
-    
   };
 
   // Hàm xử lý sự thay đổi tầng
@@ -74,14 +72,17 @@ const TopRoomList = ({
       currentPage: 1,
     }));
   };
-  
 
   return (
     <div style={styles.container}>
       {/* Chọn khu ký túc */}
       <div style={styles.selectWrapper}>
         <span>Khu ký túc</span>
-        <select value={area} onChange={handleAreaChange} style={styles.selectRed}>
+        <select
+          value={area}
+          onChange={handleAreaChange}
+          style={styles.selectRed}
+        >
           <option value="B1">B1</option>
           <option value="B2">B2</option>
           <option value="B5">B5</option>
@@ -91,18 +92,26 @@ const TopRoomList = ({
       {/* Chọn giới tính */}
       <div style={styles.selectWrapper}>
         <span>Giới tính</span>
-        <select value={gender} onChange={handleGenderChange} style={styles.selectRed}>
+        <select
+          value={gender}
+          onChange={handleGenderChange}
+          style={styles.selectRed}
+        >
           <option value="">Tất cả</option>
           <option value="X">Nam</option>
           <option value="Y">Nữ</option>
         </select>
       </div>
 
-      {/* Chọn trạng thái */}   
-      
+      {/* Chọn trạng thái */}
+
       <div style={styles.selectWrapper}>
         <span>Trạng thái</span>
-        <select value={status} onChange={handleStatusChange} style={styles.selectRed}>
+        <select
+          value={status}
+          onChange={handleStatusChange}
+          style={styles.selectRed}
+        >
           <option value="">Tất cả</option>
           <option value="notfull">Còn chỗ</option>
           <option value="full">Hết chỗ</option>
@@ -113,7 +122,12 @@ const TopRoomList = ({
       {/* Chọn tầng */}
       <div style={styles.selectWrapper}>
         <span>Tầng</span>
-        <select value={floor} onClick={handleFloorClick} onChange={handleFloorChange} style={styles.selectRed}>
+        <select
+          value={floor}
+          onClick={handleFloorClick}
+          onChange={handleFloorChange}
+          style={styles.selectRed}
+        >
           <option value="">Tất cả</option>
           {/* <option value="1">1</option>
           <option value="2">2</option>
@@ -139,13 +153,16 @@ const TopRoomList = ({
 
       <div style={styles.selectWrapper}>
         <span>Show</span>
-        <select value={pagination.limit} onChange={handleLimitChange} style={styles.select}>
+        <select
+          value={pagination.limit}
+          onChange={handleLimitChange}
+          style={styles.select}
+        >
           <option value={8}>8</option>
           <option value={12}>12</option>
           <option value={16}>16</option>
         </select>
       </div>
-
     </div>
   );
 };
@@ -188,7 +205,7 @@ const styles = {
   },
   selectRed: {
     marginLeft: "8px",
-    padding: "5px 0px",
+    padding: "5px 10px",
     border: "1px solid #ccc",
     borderRadius: "5px",
     cursor: "pointer",
